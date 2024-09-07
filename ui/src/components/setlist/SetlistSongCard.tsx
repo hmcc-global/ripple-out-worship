@@ -34,21 +34,36 @@ const SetlistSongCard = (props: SetlistSongCardProps) => {
 
   return (
     <Container
+      disableGutters
       sx={{
         borderRadius: '8px',
         border: 1,
         borderColor: '#49454F',
         backgroundColor: 'primary.darkest',
-        py: 2,
+        p: '1rem',
+        '&:hover': {
+          borderColor: 'secondary.main',
+          cursor: 'pointer',
+        },
+        transition: 'all 0.1s ease-in-out',
+        maxWidth: '100%',
       }}
     >
-      <Stack direction="row" display="flex" justifyContent="space-between">
+      <Stack
+        direction="row"
+        display="flex"
+        justifyContent="space-between"
+        minWidth={'100%'}
+        maxWidth={'100%'}
+        p={0}
+        mb="1rem"
+      >
         {/* song title and artist*/}
         <Stack>
-          <Typography variant="h2" color={'secondary.main'}>
+          <Typography variant="h4" color={'secondary.main'}>
             {title}
           </Typography>
-          <Typography variant="subtitle1" color={'secondary.main'}>
+          <Typography variant="subtitle2" color={'secondary.main'}>
             {artist}
           </Typography>
         </Stack>
@@ -76,38 +91,43 @@ const SetlistSongCard = (props: SetlistSongCardProps) => {
       </Stack>
 
       {/* song fields and tags */}
-      <Grid container spacing={2}>
+      <Stack
+        direction={isDesktop ? 'row' : 'column'}
+        maxWidth={'100%'}
+        flexWrap="wrap"
+        rowGap={'0.5rem'}
+      >
         {CardFields &&
           showDetails !== false &&
           CardFields.map((field, i) => {
             return (
-              <Grid item>
-                <Stack direction="row" alignItems="center" key={i} spacing={1}>
-                  {displayData[i] ? (
-                    <>
-                      {/* field key */}
-                      <Typography
-                        variant="body2"
-                        color="#9E9E9E"
-                        width={isDesktop ? '100%' : '40%'}
-                      >
-                        {field}
-                      </Typography>
-                      {/* render chip or string as value */}
-                      {Array.isArray(fieldData[i]) ? (
-                        <SongFieldArray data={fieldData[i]} />
-                      ) : (
-                        <Typography variant="body2" color={'#CCC2DC'}>
-                          {fieldData[i] ?? '-'}
-                        </Typography>
-                      )}
-                    </>
-                  ) : null}
+              displayData[i] && (
+                <Stack
+                  direction="row"
+                  display="flex"
+                  key={i}
+                  spacing={1}
+                  width="fit-content"
+                  maxWidth="100%"
+                  alignItems={'center'}
+                  justifyContent={'flex-start'}
+                  mr={isDesktop ? '1.25rem' : 1}
+                >
+                  <Typography variant="body2" color="#9E9E9E" minWidth={'fit-content'}>
+                    {field}
+                  </Typography>
+                  {Array.isArray(fieldData[i]) ? (
+                    <SongFieldArray data={fieldData[i]} />
+                  ) : (
+                    <Typography variant="body2" color={'#CCC2DC'} align="left" noWrap>
+                      {fieldData[i] ?? '-'}
+                    </Typography>
+                  )}
                 </Stack>
-              </Grid>
+              )
             );
           })}
-      </Grid>
+      </Stack>
     </Container>
   );
 };
