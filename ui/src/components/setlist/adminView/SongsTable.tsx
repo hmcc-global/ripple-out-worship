@@ -1,9 +1,8 @@
-import { SongSchema } from '../../../types/song.types';
+import { SongSetlistSchema } from '../../../types/song.types';
 import { Box, Divider, Grid, Typography, useTheme } from '@mui/material';
-import { FC } from 'react';
 
 type Props = {
-  songs: SongSchema[];
+  songs: SongSetlistSchema[];
 };
 
 const SongsTable = ({ songs }: Props) => {
@@ -58,7 +57,7 @@ const SongsTable = ({ songs }: Props) => {
                   height: '40px',
                 }}
               >
-                <Typography>{song.originalKey}</Typography>
+                <Typography>{song.key}</Typography>
               </Box>
             </Grid>
           </Grid>

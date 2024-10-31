@@ -36,6 +36,7 @@ import AutocompleteInput from '../custom/AutocompleteInput';
 import { useNavigate } from 'react-router-dom';
 import { MusicNote } from '@mui/icons-material';
 import PageHeader from '../navigation/PageHeader';
+import HeaderWithIcon from '../custom/HeaderWithIcon';
 
 const SongEditorContainer: FC<SongEditorProps> = () => {
   // hook to detect the window size
@@ -293,7 +294,7 @@ const SongEditorContainer: FC<SongEditorProps> = () => {
             }
           />
 
-          <Box my={2}>
+          <Box my={'24px'}>
             {/* Error message */}
             {invalidSong ? (
               <Typography variant={'body2'} color={'error'}>
@@ -320,14 +321,13 @@ const SongEditorContainer: FC<SongEditorProps> = () => {
               <Box width={'35vw'}>
                 <Stack direction="column" spacing={2}>
                   {/* header */}
-                  <Typography
-                    variant="h4"
-                    sx={{ display: 'flex', alignItems: 'center', color: 'secondary.main' }}
-                    gap={1}
-                  >
-                    <InfoIcon />
-                    Song Details
-                  </Typography>
+                  <HeaderWithIcon
+                    headerText={'Song Details'}
+                    headerVariant={'h4'}
+                    iconColor={'secondary.main'}
+                    headerColor={'secondary.main'}
+                    Icon={InfoIcon}
+                  />
 
                   {/* Song Title Field */}
                   <Controller
@@ -531,14 +531,13 @@ const SongEditorContainer: FC<SongEditorProps> = () => {
                     alignItems="center"
                     justifyContent="space-between"
                   >
-                    <Typography
-                      variant="h4"
-                      sx={{ display: 'flex', alignItems: 'center', color: 'secondary.main' }}
-                      gap={1}
-                    >
-                      <LibraryMusicIcon />
-                      Lyrics & Chords
-                    </Typography>
+                    <HeaderWithIcon
+                      headerText={'Lyrics & Chords'}
+                      headerVariant={'h4'}
+                      iconColor={'secondary.main'}
+                      headerColor={'secondary.main'}
+                      Icon={LibraryMusicIcon}
+                    />
                     <SongHelpDialog />
                   </Grid>
 
@@ -576,14 +575,13 @@ const SongEditorContainer: FC<SongEditorProps> = () => {
                     alignItems="center"
                     justifyContent="space-between"
                   >
-                    <Typography
-                      variant="h4"
-                      sx={{ display: 'flex', alignItems: 'center', color: 'secondary.main' }}
-                      gap={1}
-                    >
-                      <LibraryMusicIcon />
-                      Lyrics & Simplified Chords (Optional)
-                    </Typography>
+                    <HeaderWithIcon
+                      headerText={'Lyrics & Simplified Chords (Optional)'}
+                      headerVariant={'h4'}
+                      iconColor={'secondary.main'}
+                      headerColor={'secondary.main'}
+                      Icon={LibraryMusicIcon}
+                    />
                     <SongHelpDialog />
                   </Grid>
 

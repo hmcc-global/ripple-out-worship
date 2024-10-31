@@ -1,12 +1,11 @@
-import { Button, Box, Container, Modal, Stack, Typography } from '@mui/material';
-import { SongCardProps } from '../../types/song.types';
+import { Box, Container, Stack, Typography } from '@mui/material';
+import { SongCardProps, SongSchema } from '../../types/song.types';
 import { CardFields } from '../../constants';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import SongFieldArray from './SongFieldArray';
-import SongTagArray from './SongTagArray';
-import getLyricsPreview from '../../helpers/song/getLyricsPreview';
+import SongPreviewModal from '../utility/SongPreviewModal';
 
 const SongCard = (props: SongCardProps) => {
   const {
@@ -130,48 +129,17 @@ const SongCard = (props: SongCardProps) => {
             })}
         </Stack>
       </Container>
-      <Modal open={modalOpen} onClose={handleClose}>
-        <Stack
-          sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: 400,
-            bgcolor: '#2B2930',
-            borderRadius: '10px',
-            boxShadow: 2,
-            p: '1.5rem',
-          }}
-          spacing={1}
-        >
-          <Typography variant="h2">{title}</Typography>
-          <Typography variant="subtitle1" sx={{ color: 'secondary.light' }}>
-            {artist}
-          </Typography>
-          <Typography sx={{ color: 'secondary.light' }}>{getLyricsPreview(chordLyrics)}</Typography>
-          {Array.isArray(fieldData[0]) ? <SongTagArray data={fieldData[0]} /> : null}
-          <Stack direction="row" display="flex" justifyContent="right" spacing={2}>
-            <Button size="small" variant="text" onClick={handleClose}>
-              <Typography variant="body2" color="#CAC4D0" textTransform={'none'}>
-                Cancel
-              </Typography>
-            </Button>
-            <Button
-              size="medium"
-              variant="outlined"
-              onClick={() => navigate('/song/add')}
-              sx={{
-                borderColor: 'primary.light',
-              }}
-            >
-              <Typography variant="body2" color="#CAC4D0" textTransform={'none'}>
-                Add Song
-              </Typography>{' '}
-            </Button>
-          </Stack>
-        </Stack>
-      </Modal>
+      <SongPreviewModal
+        open={modalOpen}
+        onClose={handleClose}
+        songToPreview={
+          {
+            title,
+            artist,
+            chordLyrics,
+          } as SongSchema
+        }
+      />
     </>
   );
 };

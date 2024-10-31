@@ -1,5 +1,5 @@
 import { Setlist, SetlistFolder } from '../../types/setlist.types';
-import { ExpandLess, ExpandMore, Folder, KeyboardArrowDown, QueueMusic } from '@mui/icons-material';
+import { Add, ExpandLess, ExpandMore, Folder, QueueMusic } from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -138,11 +138,11 @@ const SetlistListContainer: FC = (): ReactElement => {
               },
               transition: 'all 0.1s ease-in-out',
             }}
-            endIcon={<KeyboardArrowDown />}
+            startIcon={<Add />}
             onClick={handleCreateClick}
           >
             <Typography variant="subtitle1" fontWeight={700}>
-              New Song
+              New Setlist
             </Typography>
           </Button>
         }

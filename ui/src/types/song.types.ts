@@ -110,3 +110,8 @@ export type SongSchema = {
   simplifiedChordLyrics: string;
   recommendedKeys: Array<string>;
 };
+
+export type SongSetlistSchema = SongSchema & {
+  key: string;
+  sequence: number;
+};
