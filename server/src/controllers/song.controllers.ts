@@ -62,6 +62,42 @@ const getSong: RequestHandler = async (req: Request, res: Response): Promise<voi
     }
   }
 };
+const searchSongs: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+  const { keyword, tempo, themes, page = 1, limit = 20 } = req.query;
+
+  const tempoArray = Array.isArray(tempo) ? tempo : [tempo].filter(Boolean);
+  const themesArray = Array.isArray(themes) ? themes : [themes].filter(Boolean);
+
+  const parsedPage = Math.max(1, Number(page)); // Ensure page is at least 1
+  const parsedLimit = Math.max(1, Math.min(100, Number(limit))); // Limit max limit for safety
+
+  try {
+    const query: any = {
+      isDeleted: false,
+    };
+
+    if (keyword) {
+      query.title = { $regex: keyword, $options: 'i' };
+    }
+    if (tempoArray.length > 0) {
+      query.tempo = { $in: tempoArray };
+    }
+    if (themesArray.length > 0) {
+      query.themes = { $in: themesArray };
+    }
+    const skip = (parsedPage - 1) * parsedLimit;
+    const data: SongDocument[] = await Song.find(query).skip(skip).limit(parsedLimit).exec();
+    const totalCount = await Song.countDocuments(query).exec();
+    res.status(200).json({
+      data,
+      totalCount,
+      currentPage: parsedPage,
+      totalPages: Math.ceil(totalCount / parsedLimit),
+    });
+  } catch (error: any) {
+    sendResponse(res, 500, error?.message);
+  }
+};
 
 const getSongView: RequestHandler = async (req: Request, res: Response): Promise<void> => {
   const { ...filter } = req.body;
@@ -124,4 +160,4 @@ const deleteSong: RequestHandler = async (req: Request, res: Response): Promise<
   }
 };
 
-export { createSong, getSong, getSongView, updateSong, deleteSong };
+export { createSong, getSong, getSongView, updateSong, deleteSong, searchSongs };
