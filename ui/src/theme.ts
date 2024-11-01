@@ -170,7 +170,7 @@ const customTheme = createTheme({
         },
         paper: {
           backgroundColor: '#1D1B20',
-          color: 'PRIMARY_LIGHTER',
+          color: PRIMARY_LIGHTER,
         },
         popupIndicator: {
           color: PRIMARY_LIGHTER,

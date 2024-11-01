@@ -113,7 +113,7 @@ const RegisterContainer: React.FC = () => {
           <form onSubmit={handleSubmit(handleRegister)}>
             <Stack spacing={formSpacing}>
               <Stack spacing={1}>
-                <Typography variant="subtitle1" color="secondary">
+                <Typography variant="subtitle1" color="secondary.light">
                   Full Name
                 </Typography>
                 <TextField
@@ -126,7 +126,7 @@ const RegisterContainer: React.FC = () => {
                 />
               </Stack>
               <Stack spacing={1}>
-                <Typography variant="subtitle1" color="secondary">
+                <Typography variant="subtitle1" color="secondary.light">
                   Email
                 </Typography>
                 <TextField
@@ -140,7 +140,7 @@ const RegisterContainer: React.FC = () => {
                 />
               </Stack>
               <Stack spacing={1}>
-                <Typography variant="subtitle1" color="secondary">
+                <Typography variant="subtitle1" color="secondary.light">
                   Password
                 </Typography>
                 <TextField
@@ -167,7 +167,7 @@ const RegisterContainer: React.FC = () => {
                 />
               </Stack>
               <Stack spacing={1}>
-                <Typography variant="subtitle1" color="secondary">
+                <Typography variant="subtitle1" color="secondary.light">
                   Confirm Password
                 </Typography>
                 <TextField
@@ -205,17 +205,18 @@ const RegisterContainer: React.FC = () => {
                 variant={'contained'}
                 fullWidth
               >
-                <Typography variant="subtitle1">Sign Up</Typography>
+                <Typography variant="subtitle1" sx={{ fontWeight: 700 }} color="primary">
+                  Sign Up
+                </Typography>
               </Button>
-              <Link
-                href="/login"
-                color="white"
-                underline={'hover'}
-                variant="button"
-                textAlign={'center'}
-              >
-                <Typography variant="subtitle1">Already have an account? Login</Typography>
-              </Link>
+              <Stack alignItems="center" justifyContent="center" direction="row" spacing={4}>
+                <Typography variant="subtitle1" color="white">
+                  Already have an account?
+                </Typography>{' '}
+                <Link href="/login" color="secondary" underline={'hover'} variant="button">
+                  <Typography variant="subtitle1">LOGIN</Typography>
+                </Link>
+              </Stack>
             </Stack>
           </form>
         </Stack>
