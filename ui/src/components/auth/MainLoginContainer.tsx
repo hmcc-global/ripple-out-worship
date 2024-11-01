@@ -36,7 +36,7 @@ const MainLoginContainer: React.FC = () => {
       }}
     >
       <Stack
-        direction={['column', 'row']}
+        direction={['column', 'column', 'row', 'row']}
         width="100%"
         maxWidth="1280px"
         spacing={2}

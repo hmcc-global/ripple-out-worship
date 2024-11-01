@@ -19,7 +19,8 @@ const PRIMARY_DARKEST = '#141218';
 const SECONDARY_MAIN = '#D0BCFE';
 const SECONDARY_LIGHT = '#EADDFF'; // grey
 const SECONDARY_LIGHTER = '#4A4458'; // purple grey
-const SECONDARY_DARK = '#332D41'; // dark grey
+const SECONDARY_DARK = '#EADDFF'; // grey, same as SECONDARY_LIGHT
+// const SECONDARY_DARK = '#332D41'; // previous secondary dark, causes buttons to be colored similar to BG when hovered
 
 const WARNING_MAIN = '#EFB8C8';
 
@@ -169,7 +170,7 @@ const customTheme = createTheme({
         },
         paper: {
           backgroundColor: '#1D1B20',
-          color: 'PRIMARY_LIGHTER',
+          color: PRIMARY_LIGHTER,
         },
         popupIndicator: {
           color: PRIMARY_LIGHTER,
