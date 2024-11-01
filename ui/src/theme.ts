@@ -2,6 +2,8 @@ import { createTheme, PaletteOptions, SimplePaletteColorOptions } from '@mui/mat
 import '@fontsource/work-sans';
 import '@fontsource/dm-sans';
 import '@mui/material/styles';
+import { createBreakpoints, fontWeight } from '@mui/system';
+const breakpoints = createBreakpoints({});
 
 // const PRIMARY_MAIN = '#4B50B4';
 const PRIMARY_MAIN = '#4F378B';
@@ -76,6 +78,12 @@ const customTheme = createTheme({
     h1: {
       fontSize: '2rem', // Equivalent to 32px (16 * 2)
       fontWeight: 700,
+      [breakpoints.up('lg')]: {
+        fontSize: '2.5rem',
+      },
+      [breakpoints.down('sm')]: {
+        fontSize: '1.5rem',
+      },
     },
     h2: {
       fontSize: '1.5rem', // Equivalent to 24px (16 * 1.5)
@@ -104,10 +112,16 @@ const customTheme = createTheme({
     body1: {
       fontSize: '1rem', // Equivalent to 16px (16 * 1)
       fontWeight: 400,
+      [breakpoints.down('sm')]: {
+        fontSize: '0.875rem',
+      },
     },
     body2: {
       fontSize: '0.875rem', // Equivalent to 14px (16 * 0.875)
       fontWeight: 400,
+      [breakpoints.down('sm')]: {
+        fontSize: '0.8rem',
+      },
     },
     caption: {
       fontSize: '0.6875rem', // Equivalent to 11px (16 * 0.0.6875)
@@ -116,6 +130,7 @@ const customTheme = createTheme({
     button: {
       fontSize: '0.875rem', // Equivalent to 14px (16 * 0.875)
       fontWeight: 600,
+      textTransform: 'none',
     },
   },
   components: {
@@ -124,7 +139,7 @@ const customTheme = createTheme({
         root: {
           color: PRIMARY_LIGHTER,
           '&.Mui-focused': {
-            color: 'PRIMARY_LIGHTER',
+            color: PRIMARY_LIGHTER,
           },
         },
       },
@@ -132,6 +147,8 @@ const customTheme = createTheme({
     MuiInputBase: {
       styleOverrides: {
         root: {
+          fontWeight: 500,
+          color: PRIMARY_LIGHTER,
           background: '#1D1B20',
           border: '1px solid {theme.palette.primary.main}',
           '& .MuiOutlinedInput-notchedOutline': {
@@ -152,7 +169,7 @@ const customTheme = createTheme({
         },
         paper: {
           backgroundColor: '#1D1B20',
-          color: PRIMARY_LIGHTER,
+          color: 'PRIMARY_LIGHTER',
         },
         popupIndicator: {
           color: PRIMARY_LIGHTER,
