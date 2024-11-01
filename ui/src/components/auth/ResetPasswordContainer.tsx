@@ -102,12 +102,10 @@ const ResetPasswordContainer: React.FC = () => {
   return (
     <>
       <Box
-        style={{
-          background: theme.palette.primary.darker,
-          borderRadius: '30px',
-          padding: '32px 24px',
-        }}
         sx={{
+          background: theme.palette.primary.darker,
+          borderRadius: ['15px', '30px'],
+          padding: '32px 24px',
           width: { xs: '100%', md: '50%' },
         }}
       >
@@ -123,8 +121,8 @@ const ResetPasswordContainer: React.FC = () => {
           <form onSubmit={handleSubmit(handleResetPassword)}>
             <Stack spacing={formSpacing}>
               <Stack spacing={1}>
+                <Typography variant="subtitle1">Password</Typography>
                 <TextField
-                  label="Password"
                   type="password"
                   {...register('password', {
                     required: 'Required',
@@ -135,8 +133,8 @@ const ResetPasswordContainer: React.FC = () => {
                 />
               </Stack>
               <Stack spacing={1}>
+                <Typography variant="subtitle1">Confirm Password</Typography>
                 <TextField
-                  label="Confirm Password"
                   type="password"
                   {...register('confirmPassword', {
                     required: 'Required',
@@ -153,7 +151,7 @@ const ResetPasswordContainer: React.FC = () => {
                 variant={'contained'}
                 fullWidth
               >
-                RESET PASSWORD
+                <Typography variant="subtitle1">Reset Password</Typography>
               </Button>
             </Stack>
           </form>
