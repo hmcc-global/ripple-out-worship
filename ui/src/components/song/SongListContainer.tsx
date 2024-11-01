@@ -18,6 +18,7 @@ import PageHeader from '../navigation/PageHeader';
 import { getFirstLineLyrics } from '../../helpers/song';
 import axios from 'axios';
 import { useSongs, useUser } from '../../helpers/customHooks';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const SongListContainer: FC = (): ReactElement => {
   const { user } = useUser();
@@ -36,7 +37,7 @@ const SongListContainer: FC = (): ReactElement => {
   const handleClose = () => setOpen(false);
   const allSongs = useSongs() as SongSchema[];
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const handleScroll = () => {
     const searchDisplayBox = document.getElementById('search-display');
@@ -64,7 +65,6 @@ const SongListContainer: FC = (): ReactElement => {
 
   const getSongResults = useCallback(async () => {
     if (filterData) {
-      setLoading(true);
       try {
         const payload = await axios.get('/api/songs/search', {
           params: {
@@ -97,6 +97,7 @@ const SongListContainer: FC = (): ReactElement => {
   }, [filterData, page]);
 
   useEffect(() => {
+    setLoading(true);
     setSongResults([]);
     setPage(1);
 
@@ -131,7 +132,6 @@ const SongListContainer: FC = (): ReactElement => {
   }, [location.search]);
 
   const modalSearchStyle = {
-    position: 'absolute',
     width: '100vw',
     height: '100vh',
     bgcolor: 'background.paper',
@@ -148,7 +148,6 @@ const SongListContainer: FC = (): ReactElement => {
           py: '1rem',
           px: '1.5rem',
           maxHeight: '100vh',
-          height: '100%',
           minWidth: '100%',
           overflow: 'hidden',
         }}
@@ -161,6 +160,7 @@ const SongListContainer: FC = (): ReactElement => {
               variant="outlined"
               disabled={user?.accessType !== 'admin'}
               sx={{
+                display: user?.accessType !== 'admin' ? 'none' : 'flex',
                 border: 0,
                 padding: '10px 25px',
                 borderRadius: '40px',
@@ -183,8 +183,14 @@ const SongListContainer: FC = (): ReactElement => {
           }
         />
         <Box display={{ base: 'block', md: 'none' }}></Box>
-        <Stack direction="row" maxWidth="100%" height="90vh" width="100%" gap={'1%'}>
-          <Box display={isDesktop ? 'flex' : 'none'}>
+        <Stack
+          direction={{ base: 'column', md: 'row' }}
+          maxWidth="100%"
+          height="90vh"
+          width="100%"
+          gap={'1%'}
+        >
+          <Box>
             <SongSearch
               filterData={filterData}
               setFilterData={setFilterData}
@@ -228,19 +234,21 @@ const SongListContainer: FC = (): ReactElement => {
                 maxWidth="100%"
                 id="search-display"
               >
-                {songResults.length > 0 ? (
-                  songResults.map((song, i) => {
-                    return (
-                      <SongCard
-                        key={i}
-                        {...song}
-                        showDetails={showDetails}
-                        filterData={filterData}
-                        isDesktop={isDesktop}
-                        firstLine={getFirstLineLyrics(song.chordLyrics)}
-                      />
-                    );
-                  })
+                {loading && songResults.length == 0 ? (
+                  <Stack height="80%" justifyContent="center" alignItems="center" width={'400'}>
+                    <CircularProgress />
+                  </Stack>
+                ) : songResults.length > 0 ? (
+                  songResults.map((song, i) => (
+                    <SongCard
+                      key={i}
+                      {...song}
+                      showDetails={showDetails}
+                      filterData={filterData}
+                      isDesktop={isDesktop}
+                      firstLine={getFirstLineLyrics(song.chordLyrics)}
+                    />
+                  ))
                 ) : (
                   <Stack height="80%" display="flex" justifyContent="center" alignItems="center">
                     <Typography variant="h2" color="primary.main">
