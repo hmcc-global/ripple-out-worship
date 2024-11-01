@@ -52,12 +52,12 @@ const MainLoginContainer: React.FC = () => {
             width: { xs: '100%', md: '50%' },
           }}
         >
-          <Typography variant="h1" sx={{ pb: 2, textAlign: ['center', 'center', 'left'] }}>
+          <Typography variant="h1" sx={{ pb: 2, textAlign: ['center', 'left'] }}>
             Welcome to
             <br />
             Ripple Worship
           </Typography>
-          <Typography variant="body1" textAlign={['center', 'center', 'left']}>
+          <Typography variant="body1" textAlign={['center', 'left']}>
             Harvest Mission Community Church
           </Typography>
         </Box>
