@@ -97,13 +97,11 @@ const RegisterContainer: React.FC = () => {
   return (
     <>
       <Box
-        style={{
+        sx={{
           background: theme.palette.primary.darker,
+          width: { xs: '100%', md: '50%' },
           borderRadius: '30px',
           padding: '32px 24px',
-        }}
-        sx={{
-          width: { xs: '100%', md: '50%' },
         }}
       >
         <Stack direction={'column'} margin={'auto'} spacing={formSpacing}>
@@ -115,8 +113,10 @@ const RegisterContainer: React.FC = () => {
           <form onSubmit={handleSubmit(handleRegister)}>
             <Stack spacing={formSpacing}>
               <Stack spacing={1}>
+                <Typography variant="subtitle1" color="secondary.light">
+                  Full Name
+                </Typography>
                 <TextField
-                  label="Full Name"
                   fullWidth
                   {...register('fullName', {
                     required: 'Required',
@@ -126,8 +126,10 @@ const RegisterContainer: React.FC = () => {
                 />
               </Stack>
               <Stack spacing={1}>
+                <Typography variant="subtitle1" color="secondary.light">
+                  Email
+                </Typography>
                 <TextField
-                  label="Email"
                   fullWidth
                   autoComplete={'email'}
                   {...register('email', {
@@ -138,8 +140,10 @@ const RegisterContainer: React.FC = () => {
                 />
               </Stack>
               <Stack spacing={1}>
+                <Typography variant="subtitle1" color="secondary.light">
+                  Password
+                </Typography>
                 <TextField
-                  label="Password"
                   type={showPassword ? 'text' : 'password'}
                   {...register('password', {
                     required: 'Required',
@@ -163,8 +167,10 @@ const RegisterContainer: React.FC = () => {
                 />
               </Stack>
               <Stack spacing={1}>
+                <Typography variant="subtitle1" color="secondary.light">
+                  Confirm Password
+                </Typography>
                 <TextField
-                  label="Confirm Password"
                   type={showConfirmPassword ? 'text' : 'password'}
                   {...register('confirmPassword', {
                     required: 'Required',
@@ -199,17 +205,18 @@ const RegisterContainer: React.FC = () => {
                 variant={'contained'}
                 fullWidth
               >
-                Sign Up
+                <Typography variant="subtitle1" sx={{ fontWeight: 700 }} color="primary">
+                  Sign Up
+                </Typography>
               </Button>
-              <Link
-                href="/login"
-                color="white"
-                underline={'hover'}
-                variant="button"
-                textAlign={'center'}
-              >
-                Already have an account? Login
-              </Link>
+              <Stack alignItems="center" justifyContent="center" direction="row" spacing={4}>
+                <Typography variant="subtitle1" color="white">
+                  Already have an account?
+                </Typography>{' '}
+                <Link href="/login" color="secondary" underline={'hover'} variant="button">
+                  <Typography variant="subtitle1">LOGIN</Typography>
+                </Link>
+              </Stack>
             </Stack>
           </form>
         </Stack>

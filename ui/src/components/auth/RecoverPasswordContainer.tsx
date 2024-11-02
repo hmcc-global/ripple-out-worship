@@ -69,12 +69,10 @@ const RecoverPasswordContainer: React.FC = () => {
   return (
     <>
       <Box
-        style={{
-          background: theme.palette.primary.darker,
-          borderRadius: '30px',
-          padding: '32px 24px',
-        }}
         sx={{
+          background: theme.palette.primary.darker,
+          borderRadius: ['15px', '30px'],
+          padding: '32px 24px',
           width: { xs: '100%', md: '50%' },
         }}
       >
@@ -85,7 +83,7 @@ const RecoverPasswordContainer: React.FC = () => {
           to="/"
           color="primary"
           sx={{ textDecoration: 'none' }}
-          marginBottom={'2.5rem'}
+          marginBottom={['0.75rem', '1.5rem']}
         >
           <ArrowBackRounded style={{ color: theme.palette.text.primary }} />
           <Typography variant="body1" color={'text'} marginLeft={1}>
@@ -101,8 +99,8 @@ const RecoverPasswordContainer: React.FC = () => {
           <form onSubmit={handleSubmit(handleRecoverPassword)}>
             <Stack spacing={formSpacing}>
               <Stack spacing={1}>
+                <Typography variant="subtitle1">Email</Typography>
                 <TextField
-                  label="Email"
                   {...register('email', {
                     required: 'Required',
                   })}
@@ -122,7 +120,7 @@ const RecoverPasswordContainer: React.FC = () => {
                 variant={'contained'}
                 fullWidth
               >
-                SEND RECOVERY LINK
+                <Typography variant="subtitle1">Send Recovery Link</Typography>
               </Button>
             </Stack>
           </form>
