@@ -1,10 +1,11 @@
 import { UserEditorFields } from './user.types';
-import { SongSearchFilter, SongSchema } from './song.types';
+import { SongSearchFilter, SongSetlistSchema } from './song.types';
+import { Dayjs } from 'dayjs';
 
 interface SetlistEditorFields {
   name: string;
-  date: Date;
-  songs: string[];
+  date: Dayjs;
+  songs: SongSetlistSchema[];
   groupIds: string[];
 }
 
@@ -38,7 +39,7 @@ export type Setlist = {
   _id: string;
   name: string;
   date: Date | string;
-  songs: SongSchema[];
+  songs: SongSetlistSchema[];
   sharedUserIds: string[];
   groupIds: string[];
   publicLink: string;
