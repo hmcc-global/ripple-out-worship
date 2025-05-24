@@ -19,7 +19,8 @@ app.use(cors());
 app.use(express.json());
 app.use('/api', getRoutes());
 if (!isDevelopment) {
-  app.use(express.static(path.join(__dirname, '../client')));
+  // app.use(express.static(path.join(__dirname, '../client')));
+  app.use(express.static('client'));
 }
 
 // Starts the server after connecting to the database
