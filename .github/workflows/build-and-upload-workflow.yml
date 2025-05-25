@@ -34,7 +34,7 @@ jobs:
           cd server && yarn install
       - name: "Install Dependencies in ui/ folder"
         run: |
-         cd ui && yarn install
+          cd ui && yarn install
       - name: "Create ui/ .env"
         run: |
           echo "${{ secrets.UI_ENV }}" > ui/.env
@@ -56,7 +56,7 @@ jobs:
         run: |
           zip release.zip ./* -r -q
       - name: "Upload build artifact"
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: my_artifact
           path: release.zip
@@ -70,5 +70,5 @@ jobs:
             -X POST \
             -H "Accept: application/vnd.github.everest-preview+json" \
             -H "Authorization: Bearer ${{ secrets.AUTH_TOKEN }}" \
-            https://api.github.com/repos/hmcc-global/psalted-2/actions/workflows/deploy-and-delete-workflow.yml/dispatches \
+            https://api.github.com/repos/hmcc-global/ripple-out-worship/actions/workflows/deploy-and-delete-workflow.yml/dispatches \
             -d '{"ref":"${{ github.ref_name }}", "inputs": {"runId": "${{ github.run_id }}", "env": "${{ github.event.inputs.deploy_env }}"}}'
