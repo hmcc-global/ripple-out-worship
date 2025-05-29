@@ -39,7 +39,7 @@ const SongSearchResult = forwardRef<HTMLDivElement, SongSearchResultProps>((prop
         '&:hover, &:focus': {
           backgroundColor: '#6750A4',
         },
-        backgroundColor: isFocused ? '#6750A4' : '#2B2930',
+        backgroundColor: isFocused ? '#6750A4' : '#211F26',
         cursor: 'pointer',
         outline: 'none',
       }}

@@ -249,12 +249,13 @@ const GlobalSearchModal = (props: GlobalSearchModalProps) => {
         <Box
           sx={{
             position: 'fixed',
-            top: '22.5vh',
-            left: '30vw',
-            backgroundColor: '#2B2930',
+            top: ['0vh', '22.5vh'],
+            height: { xs: 'calc(100vh - 80px)', md: 'auto' },
+            left: ['0vw', '30vw'],
+            backgroundColor: '#171717',
             borderRadius: '10px',
             p: '1rem',
-            width: '40%',
+            width: ['100%', '40%'],
           }}
           onKeyDown={handleKeyDown}
         >
@@ -263,9 +264,18 @@ const GlobalSearchModal = (props: GlobalSearchModalProps) => {
               display: 'flex',
               flexDirection: 'column',
               gap: '1rem',
+              border: '1px solid #6750A4',
+              borderRadius: '15px',
+              backgroundColor: '#211F26',
+              padding: '1rem',
             }}
           >
-            <Box sx={{ display: 'flex', gap: '8px' }}>
+            <Box
+              sx={{
+                display: 'flex',
+                gap: '8px',
+              }}
+            >
               {radioFilters.map((value) => (
                 <RadioCard
                   key={value}
@@ -276,16 +286,24 @@ const GlobalSearchModal = (props: GlobalSearchModalProps) => {
                 </RadioCard>
               ))}
             </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                width: '100%',
+                backgroundColor: '#211F26',
+              }}
+            >
               <TextField
                 variant="standard"
                 size="medium"
-                placeholder="Browse keywords"
+                placeholder="Search songs keywords"
                 InputProps={{
                   style: {
+                    fontFamily: 'DM Sans, sans-serif',
                     fontSize: '1rem',
                     color: '#CAC4D0',
-                    background: '#2B2930',
+                    background: '#211F26',
                   },
                   disableUnderline: true,
                   startAdornment: (
@@ -303,9 +321,9 @@ const GlobalSearchModal = (props: GlobalSearchModalProps) => {
                 sx={{
                   flexGrow: 1,
                   '& .MuiInputBase-root': {
-                    color: 'black',
+                    color: '#211F26',
                     '&::placeholder': {
-                      color: 'gray.8',
+                      color: '#211F26',
                     },
                   },
                 }}
@@ -328,7 +346,9 @@ const GlobalSearchModal = (props: GlobalSearchModalProps) => {
               }}
             >
               {loading ? (
-                <Box sx={{ fontSize: '1rem', color: 'black', p: 2 }}>Loading...</Box>
+                <Box sx={{ fontSize: '1rem', color: 'black', p: 2, backgroundColor: '#211F26' }}>
+                  Loading...
+                </Box>
               ) : (
                 renderResults()
               )}
