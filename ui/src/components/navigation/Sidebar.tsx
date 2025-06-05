@@ -148,6 +148,10 @@ const SideBar: FC = (): ReactElement => {
                 );
               }
 
+              if (!isMobile && item.text === 'Profile') {
+                return null;
+              }
+
               // Normal menu item
               return (
                 <ListItem key={index} disablePadding>
