@@ -165,6 +165,7 @@ const SideBar: FC = (): ReactElement => {
                   >
                     <ListItemIcon
                       sx={{
+                        minWidth: 0,
                         color: 'primary.lighter',
                         backgroundColor: selectedItem === item.text ? 'primary.main' : '',
                         borderRadius: '100px',
