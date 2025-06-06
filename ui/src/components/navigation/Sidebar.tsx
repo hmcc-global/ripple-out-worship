@@ -80,6 +80,16 @@ const SideBar: FC = (): ReactElement => {
 
   const profileMenuItem = { icon: <Person />, text: 'Profile', path: 'profile' };
 
+  const mobileMenuItems = [
+    { icon: <Language />, text: 'Home', path: '' },
+    { icon: <MusicNoteIcon />, text: 'Songs', path: 'song' },
+    { icon: <SearchIcon />, text: 'Search', path: '' }, // Open modal
+    { icon: <QueueMusicIcon />, text: 'Setlists', path: 'setlist' },
+    { icon: <Person />, text: 'Profile', path: 'profile' },
+  ];
+
+  const menuItems = isMobile ? mobileMenuItems : topMenuItems;
+
   const handleClick = (text: string, path: string) => {
     setSelectedItem(text);
     navigate(`/${path}`);
@@ -127,9 +137,23 @@ const SideBar: FC = (): ReactElement => {
               flex: '1',
             }}
           >
-            {/* Render the top menu items */}
-            {topMenuItems.map((item, index) =>
-              item.text === 'Profile' && isDesktop ? null : (
+            {menuItems.map((item, index) => {
+              if (isMobile && item.text === 'Search') {
+                return (
+                  <ListItem key={index} disablePadding sx={{ justifyContent: 'center', flex: 1 }}>
+                    <SearchButtonBox onClick={handleSearchClick}>
+                      <SearchIcon sx={{ color: '#D0BCFE', width: '1.75rem', height: '1.75rem' }} />
+                    </SearchButtonBox>
+                  </ListItem>
+                );
+              }
+
+              if (!isMobile && item.text === 'Profile') {
+                return null;
+              }
+
+              // Normal menu item
+              return (
                 <ListItem key={index} disablePadding>
                   <ListItemButton
                     selected={selectedItem === item.text}
@@ -145,6 +169,7 @@ const SideBar: FC = (): ReactElement => {
                   >
                     <ListItemIcon
                       sx={{
+                        minWidth: 0,
                         color: 'primary.lighter',
                         backgroundColor: selectedItem === item.text ? 'primary.main' : '',
                         borderRadius: '100px',
@@ -155,7 +180,6 @@ const SideBar: FC = (): ReactElement => {
                     >
                       {item.icon}
                     </ListItemIcon>
-
                     <ListItemText
                       primaryTypographyProps={{
                         sx: { color: 'primary.lighter' },
@@ -166,9 +190,10 @@ const SideBar: FC = (): ReactElement => {
                     />
                   </ListItemButton>
                 </ListItem>
-              )
-            )}
+              );
+            })}
           </List>
+
           <List
             sx={{
               display: isMobile ? 'none' : 'flex',

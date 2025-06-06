@@ -19,7 +19,7 @@ const RecommendedSongCard: FC<RecommendedSongCardProps> = ({
         border: 1,
         borderColor: '#49454F',
         p: 3,
-        width: '38%',
+        width: ['100%', '38%'],
         '&:hover': {
           cursor: 'pointer',
           backgroundColor: '#1E1B26',
