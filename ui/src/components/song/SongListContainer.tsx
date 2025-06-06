@@ -153,6 +153,43 @@ const SongListContainer: FC = (): ReactElement => {
           overflow: 'hidden',
         }}
       >
+        <Button
+          variant="outlined"
+          disabled={user?.accessType !== 'admin'}
+          sx={{
+            zIndex: 9,
+            display: {
+              xs: 'flex',
+              sm: 'none',
+            },
+            position: 'fixed',
+            bottom: '90px',
+            right: '40px',
+            border: 0,
+            padding: '5px 10px',
+            borderRadius: '40px',
+            backgroundColor: '#D0BCFF',
+            color: '#381E72',
+            textTransform: 'none',
+            '&:hover': {
+              backgroundColor: '#D0BCFF',
+              opacity: '0.95',
+            },
+            transition: 'all 0.1s ease-in-out',
+          }}
+          startIcon={<Add />}
+          onClick={() => navigate('/song/add')}
+        >
+          <Typography
+            variant="subtitle1"
+            fontWeight={700}
+            sx={{
+              fontSize: '1rem',
+            }}
+          >
+            New Song
+          </Typography>
+        </Button>
         <PageHeader
           title="Songs"
           icon={<MusicNote />}
