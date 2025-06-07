@@ -23,6 +23,7 @@ import { useDispatch } from 'react-redux';
 import { refetchUser, signout } from '../../reducers/userSlice';
 import LockIcon from '@mui/icons-material/Lock';
 import DeleteIcon from '@mui/icons-material/Delete';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 const RowStack = styled(Stack)({
   display: 'flex',
@@ -108,8 +109,18 @@ const ProfileDesktopView: FC = (): ReactElement => {
 
   return (
     <Container
-      maxWidth="md"
-      sx={{ py: '1rem', px: '1.5rem', ml: '0', height: '100%', overflow: 'auto' }}
+      maxWidth={false}
+      sx={{
+        py: '1rem',
+        px: '1.5rem',
+        ml: '0',
+        height: '100%',
+        overflow: 'auto',
+        maxWidth: {
+          xs: '100%', // mobile
+          md: '45%',
+        },
+      }}
     >
       <Box
         sx={{
@@ -147,66 +158,115 @@ const ProfileDesktopView: FC = (): ReactElement => {
               </Typography>
             </Button>
           </RowStack>
-          <RowStack>
+          <Box>
+            <Typography
+              sx={{
+                marginBottom: '6px',
+                fontSize: '1rem',
+                color: '#EADDFF',
+                fontWeight: '400',
+              }}
+            >
+              Full Name
+            </Typography>
             <DisabledTextField
               fullWidth
               disabled
               id="outlined-name"
-              label="Name"
               variant="outlined"
               value={user?.fullName}
               {...register('fullName', { required: true })}
+              sx={{ width: '75%' }}
             />
-          </RowStack>
-          <DisabledTextField
-            fullWidth
-            disabled
-            id="outlined-email"
-            label="Email"
-            value={user?.email}
-            {...register('email', { required: true })}
-            style={{ marginBottom: '16px' }}
-          />
-          <Divider style={{ borderColor: theme.palette.secondary.dark, marginBottom: '16px' }} />
-          <Box display="flex" flexDirection="column" alignItems="flex-start" gap="16px">
-            <Button
-              variant="contained"
-              color="primary"
-              startIcon={<PersonIcon />}
-              onClick={() => dispatch(signout(''))}
-              style={{ borderRadius: '20px' }}
+          </Box>
+          <Box>
+            <Typography
+              sx={{
+                marginBottom: '6px',
+                fontSize: '1rem',
+                color: '#EADDFF',
+                fontWeight: '400',
+              }}
             >
-              <Typography color="inherit" variant="h5">
-                Log out
-              </Typography>
-            </Button>
+              Email
+            </Typography>
+            <DisabledTextField
+              fullWidth
+              disabled
+              id="outlined-email"
+              value={user?.email}
+              {...register('email', { required: true })}
+              style={{ marginBottom: '16px' }}
+              sx={{ width: '75%' }}
+            />
+          </Box>
+          <Box display="flex" flexDirection="column" alignItems="flex-start" gap="24px">
             <Button
               variant="contained"
               color="secondary"
               startIcon={<LockIcon />}
               onClick={changePassHandler}
               style={{
+                padding: '8px 16px',
                 borderRadius: '20px',
                 display: user?.password === '' ? 'none' : 'inline-flex',
               }}
               disabled={user?.password === ''}
             >
-              <Typography color="inherit" variant="h5">
+              <Typography
+                color="inherit"
+                variant="h6"
+                sx={{
+                  color: ' #381E72',
+                  fontSize: '1rem',
+                  fontWeight: 700,
+                }}
+              >
                 {user?.password === '' ? 'Google Login cannot change password' : 'Change Password'}
               </Typography>
             </Button>
             <Button
+              variant="contained"
+              color="secondary"
+              startIcon={<LogoutIcon />}
+              onClick={() => dispatch(signout(''))}
+              style={{ borderRadius: '20px', padding: '8px 16px' }}
+            >
+              <Typography
+                color="inherit"
+                sx={{
+                  color: ' #381E72',
+                  fontSize: '1rem',
+                  fontWeight: 700,
+                }}
+              >
+                Log out
+              </Typography>
+            </Button>
+            <Divider
+              flexItem
+              sx={{ borderBottomWidth: '0.5px' }}
+              style={{ borderColor: theme.palette.secondary.dark, marginBottom: '8px' }}
+            />
+            <Button
               startIcon={<DeleteIcon />}
               variant="contained"
               color="warning"
-              style={{ borderRadius: '20px' }}
+              style={{ borderRadius: '20px', padding: '8px 16px' }}
             >
-              <Typography color="inherit" variant="h5">
+              <Typography
+                sx={{
+                  color: ' #601410',
+                  fontSize: '1rem',
+                  fontWeight: 700,
+                }}
+              >
                 Delete Account (Coming Soon)
               </Typography>
             </Button>
           </Box>
         </Stack>
+
         <EditModal
           onSubmit={handleEditUserInformation}
           register={register}
