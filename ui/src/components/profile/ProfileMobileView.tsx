@@ -24,6 +24,10 @@ import LockIcon from '@mui/icons-material/Lock';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useTheme } from '@mui/material/styles';
 import LogoutIcon from '@mui/icons-material/Logout';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+import CheckIcon from '@mui/icons-material/Check';
+import CloseIcon from '@mui/icons-material/Close';
 
 const RowStack = styled(Stack)({
   display: 'flex',
@@ -39,6 +43,13 @@ const ProfileMobileView: FC = (): ReactElement => {
   const [showEditProfile, setShowEditProfile] = useState<boolean>(false);
   const [showChangePassword, setShowChangePassword] = useState<boolean>(false);
   const theme = useTheme();
+  const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
+  const [snackbarMessage, setSnackbarMessage] = useState<String>('');
+  const [snackbarStatus, setSnackbarStatus] = useState<'success' | 'error'>('success');
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
 
   const handleEditUserInformation = async (data: UserEditorFields) => {
     data._id = user?._id || '';
@@ -49,8 +60,14 @@ const ProfileMobileView: FC = (): ReactElement => {
       });
       if (status === 200) {
         dispatch(refetchUser({ token, _doc: updated }));
+        setSnackbarStatus('success');
+        setSnackbarMessage('User information updated successfully!');
+        setSnackbarOpen(true);
       }
     } catch (e) {
+      setSnackbarStatus('error');
+      setSnackbarMessage('Failed to update user information.');
+      setSnackbarOpen(true);
       console.log(e);
     }
   };
@@ -65,8 +82,14 @@ const ProfileMobileView: FC = (): ReactElement => {
       });
       if (status === 200) {
         dispatch(refetchUser({ token, _doc: updated }));
+        setSnackbarStatus('success');
+        setSnackbarMessage('Password changed successfully!');
+        setSnackbarOpen(true);
       }
     } catch (e) {
+      setSnackbarStatus('error');
+      setSnackbarMessage('Failed to change password.');
+      setSnackbarOpen(true);
       console.log(e);
     }
   };
@@ -263,6 +286,36 @@ const ProfileMobileView: FC = (): ReactElement => {
           register={register}
         />
       </Box>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <MuiAlert
+          elevation={0}
+          variant="filled"
+          icon={
+            snackbarStatus === 'error' ? (
+              <CloseIcon sx={{ fontSize: 20, color: '#fff', mr: 1 }} />
+            ) : (
+              <CheckIcon sx={{ fontSize: 20, color: '#fff', mr: 1 }} />
+            )
+          }
+          sx={{
+            fontFamily: 'DM Sans, sans-serif',
+            background: '#36333b',
+            color: '#EADDFF',
+            borderRadius: 3,
+            fontWeight: 400,
+            fontSize: '1rem',
+            alignItems: 'center',
+            '.MuiAlert-icon': { marginRight: 1 },
+          }}
+        >
+          {snackbarMessage}
+        </MuiAlert>
+      </Snackbar>
     </Container>
   );
 };
