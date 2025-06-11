@@ -12,6 +12,7 @@ import { SongSearchProps } from '../../types/song.types';
 import { useState, useEffect } from 'react';
 import { tempoOptions, themeOptions, displayResultOptions } from '../../constants';
 import { ArrowDropDown, Info, Refresh, Tune } from '@mui/icons-material';
+import SearchIcon from '@mui/icons-material/Search';
 import TuneIcon from '@mui/icons-material/Tune';
 import HeaderWithIcon from '../custom/HeaderWithIcon';
 import { useLocation } from 'react-router-dom';
@@ -156,106 +157,76 @@ const SongSearch = (props: SongSearchProps) => {
           </Stack>
           <Stack direction="column" gap={'1.25rem'}>
             {showSearchBox && (
-              <Box height="100vh" sx={{ zIndex: 10, backgroundColor: '#171717' }}>
-                <Box>
+              <Box
+                height="100vh"
+                width="100vw"
+                position="fixed"
+                top={0}
+                left={0}
+                sx={{ zIndex: 10, backgroundColor: '#000' }}
+              >
+                <Container sx={{ py: '1em', borderRadius: '16px' }}>
+                  <HeaderWithIcon
+                    Icon={SearchIcon}
+                    headerText="Search"
+                    headerVariant="h3"
+                    headerColor="#CAC4D0"
+                  />
+                  <TextField
+                    variant="standard"
+                    placeholder="type Song Title, Keywords, etc"
+                    InputProps={{
+                      style: {
+                        fontSize: '1rem',
+                        color: '#CAC4D0',
+                        background: '#4A4458',
+                        borderRadius: '26px',
+                        border: 0,
+                        padding: '0.5rem 1rem',
+                        marginRight: ' 0.5em',
+                        height: '6em',
+                        width: '90%',
+                        margin: 'auto',
+                      },
+                      disableUnderline: true,
+                    }}
+                    sx={{
+                      width: '100%',
+                      paddingY: '0.5em',
+                    }}
+                    value={searchString}
+                    onChange={(e) => setSearchString(e.target.value)}
+                    autoFocus
+                    onKeyDown={() => updateFilterData()}
+                  />
+
                   <Stack
                     direction="row"
-                    justifyContent={'space-between'}
-                    width="100%"
-                    alignItems={'center'}
-                    pb="0.5rem"
+                    alignItems="center"
+                    pb={3}
+                    justifyContent="space-between"
+                    minWidth="100%"
                   >
-                    <Typography variant="h4" color="#E6E0E9">
-                      Tempo
-                    </Typography>
-                    <IconButton
-                      onClick={() => setIsTempoOpen(!isTempoOpen)}
+                    <HeaderWithIcon
+                      Icon={Tune}
+                      headerText="Filter"
+                      headerVariant="h3"
+                      headerColor="#CAC4D0"
+                    />
+                    <Button
                       sx={{
-                        color: '#E8DEF8',
-                        p: 0,
-                        transform: isTempoOpen ? '' : 'rotate(-180deg)',
-                        transition: '0.1s ease-in-out',
+                        padding: '7.5px 15px',
+                        borderRadius: '10px',
+                        backgroundColor: '#000',
+                        color: 'secondary.main',
+                        textTransform: 'none',
                       }}
-                      disableRipple
-                      disableTouchRipple
+                      startIcon={<Refresh />}
+                      onClick={handleResetFilters}
                     >
-                      <ArrowDropDown sx={{ color: '#CAC4D0' }} />
-                    </IconButton>
+                      Reset All
+                    </Button>
                   </Stack>
-                  {isTempoOpen &&
-                    tempoOptions.map((item) => (
-                      <Chip
-                        sx={{
-                          backgroundColor: disabledTempo.includes(item)
-                            ? 'secondary.lighter'
-                            : 'primary.dark',
-                          borderRadius: '8px',
-                          m: 0.5,
-                          '&:hover': {
-                            backgroundColor: 'primary.dark',
-                          },
-                        }}
-                        key={item}
-                        label={item}
-                        onDelete={
-                          disabledTempo.includes(item) ? undefined : handleDeleteTempo(item)
-                        }
-                        onClick={
-                          disabledTempo.includes(item) ? handleReactivateTempo(item) : undefined
-                        }
-                      />
-                    ))}
-                </Box>
-
-                <Box>
-                  <Stack
-                    direction="row"
-                    justifyContent={'space-between'}
-                    width="100%"
-                    alignItems={'center'}
-                    pb="0.5rem"
-                  >
-                    <Typography variant="h4" color="#E6E0E9">
-                      Themes
-                    </Typography>
-                    <IconButton
-                      onClick={() => setIsThemeOpen(!isThemeOpen)}
-                      sx={{
-                        color: '#E8DEF8',
-                        p: 0,
-                        transform: isThemeOpen ? '' : 'rotate(-180deg)',
-                        transition: '0.1s ease-in-out',
-                      }}
-                      disableRipple
-                      disableTouchRipple
-                    >
-                      <ArrowDropDown sx={{ color: '#CAC4D0' }} />
-                    </IconButton>
-                  </Stack>
-
-                  {isThemeOpen &&
-                    themeOptions.map((item) => (
-                      <Chip
-                        sx={{
-                          backgroundColor: disabledTheme.includes(item)
-                            ? 'secondary.lighter'
-                            : 'primary.dark',
-                          borderRadius: '8px',
-                          m: 0.5,
-                          '&:hover': {
-                            backgroundColor: 'primary.dark',
-                          },
-                        }}
-                        key={item}
-                        label={item}
-                        onDelete={
-                          disabledTheme.includes(item) ? undefined : handleDeleteTheme(item)
-                        }
-                        onClick={
-                          disabledTheme.includes(item) ? handleReactivateTheme(item) : undefined
-                        }
-                      />
-                    ))}
                   <Box>
                     <Stack
                       direction="row"
@@ -265,14 +236,14 @@ const SongSearch = (props: SongSearchProps) => {
                       pb="0.5rem"
                     >
                       <Typography variant="h4" color="#E6E0E9">
-                        Display Results Details
+                        Tempo
                       </Typography>
                       <IconButton
-                        onClick={() => setIsDisplayResultOpen(!isDisplayResultOpen)}
+                        onClick={() => setIsTempoOpen(!isTempoOpen)}
                         sx={{
                           color: '#E8DEF8',
                           p: 0,
-                          transform: isDisplayResultOpen ? '' : 'rotate(-180deg)',
+                          transform: isTempoOpen ? '' : 'rotate(-180deg)',
                           transition: '0.1s ease-in-out',
                         }}
                         disableRipple
@@ -281,12 +252,11 @@ const SongSearch = (props: SongSearchProps) => {
                         <ArrowDropDown sx={{ color: '#CAC4D0' }} />
                       </IconButton>
                     </Stack>
-
-                    {isDisplayResultOpen &&
-                      displayResultOptions.map((item) => (
+                    {isTempoOpen &&
+                      tempoOptions.map((item) => (
                         <Chip
                           sx={{
-                            backgroundColor: disabledDisplayResult.includes(item)
+                            backgroundColor: disabledTempo.includes(item)
                               ? 'secondary.lighter'
                               : 'primary.dark',
                             borderRadius: '8px',
@@ -298,44 +268,146 @@ const SongSearch = (props: SongSearchProps) => {
                           key={item}
                           label={item}
                           onDelete={
-                            disabledDisplayResult.includes(item)
-                              ? undefined
-                              : handleDeleteDisplayResult(item)
+                            disabledTempo.includes(item) ? undefined : handleDeleteTempo(item)
                           }
                           onClick={
-                            disabledDisplayResult.includes(item)
-                              ? handleReactivateDisplayResult(item)
-                              : undefined
+                            disabledTempo.includes(item) ? handleReactivateTempo(item) : undefined
                           }
                         />
                       ))}
                   </Box>
-                  <Button
-                    onClick={() => handleSearchToggle()}
-                    variant="outlined"
-                    sx={{
-                      border: 0,
-                      padding: {
-                        xs: '8px 15px',
-                        sm: '10px 25px',
-                      },
-                      borderRadius: '40px',
-                      backgroundColor: '#D0BCFF',
-                      textTransform: 'none',
-                      width: '100%', // Set the button width to 100%
-                      maxWidth: '300px', // Set a maximum width if desired
-                      '&:hover': {
+
+                  <Box>
+                    <Stack
+                      direction="row"
+                      justifyContent={'space-between'}
+                      width="100%"
+                      alignItems={'center'}
+                      pb="0.5rem"
+                      pt="0.5rem"
+                    >
+                      <Typography variant="h4" color="#E6E0E9">
+                        Themes
+                      </Typography>
+                      <IconButton
+                        onClick={() => setIsThemeOpen(!isThemeOpen)}
+                        sx={{
+                          color: '#E8DEF8',
+                          p: 0,
+                          transform: isThemeOpen ? '' : 'rotate(-180deg)',
+                          transition: '0.1s ease-in-out',
+                        }}
+                        disableRipple
+                        disableTouchRipple
+                      >
+                        <ArrowDropDown sx={{ color: '#CAC4D0' }} />
+                      </IconButton>
+                    </Stack>
+
+                    {isThemeOpen &&
+                      themeOptions.map((item) => (
+                        <Chip
+                          sx={{
+                            backgroundColor: disabledTheme.includes(item)
+                              ? 'secondary.lighter'
+                              : 'primary.dark',
+                            borderRadius: '8px',
+                            m: 0.5,
+                            '&:hover': {
+                              backgroundColor: 'primary.dark',
+                            },
+                          }}
+                          key={item}
+                          label={item}
+                          onDelete={
+                            disabledTheme.includes(item) ? undefined : handleDeleteTheme(item)
+                          }
+                          onClick={
+                            disabledTheme.includes(item) ? handleReactivateTheme(item) : undefined
+                          }
+                        />
+                      ))}
+                    <Box>
+                      <Stack
+                        direction="row"
+                        justifyContent={'space-between'}
+                        width="100%"
+                        alignItems={'center'}
+                        pb="0.5rem"
+                        pt="0.5rem"
+                      >
+                        <Typography variant="h4" color="#E6E0E9">
+                          Display Results Details
+                        </Typography>
+                        <IconButton
+                          onClick={() => setIsDisplayResultOpen(!isDisplayResultOpen)}
+                          sx={{
+                            color: '#E8DEF8',
+                            p: 0,
+                            transform: isDisplayResultOpen ? '' : 'rotate(-180deg)',
+                            transition: '0.1s ease-in-out',
+                          }}
+                          disableRipple
+                          disableTouchRipple
+                        >
+                          <ArrowDropDown sx={{ color: '#CAC4D0' }} />
+                        </IconButton>
+                      </Stack>
+
+                      {isDisplayResultOpen &&
+                        displayResultOptions.map((item) => (
+                          <Chip
+                            sx={{
+                              backgroundColor: disabledDisplayResult.includes(item)
+                                ? 'secondary.lighter'
+                                : 'primary.dark',
+                              borderRadius: '8px',
+                              m: 0.5,
+                              '&:hover': {
+                                backgroundColor: 'primary.dark',
+                              },
+                            }}
+                            key={item}
+                            label={item}
+                            onDelete={
+                              disabledDisplayResult.includes(item)
+                                ? undefined
+                                : handleDeleteDisplayResult(item)
+                            }
+                            onClick={
+                              disabledDisplayResult.includes(item)
+                                ? handleReactivateDisplayResult(item)
+                                : undefined
+                            }
+                          />
+                        ))}
+                    </Box>
+                    <Button
+                      onClick={() => handleSearchToggle()}
+                      variant="outlined"
+                      sx={{
+                        border: 0,
+                        padding: {
+                          xs: '8px 15px',
+                          sm: '10px 25px',
+                        },
+                        borderRadius: '40px',
                         backgroundColor: '#D0BCFF',
-                        opacity: '0.95',
-                      },
-                      transition: 'all 0.1s ease-in-out',
-                    }}
-                  >
-                    <Typography variant="h4" color="#381E72">
-                      Apply
-                    </Typography>
-                  </Button>
-                </Box>
+                        textTransform: 'none',
+                        width: '100%',
+                        '&:hover': {
+                          backgroundColor: '#D0BCFF',
+                          opacity: '0.95',
+                        },
+                        transition: 'all 0.1s ease-in-out',
+                      }}
+                    >
+                      <Typography variant="h4" color="#381E72">
+                        Apply
+                      </Typography>
+                    </Button>
+                  </Box>
+                </Container>
               </Box>
             )}
           </Stack>
