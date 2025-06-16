@@ -5,11 +5,12 @@ import * as path from 'path';
 import dotenv from 'dotenv';
 import cors from 'cors';
 
+dotenv.config();
+
 const app = express();
+console.log(process.env.PORT);
 const port: number = process.env.PORT ? parseInt(process.env.PORT) : 1338; // development port is 1338
 const isDevelopment = process.env.NODE_ENV === 'test';
-
-dotenv.config();
 
 // Use EJS as the template engine
 app.set('view engine', 'ejs');
