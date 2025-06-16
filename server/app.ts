@@ -20,28 +20,9 @@ app.use(cors());
 app.use(express.json());
 app.use('/api', getRoutes());
 if (!isDevelopment) {
-  // Serve the static files from the React app
-  app.use(express.static(path.join(__dirname, '/client')));
-  // Serve .js files from js static folder
-  app.get('*/*.js', (req, res) => {
-      const urlParts = req.url.split('/');
-      res.sendFile(path.join(__dirname + '/client/static/js/' + urlParts[urlParts.length - 1]));
-  });
-  // Serve .cssfiles from css staic folder
-  app.get('*/*.css', (req, res) => {
-      const urlParts = req.url.split('/');
-      res.sendFile(path.join(__dirname + '/client/static/css/' + urlParts[urlParts.length - 1]));
-  });
-  app.get('*/*.css.map', (req, res) => {
-      const urlParts = req.url.split('/');
-      res.sendFile(path.join(__dirname + '/client/static/css/' + urlParts[urlParts.length - 1]));
-  });
-  // Serve images files from media staic folder
-  app.get('*/*.(jpg|svg|png|woff|woff2)', (req, res) => {
-      const urlParts = req.url.split('/');
-      res.sendFile(path.join(__dirname + '/client/static/media/' + urlParts[urlParts.length - 1]));
-  });
-  // Handles any requests that don't match the ones above
+  app.use(express.static(path.join(__dirname, '/client/')));
+  app.use(express.static(path.join(__dirname, '/client/images')));
+  app.use(express.static(path.join(__dirname, '/client/static')));
   app.get('*', (_, res) => {
       res.sendFile(path.join(__dirname + '/client/index.html'));
   });
