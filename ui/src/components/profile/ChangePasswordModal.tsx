@@ -19,10 +19,10 @@ const modalStyle = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 400,
+  width: { xs: '90%', sm: 400 },
   bgcolor: 'background.paper',
   boxShadow: 24,
-  p: 4,
+  p: { xs: 2, sm: 4 },
   borderRadius: '20px',
 };
 
@@ -54,7 +54,7 @@ const ChangePasswordModal = (props: otherProfileProps) => {
 
   return (
     <Modal open={!!open} onClose={handleClose}>
-      <Box sx={modalStyle} width="40%" margin={5}>
+      <Box sx={modalStyle}>
         <div
           style={{
             display: 'flex',

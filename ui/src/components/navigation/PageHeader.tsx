@@ -31,11 +31,14 @@ const PageHeader = (props: PageHeaderProps) => {
           sx={{
             backgroundColor: 'primary.main',
             borderRadius: '100%',
-            padding: '1rem',
+            padding: ['0.5rem', '1rem'],
             display: 'flex',
             flexDir: 'column',
             alignItems: 'center',
             justifyContent: 'center',
+            '& svg': {
+              fontSize: { xs: 16, md: 40 },
+            },
           }}
         >
           {props.icon}
