@@ -25,7 +25,7 @@ import { useNavigate } from 'react-router-dom';
 import SetlistFolderDrawer from './SetlistFolderDrawer';
 import SetlistViewContainer from './adminView/SetlistViewContainer';
 import PageHeader from '../navigation/PageHeader';
-
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
@@ -61,6 +61,10 @@ const SetlistListContainer: FC = (): ReactElement => {
   const openCreate = Boolean(createAnchorEl);
   const handleCreateClick = (event: MouseEvent<HTMLElement>) => {
     setCreateAnchorEl(event.currentTarget);
+    setFolderName('');
+    setFolderMembers([]);
+    setFolderId('');
+    toggleFolderDrawer(false);
   };
   const handleCreateClose = () => {
     setCreateAnchorEl(null);
@@ -70,6 +74,7 @@ const SetlistListContainer: FC = (): ReactElement => {
   const [openDrawer, setOpenDrawer] = useState<boolean>(false);
   const [folderId, setFolderId] = useState<string>('');
   const [folderName, setFolderName] = useState<string>('');
+  const [folderMembers, setFolderMembers] = useState<string[]>([]);
   const toggleFolderDrawer = (newOpen: boolean) => {
     setOpenDrawer(newOpen);
   };
@@ -105,7 +110,7 @@ const SetlistListContainer: FC = (): ReactElement => {
 
   useEffect(() => {
     getSetlistsAndFolders();
-  }, [getSetlistsAndFolders]);
+  }, []);
 
   return (
     <Container
@@ -216,8 +221,21 @@ const SetlistListContainer: FC = (): ReactElement => {
                         <ListItemText>
                           <Typography>{folder.groupName}</Typography>
                         </ListItemText>
+                        <Button
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            toggleFolderDrawer(true);
+                            handleCreateClose();
+                            setFolderId(folder._id);
+                            setFolderName(folder.groupName);
+                            setFolderMembers(folder.userIds);
+                          }}
+                        >
+                          <MoreVertIcon />
+                        </Button>
                         {openFolders.includes(folder._id) ? <ExpandLess /> : <ExpandMore />}
                       </ListItemButton>
+
                       <Collapse in={openFolders.includes(folder._id)} timeout="auto" unmountOnExit>
                         <List component="div" disablePadding>
                           {folder.setlistIds.length > 0 ? (
@@ -286,6 +304,19 @@ const SetlistListContainer: FC = (): ReactElement => {
                       <ListItemText>
                         <Typography>{folder.groupName}</Typography>
                       </ListItemText>
+                      <Button
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          toggleFolderDrawer(true);
+                          handleCreateClose();
+                          console.log(folder);
+                          setFolderId(folder._id);
+                          setFolderName(folder.groupName);
+                          setFolderMembers(folder.userIds);
+                        }}
+                      >
+                        <MoreVertIcon />
+                      </Button>
                       {openFolders.includes(folder._id) ? <ExpandLess /> : <ExpandMore />}
                     </ListItemButton>
                     <Collapse in={openFolders.includes(folder._id)} timeout="auto" unmountOnExit>
@@ -366,8 +397,10 @@ const SetlistListContainer: FC = (): ReactElement => {
         toggleFolderDrawer={toggleFolderDrawer}
         setFolderId={setFolderId}
         setFolderName={setFolderName}
+        setFolderMembers={setFolderMembers}
         folderId={folderId}
         folderName={folderName}
+        folderMembers={folderMembers}
       />
     </Container>
   );

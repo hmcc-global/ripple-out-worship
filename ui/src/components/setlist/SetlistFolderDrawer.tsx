@@ -1,10 +1,9 @@
 import { SetlistFolderMember } from '../../types/setlist.types';
-import { Folder, GroupAdd, Delete, Close, Check, Add } from '@mui/icons-material';
+import { Folder, GroupAdd, Delete, Close, Check, Add, People } from '@mui/icons-material';
 import {
   Drawer,
   Box,
   Stack,
-  Typography,
   Divider,
   TextField,
   Button,
@@ -20,22 +19,34 @@ import {
   Fade,
   Snackbar,
 } from '@mui/material';
+import Typography from '@mui/material/Typography';
 import axios, { AxiosResponse } from 'axios';
 import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react';
 import HeaderWithIcon from '../custom/HeaderWithIcon';
+import { group } from 'console';
 
 type SetlistFolderDrawerProps = {
   openDrawer: boolean;
   toggleFolderDrawer: (newOpen: boolean) => void;
   setFolderId: Dispatch<SetStateAction<string>>;
   setFolderName: Dispatch<SetStateAction<string>>;
+  setFolderMembers: Dispatch<SetStateAction<string[]>>;
   folderId: string;
   folderName: string;
+  folderMembers: string[];
 };
 
 const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
-  const { openDrawer, toggleFolderDrawer, setFolderId, setFolderName, folderId, folderName } =
-    props;
+  const {
+    openDrawer,
+    toggleFolderDrawer,
+    setFolderId,
+    setFolderName,
+    setFolderMembers,
+    folderId,
+    folderName,
+    folderMembers,
+  } = props;
 
   // handle add people modal
   const [openModal, setOpenModal] = useState<boolean>(false);
@@ -43,6 +54,10 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
   const [addedPeople, setAddedPeople] = useState<string[]>([]);
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
+
+  const handleRemovePerson = (id: string) => {
+    setAddedPeople(addedPeople.filter((add) => add !== id));
+  };
 
   // handle snackbar and error in folder handling
   const [successSnackbarOpen, setSuccessSnackbarOpen] = useState<boolean>(false);
@@ -59,7 +74,11 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
 
   useEffect(() => {
     getPeople();
-  }, [getPeople]);
+  }, [addedPeople, People]);
+
+  useEffect(() => {
+    setAddedPeople(folderMembers);
+  }, [folderId, People]);
 
   // To render the songs that are added to setlist
   const addedPeopleList = allPeople.filter((person) => addedPeople.includes(person._id));
@@ -73,10 +92,12 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
 
   // cancel button on drawer
   const cancelFolderDrawer = () => {
-    handleCloseModal();
-    toggleFolderDrawer(false);
     setFolderName('');
     setAddedPeople([]);
+    setFolderMembers([]);
+    setFolderId('');
+    handleCloseModal();
+    toggleFolderDrawer(false);
   };
 
   const handleSaveFolder = async () => {
@@ -98,7 +119,6 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
 
       if (payload.status === 200) {
         cancelFolderDrawer();
-
         setInvalidFolder('');
         setSuccessSnackbarOpen(true);
         return payload.data;
@@ -164,7 +184,12 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
           {/* folder name field */}
           <Box sx={{ p: 2 }}>
             <Typography variant="subtitle1">Folder Name</Typography>
-            <TextField fullWidth id="folderName" onChange={(e) => setFolderName(e.target.value)} />
+            <TextField
+              fullWidth
+              id="folderName"
+              value={folderName}
+              onChange={(e) => setFolderName(e.target.value)}
+            />
           </Box>
 
           <Divider sx={{ borderColor: '#49454F' }} />
@@ -186,11 +211,12 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
 
             <List>
               {addedPeopleList.length > 0 ? (
-                addedPeopleList.map((person, i) => (
+                addedPeopleList.map((person) => (
                   <ListItem
-                    key={i}
+                    key={person._id} // Use a unique identifier
                     secondaryAction={
-                      <IconButton edge="end">
+                      <IconButton edge="end" onClick={() => handleRemovePerson(person._id)}>
+                        <Typography color="#EFB8C8"> Remove</Typography>
                         <Delete sx={{ color: '#EFB8C8' }} />
                       </IconButton>
                     }
@@ -209,6 +235,19 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
                 </ListItem>
               )}
             </List>
+          </Box>
+          <Box>
+            <Button
+              sx={{
+                width: '50%',
+                backgroundColor: 'secondary.main',
+                color: 'primary.main',
+                borderRadius: '40px',
+                textTransform: 'none',
+              }}
+            >
+              Delete
+            </Button>
           </Box>
 
           {/* save and cancel button for drawer */}
