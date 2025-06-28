@@ -110,7 +110,7 @@ const SetlistListContainer: FC = (): ReactElement => {
 
   useEffect(() => {
     getSetlistsAndFolders();
-  }, []);
+  }, [openDrawer]);
 
   return (
     <Container

@@ -191,6 +191,24 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
               onChange={(e) => setFolderName(e.target.value)}
             />
           </Box>
+          <Stack direction="row" spacing={2} px={2} width={'100%'} paddingBottom={2}>
+            <Box sx={{width:'70%'}}>
+
+            </Box>
+              <Button
+                sx={{
+                  width: '30%',
+                  backgroundColor: 'secondary.main',
+                  color: 'primary.main',
+                  borderRadius: '40px',
+                  textTransform: 'none',
+                }}
+                onClick={() => handleSaveFolder()}
+              >
+                Save Name
+              </Button>
+              
+            </Stack>
 
           <Divider sx={{ borderColor: '#49454F' }} />
 
@@ -217,7 +235,6 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
                     secondaryAction={
                       <IconButton edge="end" onClick={() => handleRemovePerson(person._id)}>
                         <Typography color="#EFB8C8"> Remove</Typography>
-                        <Delete sx={{ color: '#EFB8C8' }} />
                       </IconButton>
                     }
                   >
@@ -236,48 +253,22 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
               )}
             </List>
           </Box>
-          <Box>
-            <Button
-              sx={{
-                width: '50%',
-                backgroundColor: 'secondary.main',
-                color: 'primary.main',
-                borderRadius: '40px',
-                textTransform: 'none',
-              }}
-            >
-              Delete
-            </Button>
-          </Box>
+          <Divider sx={{ borderColor: '#49454F' }} />
 
           {/* save and cancel button for drawer */}
           <Box sx={{ position: 'absolute', bottom: 12, width: '100%' }}>
-            <Stack direction="row" spacing={2} px={2} width={'100%'}>
-              <Button
-                sx={{
-                  width: '50%',
-                  backgroundColor: 'secondary.main',
-                  color: 'primary.main',
-                  borderRadius: '40px',
-                  textTransform: 'none',
-                }}
-                onClick={() => handleSaveFolder()}
-              >
-                Save
-              </Button>
-              <Button
-                sx={{
-                  width: '50%',
-                  backgroundColor: 'primary.dark',
-                  color: 'secondary.light',
-                  borderRadius: '40px',
-                  textTransform: 'none',
-                }}
-                onClick={() => cancelFolderDrawer()}
-              >
-                Cancel
-              </Button>
-            </Stack>
+               <Button
+              sx={{
+                width: '50%',
+                color: '#EFB8C8',
+                borderRadius: '40px',
+                 backgroundColor: 'transparent',
+                textTransform: 'none',
+              }}
+            >
+                <Delete sx={{ color: '#EFB8C8' }} />
+              Delete Folder
+            </Button>
           </Box>
         </Box>
       </Drawer>
