@@ -23,7 +23,6 @@ import Typography from '@mui/material/Typography';
 import axios, { AxiosResponse } from 'axios';
 import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react';
 import HeaderWithIcon from '../custom/HeaderWithIcon';
-import { group } from 'console';
 
 type SetlistFolderDrawerProps = {
   openDrawer: boolean;
@@ -53,7 +52,10 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
   const [allPeople, setAllPeople] = useState<SetlistFolderMember[]>([]);
   const [addedPeople, setAddedPeople] = useState<string[]>([]);
   const handleOpenModal = () => setOpenModal(true);
-  const handleCloseModal = () => setOpenModal(false);
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    handleSaveMembers();
+  };
 
   const handleRemovePerson = (id: string) => {
     setAddedPeople(addedPeople.filter((add) => add !== id));
@@ -98,6 +100,29 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
     setFolderId('');
     handleCloseModal();
     toggleFolderDrawer(false);
+  };
+
+  const handleSaveMembers = async () => {
+    try {
+      let payload: AxiosResponse;
+
+      payload = await axios.put('/api/groups/update', {
+        id: folderId,
+        userIds: addedPeople,
+      });
+
+      if (payload.status === 200) {
+        setInvalidFolder('');
+        return payload.data;
+      }
+
+      setInvalidFolder('Error adding members');
+      setSuccessSnackbarOpen(false);
+    } catch (error: any) {
+      setInvalidFolder(error.response.data);
+      setSuccessSnackbarOpen(false);
+      console.log(error);
+    }
   };
 
   const handleSaveFolder = async () => {
@@ -166,7 +191,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
         open={openDrawer}
         onClose={() => toggleFolderDrawer(false)}
         PaperProps={{
-          sx: { width: '25%' },
+          sx: { width: { xs: '100%', md: '25%' } },
         }}
       >
         <Box>
@@ -192,23 +217,20 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
             />
           </Box>
           <Stack direction="row" spacing={2} px={2} width={'100%'} paddingBottom={2}>
-            <Box sx={{width:'70%'}}>
-
-            </Box>
-              <Button
-                sx={{
-                  width: '30%',
-                  backgroundColor: 'secondary.main',
-                  color: 'primary.main',
-                  borderRadius: '40px',
-                  textTransform: 'none',
-                }}
-                onClick={() => handleSaveFolder()}
-              >
-                Save Name
-              </Button>
-              
-            </Stack>
+            <Box sx={{ width: '70%' }}></Box>
+            <Button
+              sx={{
+                width: '30%',
+                backgroundColor: 'secondary.main',
+                color: 'primary.main',
+                borderRadius: '40px',
+                textTransform: 'none',
+              }}
+              onClick={() => handleSaveFolder()}
+            >
+              Save Name
+            </Button>
+          </Stack>
 
           <Divider sx={{ borderColor: '#49454F' }} />
 
@@ -257,16 +279,16 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
 
           {/* save and cancel button for drawer */}
           <Box sx={{ position: 'absolute', bottom: 12, width: '100%' }}>
-               <Button
+            <Button
               sx={{
-                width: '50%',
+                width: '40%',
                 color: '#EFB8C8',
                 borderRadius: '40px',
-                 backgroundColor: 'transparent',
+                backgroundColor: 'transparent',
                 textTransform: 'none',
               }}
             >
-                <Delete sx={{ color: '#EFB8C8' }} />
+              <Delete sx={{ color: '#EFB8C8' }} />
               Delete Folder
             </Button>
           </Box>
