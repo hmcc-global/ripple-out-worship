@@ -1,4 +1,4 @@
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { cloneElement, isValidElement, ReactElement, useMemo } from 'react';
 import { Box, Skeleton } from '@mui/material';
 import ErrorPage from './ErrorPage';
@@ -38,11 +38,13 @@ const PageWithNavBar = ({ children }: { children: ReactElement }) => {
 
 const PrivateRouteWrapper = ({ children, permissions }: PrivateRouteProps) => {
   const { user, loading } = useUser();
+  const location = useLocation();
   // TODO: Pass userObj as a prop to NavBar
 
   // check if Token exists in redux store
   const noTokenExists = useMemo(() => (user ? Object.keys(user).length === 0 : true), [user]);
   const noUser = permissions.includes('noUser');
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
   const isPublic = permissions.includes('public');
   const isRequireUser = permissions.includes('user');
   const isAdmin = permissions.includes('admin');
@@ -51,9 +53,9 @@ const PrivateRouteWrapper = ({ children, permissions }: PrivateRouteProps) => {
   //   const access = isPublic || permissions.some(
   //   (p: any) => userObj != null && Object.keys(userObj).length !== 0 && p === userObj.accessType
   // );
-  console.log(loading, noTokenExists);
-  if (loading) {
-    return <Skeleton />;
+  // Early redirect for logged-in users trying to access auth pages
+  if (!noTokenExists && isAuthPage) {
+    return <Navigate to="/" replace />;
   }
   // If the route does not require a user
   if (noUser) {
@@ -73,7 +75,7 @@ const PrivateRouteWrapper = ({ children, permissions }: PrivateRouteProps) => {
   // If the route is accessible (public or matches user's access type)
   else if (access || isRequireUser) {
     // If there is no token in the redux store
-    if (noTokenExists) {
+    if (noTokenExists && !loading) {
       // Navigate to the login page
       return <Navigate to="/login" />;
     } else {

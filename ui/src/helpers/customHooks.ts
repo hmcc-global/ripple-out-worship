@@ -32,11 +32,12 @@ export const useUser = (): { token: string; user?: UserEditorFields; loading: bo
           localStorage.clear();
           window.location.reload();
         }
+      } finally {
+        setLoading(false);
       }
     };
     fetchUser();
-    setLoading(false);
-  }, [token, loading, setLoading]);
+  }, [token, setLoading]);
   return { token, user: user, loading: loading };
 };
 export const useSongs = (id?: string) => {
