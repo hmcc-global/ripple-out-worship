@@ -47,15 +47,14 @@ const LoginContainer: React.FC = () => {
 
   const handleEmailLogin: SubmitHandler<LoginFormFields> = async (data) => {
     try {
-      const payload = await axios.post('/api/auth/login', {
-        email: data.email,
+      const payload = await axios.post(`/external-api/auth/login`, {
+        emailAddress: data.email,
         password: data.password ?? '',
         isRememberPassword: rememberPassword,
       });
       dispatch(signin(payload.data));
       setInvalidLogin('');
-      // TODO: Switch method once private routes are implemented
-      // window.location.reload();
+      window.location.reload();
       navigate('/');
     } catch (error: any) {
       if (error?.response?.status === 500 || error?.response?.status === 401) {

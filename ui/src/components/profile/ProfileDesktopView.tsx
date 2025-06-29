@@ -252,7 +252,11 @@ const ProfileDesktopView: FC = (): ReactElement => {
               variant="contained"
               color="secondary"
               startIcon={<LogoutIcon />}
-              onClick={() => dispatch(signout(''))}
+              //TODO: Find a more elegant way to reset to login
+              onClick={() => {
+                dispatch(signout(''));
+                window.location.reload();
+              }}
               style={{ borderRadius: '20px', padding: '8px 16px' }}
             >
               <Typography

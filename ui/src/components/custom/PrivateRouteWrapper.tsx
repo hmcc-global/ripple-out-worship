@@ -1,6 +1,6 @@
 import { Navigate } from 'react-router-dom';
-import { cloneElement, isValidElement, ReactElement } from 'react';
-import { Box } from '@mui/material';
+import { cloneElement, isValidElement, ReactElement, useMemo } from 'react';
+import { Box, Skeleton } from '@mui/material';
 import ErrorPage from './ErrorPage';
 import Sidebar from '../navigation/Sidebar';
 import { useUser } from '../../helpers/customHooks';
@@ -37,11 +37,11 @@ const PageWithNavBar = ({ children }: { children: ReactElement }) => {
 };
 
 const PrivateRouteWrapper = ({ children, permissions }: PrivateRouteProps) => {
-  const { user } = useUser();
+  const { user, loading } = useUser();
   // TODO: Pass userObj as a prop to NavBar
 
   // check if Token exists in redux store
-  const noTokenExists = user ? Object.keys(user).length === 0 : true;
+  const noTokenExists = useMemo(() => (user ? Object.keys(user).length === 0 : true), [user]);
   const noUser = permissions.includes('noUser');
   const isPublic = permissions.includes('public');
   const isRequireUser = permissions.includes('user');
@@ -51,7 +51,10 @@ const PrivateRouteWrapper = ({ children, permissions }: PrivateRouteProps) => {
   //   const access = isPublic || permissions.some(
   //   (p: any) => userObj != null && Object.keys(userObj).length !== 0 && p === userObj.accessType
   // );
-
+  console.log(loading, noTokenExists);
+  if (loading) {
+    return <Skeleton />;
+  }
   // If the route does not require a user
   if (noUser) {
     // If there is no token in the redux store

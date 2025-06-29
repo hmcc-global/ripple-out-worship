@@ -1,19 +1,43 @@
+import axios from 'axios';
 import { Setlist, SetlistFolder } from '../types/setlist.types';
 import { SongSchema, SongViewSchema } from '../types/song.types';
-import { UserEditorProps } from '../types/user.types';
-import { useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { updateAxiosClient } from '../components/custom/customAxios';
+import { UserEditorFields } from '../types/user.types';
 
 type RootState = {
-  user: UserEditorProps;
+  user: string;
   songs: SongSchema[] | SongViewSchema[];
   setlists: Setlist[];
   folders: SetlistFolder[];
 };
 
-export const useUser = () => {
-  const { token, _doc } = useSelector((state: RootState) => state.user);
-  return useMemo(() => ({ token, user: _doc }), [token, _doc]);
+export const useUser = (): { token: string; user?: UserEditorFields; loading: boolean } => {
+  const token = useSelector((state: RootState) => state.user);
+  const [user, setUser] = useState<UserEditorFields>();
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        setLoading(true);
+        const { data } = await axios.post('/external-api/auth/verify-token', {
+          token: token,
+        });
+        updateAxiosClient(token);
+        setUser(data);
+      } catch (err: any) {
+        if (err?.response?.data?.raw === 'token-expired') {
+          localStorage.clear();
+          window.location.reload();
+        }
+      }
+    };
+    fetchUser();
+    setLoading(false);
+  }, [token, loading, setLoading]);
+  return { token, user: user, loading: loading };
 };
 export const useSongs = (id?: string) => {
   const allSongs = useSelector((state: RootState) => state.songs);
