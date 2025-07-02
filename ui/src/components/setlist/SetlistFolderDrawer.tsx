@@ -1,5 +1,5 @@
 import { SetlistFolderMember } from '../../types/setlist.types';
-import { Folder, GroupAdd, Delete, Close, Check, Add, People } from '@mui/icons-material';
+import { Folder, GroupAdd, Delete, Close, Check, Add, People, Margin } from '@mui/icons-material';
 import {
   Drawer,
   Box,
@@ -19,6 +19,7 @@ import {
   Fade,
   Snackbar,
 } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 import Typography from '@mui/material/Typography';
 import axios, { AxiosResponse } from 'axios';
 import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react';
@@ -195,13 +196,18 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
         }}
       >
         <Box>
-          <Box sx={{ p: 2 }}>
+          <Box
+            sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+          >
             <HeaderWithIcon
               Icon={Folder}
               headerText="Folder Info"
               headerVariant="h4"
               iconColor="primary.light"
             />
+            <IconButton onClick={cancelFolderDrawer}>
+              <CloseIcon sx={{ color: 'primary.light' }} />
+            </IconButton>
           </Box>
 
           <Divider sx={{ borderColor: '#49454F' }} />
@@ -299,7 +305,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
       <Dialog
         open={openModal}
         onClose={handleCloseModal}
-        PaperProps={{ sx: { width: '30rem', height: '30rem' } }}
+        PaperProps={{ sx: { width: '30rem', height: '40rem', borderRadius: '10px' } }}
       >
         <DialogTitle>
           <HeaderWithIcon
