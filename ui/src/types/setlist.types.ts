@@ -50,6 +50,7 @@ export type SetlistFolder = {
   groupName: string;
   userIds: string[];
   setlistIds: string[];
+  createdAt: Date;
 };
 
 export type SetlistFolderMember = {

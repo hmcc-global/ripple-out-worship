@@ -31,9 +31,12 @@ type SetlistFolderDrawerProps = {
   setFolderId: Dispatch<SetStateAction<string>>;
   setFolderName: Dispatch<SetStateAction<string>>;
   setFolderMembers: Dispatch<SetStateAction<string[]>>;
+  setFolderCreated: Dispatch<SetStateAction<Date | null>>;
   folderId: string;
   folderName: string;
   folderMembers: string[];
+  folderCreated: Date;
+  mode: string;
 };
 
 const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
@@ -43,9 +46,12 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
     setFolderId,
     setFolderName,
     setFolderMembers,
+    setFolderCreated,
     folderId,
     folderName,
     folderMembers,
+    folderCreated,
+    mode,
   } = props;
 
   // handle add people modal
@@ -99,6 +105,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
     setAddedPeople([]);
     setFolderMembers([]);
     setFolderId('');
+    setFolderCreated(new Date());
     handleCloseModal();
     toggleFolderDrawer(false);
   };
@@ -197,17 +204,48 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
       >
         <Box>
           <Box
-            sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+            sx={{
+              p: 2,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              backgroundColor: '#000000',
+            }}
           >
             <HeaderWithIcon
               Icon={Folder}
-              headerText="Folder Info"
+              headerText={mode === 'edit' ? 'Folder Info' : 'New Folder'}
               headerVariant="h4"
               iconColor="primary.light"
             />
             <IconButton onClick={cancelFolderDrawer}>
-              <CloseIcon sx={{ color: 'primary.light' }} />
+              <CloseIcon sx={{ color: 'white' }} />
             </IconButton>
+          </Box>
+
+          <Divider sx={{ borderColor: '#49454F' }} />
+
+          <Box sx={{ p: 2 }}>
+            <Box>
+              <Typography
+                variant="subtitle1"
+                sx={{
+                  fontFamily: 'DM Sans',
+                  fontWeight: 400,
+                  fontStyle: 'italic',
+                  fontSize: '12px',
+                  lineHeight: '100%',
+                  letterSpacing: '0%',
+                  verticalAlign: 'middle',
+                }}
+              >
+                {folderCreated
+                  ? `Created on ${folderCreated.getFullYear()}-${(folderCreated.getMonth() + 1)
+                      .toString()
+                      .padStart(2, '0')}-${folderCreated.getDate().toString().padStart(2, '0')}`
+                  : 'No creation date set'}
+              </Typography>
+            </Box>
           </Box>
 
           <Divider sx={{ borderColor: '#49454F' }} />
@@ -222,22 +260,23 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
               onChange={(e) => setFolderName(e.target.value)}
             />
           </Box>
-          <Stack direction="row" spacing={2} px={2} width={'100%'} paddingBottom={2}>
-            <Box sx={{ width: '70%' }}></Box>
-            <Button
-              sx={{
-                width: '30%',
-                backgroundColor: 'secondary.main',
-                color: 'primary.main',
-                borderRadius: '40px',
-                textTransform: 'none',
-              }}
-              onClick={() => handleSaveFolder()}
-            >
-              Save Name
-            </Button>
-          </Stack>
-
+          {mode === 'edit' && (
+            <Stack direction="row" spacing={2} px={2} width={'100%'} paddingBottom={2}>
+              <Box sx={{ width: '70%' }}></Box>
+              <Button
+                sx={{
+                  width: '30%',
+                  backgroundColor: 'secondary.main',
+                  color: 'primary.main',
+                  borderRadius: '40px',
+                  textTransform: 'none',
+                }}
+                onClick={() => handleSaveFolder()}
+              >
+                Save Name
+              </Button>
+            </Stack>
+          )}
           <Divider sx={{ borderColor: '#49454F' }} />
 
           {/* folder members list */}
@@ -282,22 +321,55 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
             </List>
           </Box>
           <Divider sx={{ borderColor: '#49454F' }} />
+          {mode === 'create' && (
+            <Box sx={{ position: 'absolute', bottom: 12, width: '100%' }}>
+              <Stack direction="row" spacing={2} px={2} width={'100%'}>
+                <Button
+                  sx={{
+                    width: '50%',
+                    backgroundColor: 'primary.dark',
+                    color: 'secondary.light',
+                    borderRadius: '40px',
+                    textTransform: 'none',
+                  }}
+                  onClick={() => cancelFolderDrawer()}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  sx={{
+                    width: '50%',
+                    backgroundColor: 'secondary.main',
+                    color: 'primary.main',
+                    borderRadius: '40px',
+                    textTransform: 'none',
+                  }}
+                  onClick={() => handleSaveFolder()}
+                >
+                  Save
+                </Button>
+              </Stack>
+            </Box>
+          )}
 
           {/* save and cancel button for drawer */}
-          <Box sx={{ position: 'absolute', bottom: 12, width: '100%' }}>
-            <Button
-              sx={{
-                width: '40%',
-                color: '#EFB8C8',
-                borderRadius: '40px',
-                backgroundColor: 'transparent',
-                textTransform: 'none',
-              }}
-            >
-              <Delete sx={{ color: '#EFB8C8' }} />
-              Delete Folder
-            </Button>
-          </Box>
+
+          {mode === 'edit' && (
+            <Box sx={{ position: 'absolute', bottom: 12, width: '100%' }}>
+              <Button
+                sx={{
+                  width: '40%',
+                  color: '#EFB8C8',
+                  borderRadius: '40px',
+                  backgroundColor: 'transparent',
+                  textTransform: 'none',
+                }}
+              >
+                <Delete sx={{ color: '#EFB8C8' }} />
+                Delete Folder
+              </Button>
+            </Box>
+          )}
         </Box>
       </Drawer>
 

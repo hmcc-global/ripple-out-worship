@@ -55,6 +55,7 @@ const SetlistListContainer: FC = (): ReactElement => {
   const [tab, setTab] = useState(0);
   const [allSetlists, setAllSetlists] = useState<Setlist[]>([]);
   const [allFolders, setAllFolders] = useState<SetlistFolder[]>([]);
+  const [mode, setMode] = useState<'create' | 'edit'>('create');
 
   // handle create setlist/folder button
   const [createAnchorEl, setCreateAnchorEl] = useState<null | HTMLElement>(null);
@@ -62,6 +63,7 @@ const SetlistListContainer: FC = (): ReactElement => {
   const handleCreateClick = (event: MouseEvent<HTMLElement>) => {
     setCreateAnchorEl(event.currentTarget);
     setFolderName('');
+    setFolderCreated(new Date());
     setFolderMembers([]);
     setFolderId('');
     toggleFolderDrawer(false);
@@ -74,6 +76,7 @@ const SetlistListContainer: FC = (): ReactElement => {
   const [openDrawer, setOpenDrawer] = useState<boolean>(false);
   const [folderId, setFolderId] = useState<string>('');
   const [folderName, setFolderName] = useState<string>('');
+  const [folderCreated, setFolderCreated] = useState<Date | null>(null);
   const [folderMembers, setFolderMembers] = useState<string[]>([]);
   const toggleFolderDrawer = (newOpen: boolean) => {
     setOpenDrawer(newOpen);
@@ -182,6 +185,7 @@ const SetlistListContainer: FC = (): ReactElement => {
           </MenuItem>
           <MenuItem
             onClick={() => {
+              setMode('create');
               toggleFolderDrawer(true);
               handleCreateClose();
             }}
@@ -222,7 +226,9 @@ const SetlistListContainer: FC = (): ReactElement => {
                         </ListItemText>
                         <Button
                           onClick={(event) => {
+                            console.log(folder);
                             event.stopPropagation();
+                            setMode('edit');
                             toggleFolderDrawer(true);
                             handleCreateClose();
                             setFolderId(folder._id);
@@ -306,9 +312,10 @@ const SetlistListContainer: FC = (): ReactElement => {
                       <Button
                         onClick={(event) => {
                           event.stopPropagation();
+                          setMode('edit');
                           toggleFolderDrawer(true);
                           handleCreateClose();
-                          console.log(folder);
+                          setFolderCreated(folder.createdAt);
                           setFolderId(folder._id);
                           setFolderName(folder.groupName);
                           setFolderMembers(folder.userIds);
@@ -401,9 +408,12 @@ const SetlistListContainer: FC = (): ReactElement => {
         setFolderId={setFolderId}
         setFolderName={setFolderName}
         setFolderMembers={setFolderMembers}
+        setFolderCreated={setFolderCreated}
         folderId={folderId}
         folderName={folderName}
         folderMembers={folderMembers}
+        folderCreated={folderCreated || new Date()}
+        mode={mode}
       />
     </Container>
   );
