@@ -58,7 +58,11 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [allPeople, setAllPeople] = useState<SetlistFolderMember[]>([]);
   const [addedPeople, setAddedPeople] = useState<string[]>([]);
-  const handleOpenModal = () => setOpenModal(true);
+
+  const [createdDateString, setCreatedDateString] = useState<string>('');
+  const handleOpenModal = () => {
+    setOpenModal(true);
+  };
   const handleCloseModal = () => {
     setOpenModal(false);
     handleSaveMembers();
@@ -89,6 +93,21 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
     setAddedPeople(folderMembers);
   }, [folderId, People]);
 
+  useEffect(() => {
+    if (mode === 'create') {
+      setCreatedDateString(''); // Set to empty string in create mode
+    } else {
+      const date = new Date(folderCreated);
+      setCreatedDateString(
+        date instanceof Date && !isNaN(date.getTime())
+          ? `Created at ${date.getFullYear()}-${(date.getMonth() + 1)
+              .toString()
+              .padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`
+          : 'No creation date set'
+      );
+    }
+  }, [folderCreated, mode]);
+
   // To render the songs that are added to setlist
   const addedPeopleList = allPeople.filter((person) => addedPeople.includes(person._id));
   const handleAddPerson = (id: string) => {
@@ -111,6 +130,9 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
   };
 
   const handleSaveMembers = async () => {
+    if (!folderId || !addedPeople.length) {
+      return;
+    }
     try {
       let payload: AxiosResponse;
 
@@ -127,7 +149,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
       setInvalidFolder('Error adding members');
       setSuccessSnackbarOpen(false);
     } catch (error: any) {
-      setInvalidFolder(error.response.data);
+      setInvalidFolder(error.response?.data || 'An error occurred');
       setSuccessSnackbarOpen(false);
       console.log(error);
     }
@@ -226,26 +248,20 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
           <Divider sx={{ borderColor: '#49454F' }} />
 
           <Box sx={{ p: 2 }}>
-            <Box>
-              <Typography
-                variant="subtitle1"
-                sx={{
-                  fontFamily: 'DM Sans',
-                  fontWeight: 400,
-                  fontStyle: 'italic',
-                  fontSize: '12px',
-                  lineHeight: '100%',
-                  letterSpacing: '0%',
-                  verticalAlign: 'middle',
-                }}
-              >
-                {folderCreated
-                  ? `Created on ${folderCreated.getFullYear()}-${(folderCreated.getMonth() + 1)
-                      .toString()
-                      .padStart(2, '0')}-${folderCreated.getDate().toString().padStart(2, '0')}`
-                  : 'No creation date set'}
-              </Typography>
-            </Box>
+            <Typography
+              variant="subtitle1"
+              sx={{
+                fontFamily: 'DM Sans',
+                fontWeight: 400,
+                fontStyle: 'italic',
+                fontSize: '12px',
+                lineHeight: '100%',
+                letterSpacing: '0%',
+                verticalAlign: 'middle',
+              }}
+            >
+              {createdDateString}
+            </Typography>
           </Box>
 
           <Divider sx={{ borderColor: '#49454F' }} />
@@ -325,9 +341,9 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
             <Box sx={{ position: 'absolute', bottom: 12, width: '100%' }}>
               <Stack direction="row" spacing={2} px={2} width={'100%'}>
                 <Button
+                  variant="outlined"
                   sx={{
                     width: '50%',
-                    backgroundColor: 'primary.dark',
                     color: 'secondary.light',
                     borderRadius: '40px',
                     textTransform: 'none',
@@ -337,6 +353,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
                   Cancel
                 </Button>
                 <Button
+                  variant="outlined"
                   sx={{
                     width: '50%',
                     backgroundColor: 'secondary.main',

@@ -63,7 +63,6 @@ const SetlistListContainer: FC = (): ReactElement => {
   const handleCreateClick = (event: MouseEvent<HTMLElement>) => {
     setCreateAnchorEl(event.currentTarget);
     setFolderName('');
-    setFolderCreated(new Date());
     setFolderMembers([]);
     setFolderId('');
     toggleFolderDrawer(false);
@@ -145,6 +144,7 @@ const SetlistListContainer: FC = (): ReactElement => {
                 opacity: '0.95',
               },
               transition: 'all 0.1s ease-in-out',
+              display: { xs: 'none', md: 'flex' },
             }}
             startIcon={<Add />}
             onClick={handleCreateClick}
@@ -160,19 +160,19 @@ const SetlistListContainer: FC = (): ReactElement => {
         display="flex"
         justifyContent="space-between"
         pb="10px"
-        pl={{ base: '0', md: '15px' }}
+        pl={{ base: '10px', md: '15px' }}
       >
         <Menu
           anchorEl={createAnchorEl}
           open={openCreate}
           onClose={handleCreateClose}
           anchorOrigin={{
-            vertical: 'top',
-            horizontal: 'right',
+            vertical: isDesktop ? 'top' : 'bottom',
+            horizontal: isDesktop ? 'right' : 'center',
           }}
           transformOrigin={{
-            vertical: 'top',
-            horizontal: 'right',
+            vertical: isDesktop ? 'top' : 'bottom',
+            horizontal: isDesktop ? 'right' : 'center',
           }}
         >
           <MenuItem
@@ -226,7 +226,6 @@ const SetlistListContainer: FC = (): ReactElement => {
                         </ListItemText>
                         <Button
                           onClick={(event) => {
-                            console.log(folder);
                             event.stopPropagation();
                             setMode('edit');
                             toggleFolderDrawer(true);
@@ -234,6 +233,7 @@ const SetlistListContainer: FC = (): ReactElement => {
                             setFolderId(folder._id);
                             setFolderName(folder.groupName);
                             setFolderMembers(folder.userIds);
+                            setFolderCreated(folder.createdAt);
                           }}
                         >
                           <MoreVertIcon />
@@ -315,10 +315,12 @@ const SetlistListContainer: FC = (): ReactElement => {
                           setMode('edit');
                           toggleFolderDrawer(true);
                           handleCreateClose();
-                          setFolderCreated(folder.createdAt);
                           setFolderId(folder._id);
                           setFolderName(folder.groupName);
                           setFolderMembers(folder.userIds);
+                          setFolderCreated(folder.createdAt);
+                          console.log(folderCreated);
+                          console.log(folder.createdAt);
                         }}
                       >
                         <MoreVertIcon />
@@ -415,6 +417,32 @@ const SetlistListContainer: FC = (): ReactElement => {
         folderCreated={folderCreated || new Date()}
         mode={mode}
       />
+      <Button
+        variant="outlined"
+        sx={{
+          border: 0,
+          padding: '10px 25px',
+          borderRadius: '40px',
+          backgroundColor: '#D0BCFF',
+          color: '#381E72',
+          textTransform: 'none',
+          '&:hover': {
+            backgroundColor: '#D0BCFF',
+            opacity: '0.95',
+          },
+          transition: 'all 0.1s ease-in-out',
+          position: 'fixed', // Fixed positioning
+          bottom: '100px', // Distance from the bottom
+          right: '16px', // Distance from the right
+          display: { xs: 'block', md: 'none' }, // Show only on mobile
+          zIndex: 1000, // Ensure it's above other content
+        }}
+        onClick={handleCreateClick}
+      >
+        <Typography variant="subtitle1" fontWeight={700}>
+          + New
+        </Typography>
+      </Button>
     </Container>
   );
 };
