@@ -221,7 +221,10 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
         open={openDrawer}
         onClose={() => toggleFolderDrawer(false)}
         PaperProps={{
-          sx: { width: { xs: '100%', md: '25%' } },
+          sx: {
+            width: { xs: '100%', md: '25%' },
+            backgroundColor: { xs: '#141218', md: '#2B2930' },
+          },
         }}
       >
         <Box>
@@ -231,7 +234,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              backgroundColor: '#000000',
+              backgroundColor: { xs: '#000000', md: '#211F26' },
             }}
           >
             <HeaderWithIcon
