@@ -319,8 +319,6 @@ const SetlistListContainer: FC = (): ReactElement => {
                           setFolderName(folder.groupName);
                           setFolderMembers(folder.userIds);
                           setFolderCreated(folder.createdAt);
-                          console.log(folderCreated);
-                          console.log(folder.createdAt);
                         }}
                       >
                         <MoreVertIcon />
