@@ -22,7 +22,7 @@ const SongsInfoCard = (props: SongTitleCardProps) => {
   const [open, setOpen] = useState(false);
 
   return (
-    <Container>
+    <Container maxWidth={false}>
       <Box>
         <Accordion
           disableGutters
