@@ -1,5 +1,13 @@
 import { Navigate, useLocation } from 'react-router-dom';
-import { cloneElement, isValidElement, ReactElement, useMemo } from 'react';
+import {
+  cloneElement,
+  isValidElement,
+  ReactElement,
+  useEffect,
+  useMemo,
+  useState,
+  useTransition,
+} from 'react';
 import { Box, Skeleton } from '@mui/material';
 import ErrorPage from './ErrorPage';
 import Sidebar from '../navigation/Sidebar';
@@ -39,60 +47,83 @@ const PageWithNavBar = ({ children }: { children: ReactElement }) => {
 const PrivateRouteWrapper = ({ children, permissions }: PrivateRouteProps) => {
   const { user, loading } = useUser();
   const location = useLocation();
-  // TODO: Pass userObj as a prop to NavBar
 
-  // check if Token exists in redux store
-  const noTokenExists = useMemo(() => (user ? Object.keys(user).length === 0 : true), [user]);
-  const noUser = permissions.includes('noUser');
-  const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
+  const [isPending, startTransition] = useTransition();
+  const [authState, setAuthState] = useState({
+    isAuthenticated: false,
+    //TODO: not needed?
+    isAdmin: false,
+  });
+
+  // Update auth state with transition to prevent UI flickering
+  useEffect(() => {
+    if (user && !loading) {
+      startTransition(() => {
+        setAuthState({
+          isAuthenticated: !!user && Object.keys(user).length > 0,
+          isAdmin: user?.accessType === 'admin',
+        });
+      });
+    }
+  }, [user, loading]);
+
+  // Extract route requirements
+  const requiresNoUser = permissions.includes('noUser');
+  const requiresUser = permissions.includes('user');
+  const requiresAdmin = permissions.includes('admin');
   const isPublic = permissions.includes('public');
-  const isRequireUser = permissions.includes('user');
-  const isAdmin = permissions.includes('admin');
-  const access = isPublic;
-  // TODO: When accessType is implemented, uncomment this
-  //   const access = isPublic || permissions.some(
-  //   (p: any) => userObj != null && Object.keys(userObj).length !== 0 && p === userObj.accessType
-  // );
-  // Early redirect for logged-in users trying to access auth pages
-  if (!noTokenExists && isAuthPage) {
-    return <Navigate to="/" replace />;
+
+  // Show loading state while determining auth status or during transition
+  if (loading || isPending) {
+    return <Skeleton />;
   }
-  // If the route does not require a user
-  if (noUser) {
-    // If there is no token in the redux store
-    if (noTokenExists) {
-      // Render the children of the route
+
+  const { isAuthenticated, isAdmin } = authState;
+
+  // CASE 2: Routes that don't care about auth status (public routes)
+  if (isPublic) {
+    return <PageWithNavBar children={children} />;
+  }
+
+  // CASE 3: Routes that specifically require NO user (exclusive guest routes)
+  if (requiresNoUser) {
+    if (!isAuthenticated) {
       return (
         <Box component="main" sx={{ flexGrow: 1 }}>
           {cloneElement(children)}
         </Box>
       );
     } else {
-      // If there is a token, navigate to the page
-      return <PageWithNavBar children={children} />;
+      // User is logged in but route requires no user
+      return <Navigate to="/" replace />;
     }
   }
-  // If the route is accessible (public or matches user's access type)
-  else if (access || isRequireUser) {
-    // If there is no token in the redux store
-    if (noTokenExists && !loading) {
-      // Navigate to the login page
-      return <Navigate to="/login" />;
-    } else {
+
+  // CASE 4: Routes that require any authenticated user
+  if (requiresUser) {
+    if (isAuthenticated) {
       return <PageWithNavBar children={children} />;
-    }
-  } else if (isAdmin && user?.accessType === 'admin') {
-    // TODO: cleanup and refactor logic
-    if (noTokenExists) {
-      // Navigate to the login page
-      return <Navigate to="/login" />;
     } else {
-      return <PageWithNavBar children={children} />;
+      // Redirect to login if not authenticated
+      return <Navigate to="/login" state={{ from: location.pathname }} replace />;
     }
-  } else {
-    // If the route is not accessible, render the error page
-    return <ErrorPage />;
   }
+
+  // CASE 5: Routes that require admin access
+  if (requiresAdmin) {
+    if (isAuthenticated && isAdmin) {
+      return <PageWithNavBar children={children} />;
+    } else if (isAuthenticated) {
+      // User is logged in but not admin
+      return <ErrorPage />;
+    } else {
+      // Not logged in at all
+      return <Navigate to="/login" state={{ from: location.pathname }} replace />;
+    }
+  }
+
+  // Default - access denied
+  return <ErrorPage />;
 };
 
 export default PrivateRouteWrapper;

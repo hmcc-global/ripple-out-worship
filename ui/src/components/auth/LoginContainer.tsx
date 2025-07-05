@@ -54,7 +54,6 @@ const LoginContainer: React.FC = () => {
       });
       dispatch(signin(payload.data));
       setInvalidLogin('');
-      window.location.reload();
       navigate('/');
     } catch (error: any) {
       if (error?.response?.status === 500 || error?.response?.status === 401) {
