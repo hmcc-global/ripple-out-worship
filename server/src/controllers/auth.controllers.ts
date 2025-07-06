@@ -1,7 +1,7 @@
 import { Request, RequestHandler, Response } from 'express';
-import { User } from '../models/user.model';
+import { User } from '../models/ownership.model';
 import { ResetPwdToken } from '../models/auth.model';
-import { UserSchema, UserDocument, UserAuthSchema } from '../types/user.types';
+import { UserSchema, UserDocument, UserAuthSchema } from '../types/ownership.types';
 import {
   hashInput,
   validateInput,

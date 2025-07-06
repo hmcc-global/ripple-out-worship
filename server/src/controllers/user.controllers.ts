@@ -1,6 +1,6 @@
 import { Request, RequestHandler, Response } from 'express';
-import { User } from '../models/user.model';
-import { UserDocument, UserPublicDocument } from '../types/user.types';
+import { User } from '../models/ownership.model';
+import { UserDocument, UserPublicDocument } from '../types/ownership.types';
 import { hashInput, validateInput } from '../utils/auth.utils';
 
 const sendResponse = (

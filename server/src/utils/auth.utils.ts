@@ -4,8 +4,8 @@ import crypto from 'crypto';
 import * as jwt from 'jsonwebtoken';
 import { OAuth2Client, LoginTicket, TokenPayload } from 'google-auth-library';
 import { JWT_MAX_AGE, JWT_MIN_AGE } from '../constants';
-import { User } from '../models/user.model';
-import { UserAuthSchema } from '../types/user.types';
+import { User } from '../models/ownership.model';
+import { OwnershipAuthSchema } from '../types/ownership.types';
 
 const hashInput = async function (input: string): Promise<string> {
   const salt = await bcrypt.genSalt(10);
@@ -41,7 +41,7 @@ const generateJwt = (
   }
 };
 
-const verifyJwt = async (token: string): Promise<UserAuthSchema> => {
+const verifyJwt = async (token: string): Promise<OwnershipAuthSchema> => {
   if (token == null || token === '') {
     throw new Error('Unauthorized');
   }
@@ -55,7 +55,7 @@ const verifyJwt = async (token: string): Promise<UserAuthSchema> => {
 
     // at this point should return a user object
     // with id, email and accessType
-    const userObj: UserAuthSchema | null = await User.findOne({ _id: valid.id })
+    const userObj: OwnershipAuthSchema | null = await User.findOne({ _id: valid.id })
       .select('-createdAt -updatedAt -password')
       .exec();
 
