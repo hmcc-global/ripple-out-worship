@@ -111,15 +111,13 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
 
   useEffect(() => {
     if (mode === 'create') {
-      setCreatedDateString(''); // Set to empty string in create mode
+      setCreatedDateString('');
     } else {
       const date = new Date(folderCreated);
       setCreatedDateString(
-        date instanceof Date && !isNaN(date.getTime())
-          ? `Created at ${date.getFullYear()}-${(date.getMonth() + 1)
-              .toString()
-              .padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`
-          : 'No creation date set'
+        `Created at ${date.getFullYear()}-${(date.getMonth() + 1)
+          .toString()
+          .padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`
       );
     }
   }, [folderCreated, mode]);
