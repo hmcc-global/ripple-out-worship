@@ -1,5 +1,5 @@
 import { SetlistFolderMember } from '../../types/setlist.types';
-import { Folder, GroupAdd, Delete, Close, Check, Add, People, Margin } from '@mui/icons-material';
+import { Folder, GroupAdd, Delete, Close, Check, Add } from '@mui/icons-material';
 import {
   Drawer,
   Box,
@@ -87,11 +87,11 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
 
   useEffect(() => {
     getPeople();
-  }, [addedPeople, People]);
+  }, [addedPeople]);
 
   useEffect(() => {
     setAddedPeople(folderMembers);
-  }, [folderId, People]);
+  }, [folderId]);
 
   useEffect(() => {
     if (mode === 'create') {
