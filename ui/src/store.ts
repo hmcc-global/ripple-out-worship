@@ -1,7 +1,7 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
-import {userSlice, songSlice, setlistSlice, folderSlice} from './reducers';
+import { userSlice, songSlice, setlistSlice, folderSlice, ownershipSlice } from './reducers';
 
 const persistConfig = {
   key: 'root',
@@ -13,7 +13,8 @@ const rootReducer = combineReducers({
   songs: songSlice,
   setlists: setlistSlice,
   folders: folderSlice,
-})
+  ownership: ownershipSlice,
+});
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 

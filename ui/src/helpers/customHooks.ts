@@ -2,19 +2,23 @@ import axios from 'axios';
 import { Setlist, SetlistFolder } from '../types/setlist.types';
 import { SongSchema, SongViewSchema } from '../types/song.types';
 import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { updateAxiosClient } from '../components/custom/customAxios';
 import { UserEditorFields } from '../types/user.types';
+import { fetchOwnership } from '../reducers';
+import { Ownership } from '../types/ownership.types';
 
 type RootState = {
   user: string;
   songs: SongSchema[] | SongViewSchema[];
   setlists: Setlist[];
   folders: SetlistFolder[];
+  ownership: Ownership;
 };
 
 export const useUser = (): { token: string; user?: UserEditorFields; loading: boolean } => {
   const token = useSelector((state: RootState) => state.user);
+  const dispatch = useDispatch();
   const [user, setUser] = useState<UserEditorFields>();
   const [loading, setLoading] = useState(false);
 
@@ -27,6 +31,26 @@ export const useUser = (): { token: string; user?: UserEditorFields; loading: bo
         });
         updateAxiosClient(token);
         setUser(data);
+        const { data: ownershipData, status } = await axios.get('/api/ownerships/get', {
+          params: {
+            userId: data.id,
+          },
+        });
+        if (status === 200 && ownershipData.length > 0) {
+          dispatch(fetchOwnership(ownershipData[0]));
+        } else {
+          const { data: createOwnership, status: createStatus } = await axios.post(
+            '/api/ownerships/create',
+            {
+              userId: data.id,
+              setlistIds: [],
+              groupIds: [],
+            }
+          );
+          if (createStatus === 200) {
+            dispatch(fetchOwnership(createOwnership[0]));
+          }
+        }
       } catch (err: any) {
         if (err?.response?.data?.raw === 'token-expired') {
           localStorage.clear();
@@ -37,7 +61,7 @@ export const useUser = (): { token: string; user?: UserEditorFields; loading: bo
       }
     };
     fetchUser();
-  }, [token, setLoading]);
+  }, [token, dispatch, setLoading]);
   return { token, user: user, loading: loading };
 };
 export const useSongs = (id?: string) => {
@@ -65,4 +89,9 @@ export const useFolders = (id?: string) => {
     return folder;
   }
   return allFolders;
+};
+
+export const useOwnership = () => {
+  const ownership = useSelector((state: RootState) => state.ownership);
+  return ownership;
 };
