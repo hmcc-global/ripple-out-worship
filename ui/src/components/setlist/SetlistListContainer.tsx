@@ -429,11 +429,11 @@ const SetlistListContainer: FC = (): ReactElement => {
             opacity: '0.95',
           },
           transition: 'all 0.1s ease-in-out',
-          position: 'fixed', // Fixed positioning
-          bottom: '100px', // Distance from the bottom
-          right: '16px', // Distance from the right
-          display: { xs: 'block', md: 'none' }, // Show only on mobile
-          zIndex: 1000, // Ensure it's above other content
+          position: 'fixed',
+          bottom: '100px',
+          right: '16px',
+          display: { xs: 'block', md: 'none' },
+          zIndex: 1000,
         }}
         onClick={handleCreateClick}
       >

@@ -62,7 +62,9 @@ const SetlistViewContainer: FC = (): ReactElement | null => {
       });
       if (status === 200) {
         setSetlist(data);
-        setGroupId(data.groupIds[0]);
+        if (data.groupIds[0]) {
+          setGroupId(data.groupIds[0]);
+        }
       }
     } catch (e) {
       console.log(e);
@@ -116,7 +118,9 @@ const SetlistViewContainer: FC = (): ReactElement | null => {
 
   useEffect(() => {
     getSetlist();
-    getGroup();
+    if (groupId) {
+      getGroup();
+    }
   }, [getSetlist, id, groupId]);
 
   return id && setlist ? (
