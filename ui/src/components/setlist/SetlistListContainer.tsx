@@ -75,7 +75,7 @@ const SetlistListContainer: FC = (): ReactElement => {
   const [openDrawer, setOpenDrawer] = useState<boolean>(false);
   const [folderId, setFolderId] = useState<string>('');
   const [folderName, setFolderName] = useState<string>('');
-  const [folderCreated, setFolderCreated] = useState<Date | null>(null);
+  const [folderCreated, setFolderCreated] = useState<string>('');
   const [folderMembers, setFolderMembers] = useState<string[]>([]);
   const toggleFolderDrawer = (newOpen: boolean) => {
     setOpenDrawer(newOpen);
@@ -412,7 +412,7 @@ const SetlistListContainer: FC = (): ReactElement => {
         folderId={folderId}
         folderName={folderName}
         folderMembers={folderMembers}
-        folderCreated={folderCreated || new Date()}
+        folderCreated={folderCreated}
         mode={mode}
       />
       <Button

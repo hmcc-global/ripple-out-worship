@@ -31,11 +31,11 @@ type SetlistFolderDrawerProps = {
   setFolderId: Dispatch<SetStateAction<string>>;
   setFolderName: Dispatch<SetStateAction<string>>;
   setFolderMembers: Dispatch<SetStateAction<string[]>>;
-  setFolderCreated: Dispatch<SetStateAction<Date | null>>;
+  setFolderCreated: Dispatch<SetStateAction<string>>;
   folderId: string;
   folderName: string;
   folderMembers: string[];
-  folderCreated: Date;
+  folderCreated: string;
   mode: string;
 };
 
@@ -87,7 +87,6 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
 
   const deleteGroup = useCallback(async () => {
     try {
-      console.log(folderId);
       const { data, status } = await axios.put(`/api/groups/delete`, {
         params: {
           id: folderId,
@@ -104,7 +103,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
 
   useEffect(() => {
     getPeople();
-  }, [addedPeople]);
+  }, []);
 
   useEffect(() => {
     setAddedPeople(folderMembers);
@@ -141,7 +140,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
     setAddedPeople([]);
     setFolderMembers([]);
     setFolderId('');
-    setFolderCreated(new Date());
+    setFolderCreated('');
     handleCloseModal();
     toggleFolderDrawer(false);
   };
@@ -151,9 +150,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
       return;
     }
     try {
-      let payload: AxiosResponse;
-
-      payload = await axios.put('/api/groups/update', {
+      const payload: AxiosResponse = await axios.put('/api/groups/update', {
         id: folderId,
         userIds: addedPeople,
       });
