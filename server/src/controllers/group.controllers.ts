@@ -85,8 +85,8 @@ const updateGroup: RequestHandler = async (req: Request, res: Response) => {
   }
 };
 
-const deleteGroup: RequestHandler = async (req: Request, res: Response) => {
-  const { id: groupId } = req.params;
+const deleteGroup: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+  const groupId = req.body.params.id;
 
   // Soft delete group by id
   if (groupId) {

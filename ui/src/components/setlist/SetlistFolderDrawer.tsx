@@ -85,6 +85,23 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
     }
   }, []);
 
+  const deleteGroup = useCallback(async () => {
+    try {
+      console.log(folderId);
+      const { data, status } = await axios.put(`/api/groups/delete`, {
+        params: {
+          id: folderId,
+        },
+      });
+      if (status === 200) {
+        setSuccessSnackbarOpen(true);
+        toggleFolderDrawer(false);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  }, [folderId]);
+
   useEffect(() => {
     getPeople();
   }, [addedPeople]);
@@ -211,7 +228,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
       >
         <Alert severity="success" onClose={handleCloseSuccessSnackbar}>
           <AlertTitle>Success</AlertTitle>
-          Folder successfully saved!
+          Folder successfully saved/removed !
         </Alert>
       </Snackbar>
 
@@ -377,6 +394,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
           {mode === 'edit' && (
             <Box sx={{ position: 'absolute', bottom: 12, width: '100%' }}>
               <Button
+                onClick={deleteGroup}
                 sx={{
                   width: '40%',
                   color: '#EFB8C8',
