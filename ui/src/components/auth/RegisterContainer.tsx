@@ -72,7 +72,7 @@ const RegisterContainer: React.FC = () => {
 
   const handleRegister: SubmitHandler<RegisterFormFields> = async (data) => {
     try {
-      const payload = await axios.post('/api/auth/signup', {
+      const payload = await axios.post('/external-api/auth/signup', {
         fullName: data.fullName,
         email: data.email,
         password: data.password ?? '',

@@ -47,7 +47,7 @@ const RecoverPasswordContainer: React.FC = () => {
 
   const handleRecoverPassword: SubmitHandler<RecoverPasswordFields> = async (data) => {
     try {
-      const payload = await axios.post('/api/auth/forgot-password', {
+      const payload = await axios.post('/external-api/auth/forgot-password', {
         email: data.email,
       });
 

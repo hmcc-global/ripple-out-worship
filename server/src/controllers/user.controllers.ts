@@ -1,23 +1,22 @@
 import { Request, RequestHandler, Response } from 'express';
 import { User } from '../models/ownership.model';
-import { UserDocument, UserPublicDocument } from '../types/ownership.types';
+import { OwnershipDocument, OwnershipPublicDocument } from '../types/ownership.types';
 import { hashInput, validateInput } from '../utils/auth.utils';
 
 const sendResponse = (
   res: Response,
   statusCode: number,
-  payload: UserPublicDocument[] | UserPublicDocument | string
+  payload: OwnershipPublicDocument[] | OwnershipPublicDocument | string
 ) => {
   return res.status(statusCode).json(payload);
 };
 
 const createUser: RequestHandler = async (req: Request, res: Response): Promise<void> => {
-  const { ...toCreate }: UserDocument = req.body;
+  const { ...toCreate }: OwnershipDocument = req.body;
 
   if (Object.keys(toCreate).length > 0) {
     try {
-      toCreate.password = await hashInput(toCreate.password);
-      const data: UserDocument = await User.create(toCreate);
+      const data: OwnershipDocument = await User.create(toCreate);
 
       if (data) {
         sendResponse(res, 200, data);
@@ -37,7 +36,7 @@ const getUser: RequestHandler = async (req: Request, res: Response): Promise<voi
 
   if (userId) {
     try {
-      const data: UserPublicDocument | null = await User.findOne({
+      const data: OwnershipPublicDocument | null = await User.findOne({
         _id: userId,
         isDeleted: false,
       });
@@ -52,7 +51,9 @@ const getUser: RequestHandler = async (req: Request, res: Response): Promise<voi
     }
   } else {
     try {
-      const data: UserPublicDocument[] = await User.find({ isDeleted: false }).select('-password');
+      const data: OwnershipPublicDocument[] = await User.find({ isDeleted: false }).select(
+        '-password'
+      );
 
       if (data) {
         sendResponse(res, 200, data);
@@ -69,7 +70,7 @@ const updateUser: RequestHandler = async (req: Request, res: Response): Promise<
   const { id: userId, ...toUpdate } = req.body;
   if (userId && Object.keys(toUpdate).length > 0) {
     try {
-      const data: UserDocument = await User.findOneAndUpdate(
+      const data: OwnershipDocument = await User.findOneAndUpdate(
         { _id: userId, isDeleted: false },
         { $set: toUpdate },
         {

@@ -7,12 +7,12 @@ import {
 } from '../controllers/user.controllers';
 import { Router } from 'express';
 
-const userRouter = Router();
+const ownershipRouter = Router();
 
-userRouter.post('/create', createUser);
-userRouter.get('/get', getUser);
-userRouter.put('/update', updateUser);
-userRouter.put('/delete', deleteUser);
-userRouter.put('/change-password', changePassword);
+ownershipRouter.post('/create', createUser);
+ownershipRouter.get('/get', getUser);
+ownershipRouter.put('/update', updateUser);
+ownershipRouter.put('/delete', deleteUser);
+ownershipRouter.put('/change-password', changePassword);
 
-export default userRouter;
+export default ownershipRouter;

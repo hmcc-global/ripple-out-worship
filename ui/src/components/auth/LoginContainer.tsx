@@ -66,7 +66,7 @@ const LoginContainer: React.FC = () => {
   const handleGoogleLogin = useGoogleLogin({
     onSuccess: async (codeResponse) => {
       try {
-        const payload = await axios.post('/api/auth/login-google', {
+        const payload = await axios.post('/external-api/auth/login-google', {
           responseCode: codeResponse.code,
         });
 
