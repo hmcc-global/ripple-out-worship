@@ -11,6 +11,6 @@ const ownershipSchema = new Schema<OwnershipSchema>(
   { timestamps: true }
 );
 
-const User = models.User || model<OwnershipSchema>('Ownership', ownershipSchema);
+const Ownership = models.Ownership || model<OwnershipSchema>('Ownership', ownershipSchema);
 
-export { User };
+export { Ownership };

@@ -4,10 +4,10 @@ import { GroupSchema } from '../types/group.types';
 const groupSchema = new Schema<GroupSchema>(
   {
     groupName: { type: String, required: true },
-    userIds: [{ type: Types.ObjectId, ref: 'User' }],
+    ownerships: [{ type: Types.ObjectId, ref: 'Ownership' }],
     setlistIds: [{ type: Types.ObjectId, ref: 'Setlist' }],
-    createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
-    lastUpdatedBy: { type: Schema.Types.ObjectId, ref: 'User' },
+    createdBy: { type: Schema.Types.ObjectId, ref: 'Ownership' },
+    lastUpdatedBy: { type: Schema.Types.ObjectId, ref: 'Ownership' },
     isDeleted: { type: Boolean, default: false },
   },
   {
