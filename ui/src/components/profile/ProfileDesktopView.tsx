@@ -1,5 +1,4 @@
-import { FC, ReactElement, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { FC, ReactElement } from 'react';
 import {
   Box,
   Button,
@@ -10,17 +9,12 @@ import {
   styled,
   useTheme,
 } from '@mui/material';
-import { User } from '../../types/user.types';
 import PersonIcon from '@mui/icons-material/Person';
 import { useUser } from '../../helpers/customHooks';
 import PageHeader from '../navigation/PageHeader';
 import { useDispatch } from 'react-redux';
 import { signout } from '../../reducers/userSlice';
-import Snackbar from '@mui/material/Snackbar';
-import MuiAlert from '@mui/material/Alert';
-import CheckIcon from '@mui/icons-material/Check';
 import LogoutIcon from '@mui/icons-material/Logout';
-import CloseIcon from '@mui/icons-material/Close';
 
 const RowStack = styled(Stack)({
   display: 'flex',
@@ -43,42 +37,9 @@ const DisabledTextField = styled(TextField)(({ theme }) => ({
 }));
 
 const ProfileDesktopView: FC = (): ReactElement => {
-  const { token, user } = useUser();
+  const { user } = useUser();
   const dispatch = useDispatch();
   const theme = useTheme();
-  // TO-DO refactor the use of react form to properly pass the values using the hooks instead of forcing it now.
-  const { register, getValues, setValue } = useForm<User>();
-
-  const [showEditProfile, setShowEditProfile] = useState<boolean>(false);
-  const [showChangePassword, setShowChangePassword] = useState<boolean>(false);
-  const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
-  const [snackbarMessage, setSnackbarMessage] = useState<String>('');
-  const [snackbarStatus, setSnackbarStatus] = useState<'success' | 'error'>('success');
-
-  const handleSnackbarClose = () => {
-    setSnackbarOpen(false);
-  };
-
-  const editProfileHandler = () => {
-    setValue('fullName', '');
-    setShowEditProfile(true);
-    setShowChangePassword(false);
-  };
-
-  const changePassHandler = () => {
-    setShowChangePassword(true);
-    setShowEditProfile(false);
-  };
-
-  const backProfileHandler = () => {
-    if (showEditProfile) {
-      setShowEditProfile(false);
-    } else if (showChangePassword) {
-      setShowChangePassword(false);
-    }
-    // return it to default
-    setValue('fullName', user?.fullName || '');
-  };
 
   return (
     <Container
@@ -137,7 +98,6 @@ const ProfileDesktopView: FC = (): ReactElement => {
               id="outlined-name"
               variant="outlined"
               value={user?.fullName}
-              {...register('fullName', { required: true })}
               sx={{ width: '75%' }}
             />
           </Box>
@@ -157,7 +117,6 @@ const ProfileDesktopView: FC = (): ReactElement => {
               disabled
               id="outlined-email"
               value={user?.email}
-              {...register('email', { required: true })}
               style={{ marginBottom: '16px' }}
               sx={{ width: '75%' }}
             />
@@ -188,36 +147,6 @@ const ProfileDesktopView: FC = (): ReactElement => {
           </Box>
         </Stack>
       </Box>
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={3000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-      >
-        <MuiAlert
-          elevation={0}
-          variant="filled"
-          icon={
-            snackbarStatus === 'error' ? (
-              <CloseIcon sx={{ fontSize: 20, color: '#fff', mr: 1 }} />
-            ) : (
-              <CheckIcon sx={{ fontSize: 20, color: '#fff', mr: 1 }} />
-            )
-          }
-          sx={{
-            fontFamily: 'DM Sans, sans-serif',
-            background: '#36333b',
-            color: '#EADDFF',
-            borderRadius: 3,
-            fontWeight: 400,
-            fontSize: '1rem',
-            alignItems: 'center',
-            '.MuiAlert-icon': { marginRight: 1 },
-          }}
-        >
-          {snackbarMessage}
-        </MuiAlert>
-      </Snackbar>
     </Container>
   );
 };
