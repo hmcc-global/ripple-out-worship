@@ -16,6 +16,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import TuneIcon from '@mui/icons-material/Tune';
 import HeaderWithIcon from '../custom/HeaderWithIcon';
 import { useLocation } from 'react-router-dom';
+import CloseIcon from '@mui/icons-material/Close';
 
 const SongSearch = (props: SongSearchProps) => {
   const [searchString, setSearchString] = useState<string>('');
@@ -166,12 +167,24 @@ const SongSearch = (props: SongSearchProps) => {
                 sx={{ zIndex: 10, backgroundColor: '#000' }}
               >
                 <Container sx={{ py: '1em', borderRadius: '16px' }}>
-                  <HeaderWithIcon
-                    Icon={SearchIcon}
-                    headerText="Search"
-                    headerVariant="h3"
-                    headerColor="#CAC4D0"
-                  />
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      backgroundColor: { xs: '#000000', md: '#211F26' },
+                    }}
+                  >
+                    <HeaderWithIcon
+                      Icon={SearchIcon}
+                      headerText="Search"
+                      headerVariant="h3"
+                      headerColor="#CAC4D0"
+                    />
+                    <IconButton onClick={handleSearchToggle}>
+                      <CloseIcon sx={{ color: 'white' }} />
+                    </IconButton>
+                  </Box>
                   <TextField
                     variant="standard"
                     placeholder="type Song Title, Keywords, etc"
@@ -227,6 +240,7 @@ const SongSearch = (props: SongSearchProps) => {
                       Reset All
                     </Button>
                   </Stack>
+
                   <Box>
                     <Stack
                       direction="row"
