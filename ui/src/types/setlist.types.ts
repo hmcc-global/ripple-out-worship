@@ -1,4 +1,4 @@
-import { UserEditorFields } from './user.types';
+import { User } from './user.types';
 import { SongSearchFilter, SongSetlistSchema } from './song.types';
 import { Dayjs } from 'dayjs';
 
@@ -23,8 +23,8 @@ export type SetlistSongCardProps = {
   artist: string;
   year: string;
   code: string;
-  createdBy: UserEditorFields;
-  lastUpdatedBy: UserEditorFields;
+  createdBy: User;
+  lastUpdatedBy: User;
   filterData?: SongSearchFilter;
   isVerified: Boolean;
   createdAt: Date;

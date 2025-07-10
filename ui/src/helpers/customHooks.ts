@@ -4,7 +4,7 @@ import { SongSchema, SongViewSchema } from '../types/song.types';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateAxiosClient } from '../components/custom/customAxios';
-import { UserEditorFields } from '../types/user.types';
+import { User } from '../types/user.types';
 import { fetchOwnership } from '../reducers';
 import { Ownership } from '../types/ownership.types';
 
@@ -16,10 +16,10 @@ type RootState = {
   ownership: Ownership;
 };
 
-export const useUser = (): { token: string; user?: UserEditorFields; loading: boolean } => {
+export const useUser = (): { token: string; user?: User; loading: boolean } => {
   const token = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch();
-  const [user, setUser] = useState<UserEditorFields>();
+  const [user, setUser] = useState<User>();
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {

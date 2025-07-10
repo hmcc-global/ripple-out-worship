@@ -11,12 +11,10 @@ import {
   styled,
   Divider,
 } from '@mui/material';
-import { UserEditorFields } from '../../types/user.types';
+import { User } from '../../types/user.types';
 import { useUser } from '../../helpers/customHooks';
-import EditModal from './EditModal';
-import ChangePasswordModal from './ChangePasswordModal';
 import { useDispatch } from 'react-redux';
-import { refetchUser, signout } from '../../reducers/userSlice';
+import { signout } from '../../reducers/userSlice';
 import PageHeader from '../navigation/PageHeader';
 import PersonIcon from '@mui/icons-material/Person';
 import CreateIcon from '@mui/icons-material/Create';
@@ -39,7 +37,7 @@ const RowStack = styled(Stack)({
 const ProfileMobileView: FC = (): ReactElement => {
   const { token, user } = useUser();
   const dispatch = useDispatch();
-  const { register, getValues } = useForm<UserEditorFields>();
+  const { register, getValues } = useForm<User>();
   const [showEditProfile, setShowEditProfile] = useState<boolean>(false);
   const [showChangePassword, setShowChangePassword] = useState<boolean>(false);
   const theme = useTheme();
@@ -49,49 +47,6 @@ const ProfileMobileView: FC = (): ReactElement => {
 
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
-  };
-
-  const handleEditUserInformation = async (data: UserEditorFields) => {
-    data._id = user?._id || '';
-    try {
-      const { data: updated, status } = await axios.put('/api/users/update', {
-        id: data._id,
-        fullName: data.fullName,
-      });
-      if (status === 200) {
-        dispatch(refetchUser({ token, _doc: updated }));
-        setSnackbarStatus('success');
-        setSnackbarMessage('User information updated successfully!');
-        setSnackbarOpen(true);
-      }
-    } catch (e) {
-      setSnackbarStatus('error');
-      setSnackbarMessage('Failed to update user information.');
-      setSnackbarOpen(true);
-      console.log(e);
-    }
-  };
-
-  const handleChangePassword = async (data: UserEditorFields) => {
-    data._id = user?._id || '';
-    try {
-      const { data: updated, status } = await axios.put('/api/users/change-password', {
-        id: data._id,
-        currentPassword: data.currentPassword,
-        newPassword: data.newPassword,
-      });
-      if (status === 200) {
-        dispatch(refetchUser({ token, _doc: updated }));
-        setSnackbarStatus('success');
-        setSnackbarMessage('Password changed successfully!');
-        setSnackbarOpen(true);
-      }
-    } catch (e) {
-      setSnackbarStatus('error');
-      setSnackbarMessage('Failed to change password.');
-      setSnackbarOpen(true);
-      console.log(e);
-    }
   };
 
   const editProfileHandler = () => {
@@ -138,17 +93,6 @@ const ProfileMobileView: FC = (): ReactElement => {
           <Typography variant="h2" sx={{ fontSize: '1.5rem', fontWeight: 700 }}>
             My Information
           </Typography>
-          <Button
-            startIcon={<CreateIcon />}
-            variant="contained"
-            color="secondary"
-            onClick={editProfileHandler}
-            style={{ borderRadius: '20px', padding: '10px 24px', fontWeight: 200 }}
-          >
-            <Typography color="inherit" variant="h5" sx={{ fontSize: '1rem' }}>
-              Edit
-            </Typography>
-          </Button>
         </RowStack>
         {!showEditProfile && !showChangePassword && (
           <Stack spacing={2} width="80%" mb={2}>
@@ -208,29 +152,6 @@ const ProfileMobileView: FC = (): ReactElement => {
           <Button
             variant="contained"
             color="secondary"
-            startIcon={<LockIcon />}
-            onClick={changePassHandler}
-            style={{
-              padding: '8px 16px',
-              borderRadius: '20px',
-              display: user?.password === '' ? 'none' : 'inline-flex',
-            }}
-            disabled={user?.password === ''}
-          >
-            <Typography
-              color="inherit"
-              sx={{
-                color: ' #381E72',
-                fontSize: '1rem',
-                fontWeight: 700,
-              }}
-            >
-              {user?.password === '' ? 'Google Login cannot change password' : 'Change Password'}
-            </Typography>
-          </Button>
-          <Button
-            variant="contained"
-            color="secondary"
             startIcon={<LogoutIcon />}
             onClick={() => dispatch(signout(''))}
             style={{ borderRadius: '20px', padding: '8px 16px' }}
@@ -246,45 +167,7 @@ const ProfileMobileView: FC = (): ReactElement => {
               Log out
             </Typography>
           </Button>
-          <Divider
-            flexItem
-            sx={{ borderBottomWidth: '0.5px' }}
-            style={{ borderColor: theme.palette.secondary.dark, marginBottom: '8px' }}
-          />
-          <Button
-            startIcon={<DeleteIcon />}
-            variant="contained"
-            color="warning"
-            style={{ borderRadius: '20px', padding: '8px 16px', color: '#601410' }}
-          >
-            <Typography
-              sx={{
-                color: ' #601410',
-                fontSize: '1rem',
-                fontWeight: 700,
-              }}
-            >
-              Delete Account (Coming Soon)
-            </Typography>
-          </Button>
         </Box>
-        <EditModal
-          handleClose={backProfileHandler}
-          open={showEditProfile}
-          onSubmit={handleEditUserInformation}
-          getFormValues={getValues}
-          register={register}
-          user={user}
-        />
-
-        <ChangePasswordModal
-          onSubmit={handleChangePassword}
-          open={showChangePassword}
-          user={user}
-          handleClose={backProfileHandler}
-          getFormValues={getValues}
-          register={register}
-        />
       </Box>
       <Snackbar
         open={snackbarOpen}
