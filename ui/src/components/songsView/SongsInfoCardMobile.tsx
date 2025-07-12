@@ -83,12 +83,6 @@ const SongsInfoCardMobile = ({ song, onClose }: SongsInfoCardMobileProps) => {
             <Typography color="#CCC2DC">{song.originalKey}</Typography>
           </Grid>
           <Grid item xs={4}>
-            <Typography color="#938F99">Suggested Key(s)</Typography>
-          </Grid>
-          <Grid item xs={8}>
-            <Typography color="#CCC2DC">{song && song.originalKey}</Typography>
-          </Grid>
-          <Grid item xs={4}>
             <Typography color="#938F99">Year</Typography>
           </Grid>
           <Grid item xs={8}>

@@ -79,6 +79,7 @@ const SongsViewContainer: FC = (): ReactElement => {
           {!isMobile && (
             <Button
               variant="outlined"
+              onClick={() => navigate(`/song/edit/${id}`)}
               sx={{
                 borderWidth: '2px',
                 padding: '10px 25px',
