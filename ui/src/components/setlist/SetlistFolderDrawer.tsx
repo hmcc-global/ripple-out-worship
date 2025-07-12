@@ -4,7 +4,6 @@ import {
   Drawer,
   Box,
   Stack,
-  Typography,
   Divider,
   TextField,
   Button,
@@ -20,6 +19,8 @@ import {
   Fade,
   Snackbar,
 } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+import Typography from '@mui/material/Typography';
 import axios, { AxiosResponse } from 'axios';
 import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react';
 import HeaderWithIcon from '../custom/HeaderWithIcon';
@@ -29,20 +30,47 @@ type SetlistFolderDrawerProps = {
   toggleFolderDrawer: (newOpen: boolean) => void;
   setFolderId: Dispatch<SetStateAction<string>>;
   setFolderName: Dispatch<SetStateAction<string>>;
+  setFolderMembers: Dispatch<SetStateAction<string[]>>;
+  setFolderCreated: Dispatch<SetStateAction<string>>;
   folderId: string;
   folderName: string;
+  folderMembers: string[];
+  folderCreated: string;
+  mode: string;
 };
 
 const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
-  const { openDrawer, toggleFolderDrawer, setFolderId, setFolderName, folderId, folderName } =
-    props;
+  const {
+    openDrawer,
+    toggleFolderDrawer,
+    setFolderId,
+    setFolderName,
+    setFolderMembers,
+    setFolderCreated,
+    folderId,
+    folderName,
+    folderMembers,
+    folderCreated,
+    mode,
+  } = props;
 
   // handle add people modal
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [allPeople, setAllPeople] = useState<SetlistFolderMember[]>([]);
   const [addedPeople, setAddedPeople] = useState<string[]>([]);
-  const handleOpenModal = () => setOpenModal(true);
-  const handleCloseModal = () => setOpenModal(false);
+
+  const [createdDateString, setCreatedDateString] = useState<string>('');
+  const handleOpenModal = () => {
+    setOpenModal(true);
+  };
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    handleSaveMembers();
+  };
+
+  const handleRemovePerson = (id: string) => {
+    setAddedPeople(addedPeople.filter((add) => add !== id));
+  };
 
   // handle snackbar and error in folder handling
   const [successSnackbarOpen, setSuccessSnackbarOpen] = useState<boolean>(false);
@@ -57,9 +85,42 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
     }
   }, []);
 
+  const deleteGroup = useCallback(async () => {
+    try {
+      const { data, status } = await axios.put(`/api/groups/delete`, {
+        params: {
+          id: folderId,
+        },
+      });
+      if (status === 200) {
+        setSuccessSnackbarOpen(true);
+        toggleFolderDrawer(false);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  }, [folderId]);
+
   useEffect(() => {
     getPeople();
-  }, [getPeople]);
+  }, []);
+
+  useEffect(() => {
+    setAddedPeople(folderMembers);
+  }, [folderId]);
+
+  useEffect(() => {
+    if (mode === 'create') {
+      setCreatedDateString('');
+    } else {
+      const date = new Date(folderCreated);
+      setCreatedDateString(
+        `Created at ${date.getFullYear()}-${(date.getMonth() + 1)
+          .toString()
+          .padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`
+      );
+    }
+  }, [folderCreated, mode]);
 
   // To render the songs that are added to setlist
   const addedPeopleList = allPeople.filter((person) => addedPeople.includes(person._id));
@@ -73,10 +134,37 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
 
   // cancel button on drawer
   const cancelFolderDrawer = () => {
-    handleCloseModal();
-    toggleFolderDrawer(false);
     setFolderName('');
     setAddedPeople([]);
+    setFolderMembers([]);
+    setFolderId('');
+    setFolderCreated('');
+    handleCloseModal();
+    toggleFolderDrawer(false);
+  };
+
+  const handleSaveMembers = async () => {
+    if (!folderId || !addedPeople.length) {
+      return;
+    }
+    try {
+      const payload: AxiosResponse = await axios.put('/api/groups/update', {
+        id: folderId,
+        userIds: addedPeople,
+      });
+
+      if (payload.status === 200) {
+        setInvalidFolder('');
+        return payload.data;
+      }
+
+      setInvalidFolder('Error adding members');
+      setSuccessSnackbarOpen(false);
+    } catch (error: any) {
+      setInvalidFolder(error.response?.data || 'An error occurred');
+      setSuccessSnackbarOpen(false);
+      console.log(error);
+    }
   };
 
   const handleSaveFolder = async () => {
@@ -98,7 +186,6 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
 
       if (payload.status === 200) {
         cancelFolderDrawer();
-
         setInvalidFolder('');
         setSuccessSnackbarOpen(true);
         return payload.data;
@@ -136,7 +223,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
       >
         <Alert severity="success" onClose={handleCloseSuccessSnackbar}>
           <AlertTitle>Success</AlertTitle>
-          Folder successfully saved!
+          Folder successfully saved/removed !
         </Alert>
       </Snackbar>
 
@@ -146,17 +233,50 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
         open={openDrawer}
         onClose={() => toggleFolderDrawer(false)}
         PaperProps={{
-          sx: { width: '25%' },
+          sx: {
+            width: { xs: '100%', md: '25%' },
+            backgroundColor: { xs: '#141218', md: '#2B2930' },
+          },
         }}
       >
         <Box>
-          <Box sx={{ p: 2 }}>
+          <Box
+            sx={{
+              p: 2,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              backgroundColor: { xs: '#000000', md: '#211F26' },
+            }}
+          >
             <HeaderWithIcon
               Icon={Folder}
-              headerText="Folder Info"
+              headerText={mode === 'edit' ? 'Folder Info' : 'New Folder'}
               headerVariant="h4"
               iconColor="primary.light"
             />
+            <IconButton onClick={cancelFolderDrawer}>
+              <CloseIcon sx={{ color: 'white' }} />
+            </IconButton>
+          </Box>
+
+          <Divider sx={{ borderColor: '#49454F' }} />
+
+          <Box sx={{ p: 2 }}>
+            <Typography
+              variant="subtitle1"
+              sx={{
+                fontFamily: 'DM Sans',
+                fontWeight: 400,
+                fontStyle: 'italic',
+                fontSize: '12px',
+                lineHeight: '100%',
+                letterSpacing: '0%',
+                verticalAlign: 'middle',
+              }}
+            >
+              {createdDateString}
+            </Typography>
           </Box>
 
           <Divider sx={{ borderColor: '#49454F' }} />
@@ -164,9 +284,30 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
           {/* folder name field */}
           <Box sx={{ p: 2 }}>
             <Typography variant="subtitle1">Folder Name</Typography>
-            <TextField fullWidth id="folderName" onChange={(e) => setFolderName(e.target.value)} />
+            <TextField
+              fullWidth
+              id="folderName"
+              value={folderName}
+              onChange={(e) => setFolderName(e.target.value)}
+            />
           </Box>
-
+          {mode === 'edit' && (
+            <Stack direction="row" spacing={2} px={2} width={'100%'} paddingBottom={2}>
+              <Box sx={{ width: '70%' }}></Box>
+              <Button
+                sx={{
+                  width: '30%',
+                  backgroundColor: 'secondary.main',
+                  color: 'primary.main',
+                  borderRadius: '40px',
+                  textTransform: 'none',
+                }}
+                onClick={() => handleSaveFolder()}
+              >
+                Save Name
+              </Button>
+            </Stack>
+          )}
           <Divider sx={{ borderColor: '#49454F' }} />
 
           {/* folder members list */}
@@ -186,12 +327,12 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
 
             <List>
               {addedPeopleList.length > 0 ? (
-                addedPeopleList.map((person, i) => (
+                addedPeopleList.map((person) => (
                   <ListItem
-                    key={i}
+                    key={person._id} // Use a unique identifier
                     secondaryAction={
-                      <IconButton edge="end">
-                        <Delete sx={{ color: '#EFB8C8' }} />
+                      <IconButton edge="end" onClick={() => handleRemovePerson(person._id)}>
+                        <Typography color="#EFB8C8"> Remove</Typography>
                       </IconButton>
                     }
                   >
@@ -210,36 +351,58 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
               )}
             </List>
           </Box>
+          <Divider sx={{ borderColor: '#49454F' }} />
+          {mode === 'create' && (
+            <Box sx={{ position: 'absolute', bottom: 12, width: '100%' }}>
+              <Stack direction="row" spacing={2} px={2} width={'100%'}>
+                <Button
+                  variant="outlined"
+                  sx={{
+                    width: '50%',
+                    color: 'secondary.light',
+                    borderRadius: '40px',
+                    textTransform: 'none',
+                  }}
+                  onClick={() => cancelFolderDrawer()}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="outlined"
+                  sx={{
+                    width: '50%',
+                    backgroundColor: 'secondary.main',
+                    color: 'primary.main',
+                    borderRadius: '40px',
+                    textTransform: 'none',
+                  }}
+                  onClick={() => handleSaveFolder()}
+                >
+                  Save
+                </Button>
+              </Stack>
+            </Box>
+          )}
 
           {/* save and cancel button for drawer */}
-          <Box sx={{ position: 'absolute', bottom: 12, width: '100%' }}>
-            <Stack direction="row" spacing={2} px={2} width={'100%'}>
+
+          {mode === 'edit' && (
+            <Box sx={{ position: 'absolute', bottom: 12, width: '100%' }}>
               <Button
+                onClick={deleteGroup}
                 sx={{
-                  width: '50%',
-                  backgroundColor: 'secondary.main',
-                  color: 'primary.main',
+                  width: '40%',
+                  color: '#EFB8C8',
                   borderRadius: '40px',
+                  backgroundColor: 'transparent',
                   textTransform: 'none',
                 }}
-                onClick={() => handleSaveFolder()}
               >
-                Save
+                <Delete sx={{ color: '#EFB8C8' }} />
+                Delete Folder
               </Button>
-              <Button
-                sx={{
-                  width: '50%',
-                  backgroundColor: 'primary.dark',
-                  color: 'secondary.light',
-                  borderRadius: '40px',
-                  textTransform: 'none',
-                }}
-                onClick={() => cancelFolderDrawer()}
-              >
-                Cancel
-              </Button>
-            </Stack>
-          </Box>
+            </Box>
+          )}
         </Box>
       </Drawer>
 
@@ -247,7 +410,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
       <Dialog
         open={openModal}
         onClose={handleCloseModal}
-        PaperProps={{ sx: { width: '30rem', height: '30rem' } }}
+        PaperProps={{ sx: { width: '30rem', height: '40rem', borderRadius: '10px' } }}
       >
         <DialogTitle>
           <HeaderWithIcon

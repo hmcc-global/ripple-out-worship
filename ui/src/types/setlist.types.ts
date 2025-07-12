@@ -43,6 +43,7 @@ export type Setlist = {
   sharedUserIds: string[];
   groupIds: string[];
   publicLink: string;
+  createdAt: string;
 };
 
 export type SetlistFolder = {
@@ -50,6 +51,7 @@ export type SetlistFolder = {
   groupName: string;
   userIds: string[];
   setlistIds: string[];
+  createdAt: string;
 };
 
 export type SetlistFolderMember = {

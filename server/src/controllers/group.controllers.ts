@@ -33,36 +33,31 @@ const createGroup: RequestHandler = async (req: Request, res: Response) => {
 };
 
 const getGroup: RequestHandler = async (req: Request, res: Response) => {
-  const { id: groupId } = req.params;
+  const groupId = req.query.id;
 
-  // Get group by id
-  if (groupId) {
-    try {
+  try {
+    if (groupId) {
       const data: GroupDocument | null = await Group.findOne({
         _id: groupId,
         isDeleted: false,
       });
 
       if (data) {
-        sendResponse(res, 200, data);
+        return sendResponse(res, 200, data);
       } else {
-        sendResponse(res, 404, 'Group not found');
+        return sendResponse(res, 404, 'Group not found');
       }
-    } catch (error: any) {
-      sendResponse(res, 500, error?.message);
     }
-  }
-  // If no id, get all groups
-  try {
+    // If no groupId, get all groups
     const data: GroupDocument[] = await Group.find({ isDeleted: false });
 
-    if (data) {
-      sendResponse(res, 200, data);
+    if (data.length > 0) {
+      return sendResponse(res, 200, data);
     } else {
-      sendResponse(res, 404, 'Users not found');
+      return sendResponse(res, 404, 'No groups found');
     }
   } catch (error: any) {
-    sendResponse(res, 500, error?.message);
+    return sendResponse(res, 500, error?.message);
   }
 };
 
@@ -90,8 +85,8 @@ const updateGroup: RequestHandler = async (req: Request, res: Response) => {
   }
 };
 
-const deleteGroup: RequestHandler = async (req: Request, res: Response) => {
-  const { id: groupId } = req.params;
+const deleteGroup: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+  const groupId = req.body.params.id;
 
   // Soft delete group by id
   if (groupId) {

@@ -25,7 +25,7 @@ import { useNavigate } from 'react-router-dom';
 import SetlistFolderDrawer from './SetlistFolderDrawer';
 import SetlistViewContainer from './adminView/SetlistViewContainer';
 import PageHeader from '../navigation/PageHeader';
-
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
@@ -55,12 +55,17 @@ const SetlistListContainer: FC = (): ReactElement => {
   const [tab, setTab] = useState(0);
   const [allSetlists, setAllSetlists] = useState<Setlist[]>([]);
   const [allFolders, setAllFolders] = useState<SetlistFolder[]>([]);
+  const [mode, setMode] = useState<'create' | 'edit'>('create');
 
   // handle create setlist/folder button
   const [createAnchorEl, setCreateAnchorEl] = useState<null | HTMLElement>(null);
   const openCreate = Boolean(createAnchorEl);
   const handleCreateClick = (event: MouseEvent<HTMLElement>) => {
     setCreateAnchorEl(event.currentTarget);
+    setFolderName('');
+    setFolderMembers([]);
+    setFolderId('');
+    toggleFolderDrawer(false);
   };
   const handleCreateClose = () => {
     setCreateAnchorEl(null);
@@ -70,6 +75,8 @@ const SetlistListContainer: FC = (): ReactElement => {
   const [openDrawer, setOpenDrawer] = useState<boolean>(false);
   const [folderId, setFolderId] = useState<string>('');
   const [folderName, setFolderName] = useState<string>('');
+  const [folderCreated, setFolderCreated] = useState<string>('');
+  const [folderMembers, setFolderMembers] = useState<string[]>([]);
   const toggleFolderDrawer = (newOpen: boolean) => {
     setOpenDrawer(newOpen);
   };
@@ -105,7 +112,7 @@ const SetlistListContainer: FC = (): ReactElement => {
 
   useEffect(() => {
     getSetlistsAndFolders();
-  }, [getSetlistsAndFolders]);
+  }, [openDrawer, getSetlistsAndFolders]);
 
   return (
     <Container
@@ -137,6 +144,7 @@ const SetlistListContainer: FC = (): ReactElement => {
                 opacity: '0.95',
               },
               transition: 'all 0.1s ease-in-out',
+              display: { xs: 'none', md: 'flex' },
             }}
             startIcon={<Add />}
             onClick={handleCreateClick}
@@ -152,19 +160,19 @@ const SetlistListContainer: FC = (): ReactElement => {
         display="flex"
         justifyContent="space-between"
         pb="10px"
-        pl={{ base: '0', md: '15px' }}
+        pl={{ base: '10px', md: '15px' }}
       >
         <Menu
           anchorEl={createAnchorEl}
           open={openCreate}
           onClose={handleCreateClose}
           anchorOrigin={{
-            vertical: 'top',
-            horizontal: 'right',
+            vertical: isDesktop ? 'top' : 'bottom',
+            horizontal: isDesktop ? 'right' : 'center',
           }}
           transformOrigin={{
-            vertical: 'top',
-            horizontal: 'right',
+            vertical: isDesktop ? 'top' : 'bottom',
+            horizontal: isDesktop ? 'right' : 'center',
           }}
         >
           <MenuItem
@@ -177,6 +185,7 @@ const SetlistListContainer: FC = (): ReactElement => {
           </MenuItem>
           <MenuItem
             onClick={() => {
+              setMode('create');
               toggleFolderDrawer(true);
               handleCreateClose();
             }}
@@ -185,10 +194,9 @@ const SetlistListContainer: FC = (): ReactElement => {
           </MenuItem>
         </Menu>
       </Stack>
-
       <Stack direction="row" width="100%">
         {/* list out all existing setlists */}
-        <Box width={'30%'}>
+        <Box sx={{ width: { xs: '100%', sm: '30%' } }}>
           <Tabs
             selectionFollowsFocus
             variant="fullWidth"
@@ -216,8 +224,23 @@ const SetlistListContainer: FC = (): ReactElement => {
                         <ListItemText>
                           <Typography>{folder.groupName}</Typography>
                         </ListItemText>
+                        <Button
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            setMode('edit');
+                            toggleFolderDrawer(true);
+                            handleCreateClose();
+                            setFolderId(folder._id);
+                            setFolderName(folder.groupName);
+                            setFolderMembers(folder.userIds);
+                            setFolderCreated(folder.createdAt);
+                          }}
+                        >
+                          <MoreVertIcon />
+                        </Button>
                         {openFolders.includes(folder._id) ? <ExpandLess /> : <ExpandMore />}
                       </ListItemButton>
+
                       <Collapse in={openFolders.includes(folder._id)} timeout="auto" unmountOnExit>
                         <List component="div" disablePadding>
                           {folder.setlistIds.length > 0 ? (
@@ -286,6 +309,20 @@ const SetlistListContainer: FC = (): ReactElement => {
                       <ListItemText>
                         <Typography>{folder.groupName}</Typography>
                       </ListItemText>
+                      <Button
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          setMode('edit');
+                          toggleFolderDrawer(true);
+                          handleCreateClose();
+                          setFolderId(folder._id);
+                          setFolderName(folder.groupName);
+                          setFolderMembers(folder.userIds);
+                          setFolderCreated(folder.createdAt);
+                        }}
+                      >
+                        <MoreVertIcon />
+                      </Button>
                       {openFolders.includes(folder._id) ? <ExpandLess /> : <ExpandMore />}
                     </ListItemButton>
                     <Collapse in={openFolders.includes(folder._id)} timeout="auto" unmountOnExit>
@@ -356,19 +393,54 @@ const SetlistListContainer: FC = (): ReactElement => {
         <Divider orientation="vertical" variant="fullWidth" sx={{ borderColor: '#D9D9D980' }} />
 
         {/* display setlist details & preview */}
-        <Box width="70%">
+        <Box
+          width="70%"
+          sx={{
+            display: { xs: 'none', sm: 'block' },
+          }}
+        >
           <SetlistViewContainer />
         </Box>
       </Stack>
-
       <SetlistFolderDrawer
         openDrawer={openDrawer}
         toggleFolderDrawer={toggleFolderDrawer}
         setFolderId={setFolderId}
         setFolderName={setFolderName}
+        setFolderMembers={setFolderMembers}
+        setFolderCreated={setFolderCreated}
         folderId={folderId}
         folderName={folderName}
+        folderMembers={folderMembers}
+        folderCreated={folderCreated}
+        mode={mode}
       />
+      <Button
+        variant="outlined"
+        sx={{
+          border: 0,
+          padding: '10px 25px',
+          borderRadius: '40px',
+          backgroundColor: '#D0BCFF',
+          color: '#381E72',
+          textTransform: 'none',
+          '&:hover': {
+            backgroundColor: '#D0BCFF',
+            opacity: '0.95',
+          },
+          transition: 'all 0.1s ease-in-out',
+          position: 'fixed',
+          bottom: '100px',
+          right: '16px',
+          display: { xs: 'block', md: 'none' },
+          zIndex: 1000,
+        }}
+        onClick={handleCreateClick}
+      >
+        <Typography variant="subtitle1" fontWeight={700}>
+          + New
+        </Typography>
+      </Button>
     </Container>
   );
 };
