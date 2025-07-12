@@ -11,6 +11,7 @@ const MainLoginContainer: React.FC = () => {
 
   const renderPage = () => {
     switch (pageName) {
+      //TODO: Remove signup container as it is being redirected to the main web
       case 'register':
         return <RegisterContainer />;
       case 'recover':

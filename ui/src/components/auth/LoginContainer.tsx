@@ -20,7 +20,7 @@ import { LoginFormFields } from '../../types/form.types';
 import { formSpacing } from '../../constants';
 import { emailValidator, passwordValidator } from './helpers/zod.validators';
 import { useNavigate } from 'react-router-dom';
-import { useGoogleLogin } from '@react-oauth/google';
+import { GoogleLogin } from '@react-oauth/google';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
@@ -60,23 +60,18 @@ const LoginContainer: React.FC = () => {
     }
   };
 
-  const handleGoogleLogin = useGoogleLogin({
-    onSuccess: async (codeResponse) => {
-      try {
-        const payload = await axios.post('/external-api/auth/login-google', {
-          responseCode: codeResponse.code,
-        });
-
-        dispatch(signin(payload.data));
-        setInvalidLogin('');
-        navigate('/');
-      } catch (error) {
-        console.error('Google login error:', error);
-      }
-    },
-    onError: () => console.log('failed'),
-    flow: 'auth-code',
-  });
+  const onGoogleSuccessLogin = async ({ credential }: { credential?: string }) => {
+    try {
+      const { data } = await axios.post('/external-api/auth/login-google', {
+        tokenId: credential,
+      });
+      dispatch(signin(data));
+      setInvalidLogin('');
+      navigate('/');
+    } catch (e) {
+      console.log('Google login error: ', e);
+    }
+  };
 
   return (
     <Box
@@ -167,17 +162,14 @@ const LoginContainer: React.FC = () => {
                 </Typography>
               </Button>
               <Typography>OR</Typography>
-              <Button
-                style={{ borderRadius: '30px' }}
-                color={'primary'}
-                variant={'contained'}
-                fullWidth
-                onClick={() => handleGoogleLogin()}
-              >
-                <Typography variant="subtitle1" sx={{ fontWeight: 700 }} color="secondary">
-                  Log In with Google
-                </Typography>
-              </Button>
+              <GoogleLogin
+                locale="en"
+                size="large"
+                shape="pill"
+                text="signin_with"
+                use_fedcm_for_prompt={true}
+                onSuccess={onGoogleSuccessLogin}
+              />
               <Stack
                 direction={'row'}
                 spacing={4}
@@ -187,8 +179,15 @@ const LoginContainer: React.FC = () => {
                 <Typography variant="subtitle1" color={theme.palette.secondary.light}>
                   Don't have an account?
                 </Typography>
-                <Link color="secondary" href="/register" underline={'hover'} variant="button">
-                  <Typography variant="subtitle1">SIGN UP</Typography>
+                <Link
+                  color="secondary"
+                  href={`${process.env.REACT_APP_MAIN_URL}/signup`}
+                  underline={'hover'}
+                  variant="button"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Typography variant="subtitle1">SIGN UP @HMCC.HK</Typography>
                 </Link>
               </Stack>
             </Stack>
