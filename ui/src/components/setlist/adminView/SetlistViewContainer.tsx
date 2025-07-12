@@ -143,7 +143,6 @@ const SetlistViewContainer: FC = (): ReactElement | null => {
                 if (groupData) {
                   setFolderId(groupData._id);
                   setFolderName(groupData.groupName);
-                  setFolderMembers(groupData.userIds);
                   setFolderCreated(groupData.createdAt);
                   toggleFolderDrawer(true);
                 }

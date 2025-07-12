@@ -232,7 +232,6 @@ const SetlistListContainer: FC = (): ReactElement => {
                             handleCreateClose();
                             setFolderId(folder._id);
                             setFolderName(folder.groupName);
-                            setFolderMembers(folder.userIds);
                             setFolderCreated(folder.createdAt);
                           }}
                         >
@@ -317,7 +316,6 @@ const SetlistListContainer: FC = (): ReactElement => {
                           handleCreateClose();
                           setFolderId(folder._id);
                           setFolderName(folder.groupName);
-                          setFolderMembers(folder.userIds);
                           setFolderCreated(folder.createdAt);
                         }}
                       >

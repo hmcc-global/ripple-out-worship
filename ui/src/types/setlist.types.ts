@@ -40,18 +40,21 @@ export type Setlist = {
   name: string;
   date: Date | string;
   songs: SongSetlistSchema[];
-  sharedUserIds: string[];
   groupIds: string[];
   publicLink: string;
   createdAt: string;
+  lastUpdatedBy: string;
+  isDeleted: boolean;
 };
 
 export type SetlistFolder = {
   _id: string;
   groupName: string;
-  userIds: string[];
   setlistIds: string[];
+  createdBy: string;
+  lastUpdatedBy: string;
   createdAt: string;
+  isDeleted: boolean;
 };
 
 export type SetlistFolderMember = {
