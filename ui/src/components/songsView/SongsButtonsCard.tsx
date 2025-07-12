@@ -106,9 +106,9 @@ const SongsButtonsCard = ({ song, userView = false, userHeader = false }: SongsB
         >
           <Stack direction="row" alignItems={'center'} spacing={1}>
             <Stack
+             display={{ xs: 'none', md: 'flex !important' }}
               direction="row"
               spacing={2}
-              display="flex !important"
               sx={{
                 justifyContent: 'center',
                 background: '#322F35',
