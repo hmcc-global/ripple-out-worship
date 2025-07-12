@@ -6,7 +6,6 @@ import axios from 'axios';
 import {
   Box,
   Button,
-  Checkbox,
   IconButton,
   InputAdornment,
   Link,
@@ -39,7 +38,6 @@ const LoginContainer: React.FC = () => {
 
   const [invalidLogin, setInvalidLogin] = useState<string>('');
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberPassword, setRememberPassword] = useState<boolean>(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -50,7 +48,6 @@ const LoginContainer: React.FC = () => {
       const payload = await axios.post(`/external-api/auth/login`, {
         emailAddress: data.email,
         password: data.password ?? '',
-        isRememberPassword: rememberPassword,
       });
       dispatch(signin(payload.data));
       setInvalidLogin('');
@@ -141,28 +138,7 @@ const LoginContainer: React.FC = () => {
                 }}
               />
             </Stack>
-            <Stack
-              direction={'row'}
-              spacing={1}
-              alignItems={'center'}
-              justifyContent="space-between"
-            >
-              <Box display="flex" alignItems="center">
-                <Checkbox
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setRememberPassword(e.target.checked)
-                  }
-                  color="secondary"
-                  sx={{
-                    padding: '0 0.25rem 0 0',
-                    '& .MuiSvgIcon-root': { color: theme.palette.secondary.main },
-                  }}
-                  checked={rememberPassword}
-                />
-                <Typography color="secondary" variant={'button'}>
-                  REMEMBER ME
-                </Typography>
-              </Box>
+            <Stack direction="row" spacing={1} alignItems="center" justifyContent="flex-end">
               <Link
                 href="/password/recover"
                 textAlign="right"
