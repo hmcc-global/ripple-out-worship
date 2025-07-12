@@ -31,12 +31,12 @@ const createOwnership: RequestHandler = async (req: Request, res: Response): Pro
 };
 
 const getOwnership: RequestHandler = async (req: Request, res: Response): Promise<void> => {
-  const { id: ownershipId } = req.query;
+  const { userId } = req.query;
 
-  if (ownershipId) {
+  if (userId) {
     try {
       const data: OwnershipPublicDocument | null = await Ownership.findOne({
-        _id: ownershipId,
+        userId: userId,
         isDeleted: false,
       });
 
@@ -94,7 +94,10 @@ const deleteOwnership: RequestHandler = async (req: Request, res: Response): Pro
 
   if (ownershipId) {
     try {
-      await Ownership.updateOne({ _id: ownershipId, isDeleted: false }, { $set: { isDeleted: true } });
+      await Ownership.updateOne(
+        { _id: ownershipId, isDeleted: false },
+        { $set: { isDeleted: true } }
+      );
       sendResponse(res, 200, 'Ownership successfully deleted');
     } catch (error: any) {
       sendResponse(res, 500, error?.message);
