@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { ChakraProvider, Box, Text, Link, VStack, Code, Grid, theme } from '@chakra-ui/react';
+import { ChakraProvider, Box, Text, Link, VStack, Code, Grid } from '@chakra-ui/react';
 import { ColorModeSwitcher } from './ColorModeSwitcher';
 import { Logo } from './Logo';
+import theme from './theme';
 
 export const App = () => (
   <ChakraProvider theme={theme}>
@@ -14,11 +15,12 @@ export const App = () => (
             Edit <Code fontSize="xl">src/App.tsx</Code> and save to reload.
           </Text>
           <Link
-            color="teal.500"
+            color="brand.500"
             href="https://chakra-ui.com"
             fontSize="2xl"
             target="_blank"
             rel="noopener noreferrer"
+            _hover={{ color: 'brand.600' }}
           >
             Learn Chakra
           </Link>
