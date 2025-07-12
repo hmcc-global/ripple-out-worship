@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, ButtonGroup, ButtonProps, VStack, HStack } from '@chakra-ui/react';
+import { Button, ButtonProps, VStack, HStack } from '@chakra-ui/react';
 
 interface ActionButtonsProps {
   onCancel?: () => void;
