@@ -5,3 +5,6 @@ build
 *.min.js
 coverage
 server/dist
+public
+*.test.js.snap
+serviceWorker.ts

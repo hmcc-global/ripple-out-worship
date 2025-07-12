@@ -1,7 +1,6 @@
 import * as React from 'react';
 import {
   ThemeProvider,
-  createTheme,
   CssBaseline,
   Box,
   Typography,
@@ -12,8 +11,7 @@ import {
 } from '@mui/material';
 import { ColorModeSwitcher } from './ColorModeSwitcher';
 import { Logo } from './Logo';
-
-const theme = createTheme();
+import { theme } from './theme';
 
 export const App = () => (
   <ThemeProvider theme={theme}>
