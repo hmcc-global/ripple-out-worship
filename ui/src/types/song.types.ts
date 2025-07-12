@@ -1,4 +1,4 @@
-import { UserEditorFields } from './user.types';
+import { User } from './user.types';
 
 type SongEditorFields = {
   artist: string;
@@ -36,8 +36,8 @@ export type SongCardProps = {
   code: string;
   firstLine: string;
   chordLyrics: string;
-  createdBy: UserEditorFields;
-  lastUpdatedBy: UserEditorFields;
+  createdBy: User;
+  lastUpdatedBy: User;
   filterData?: SongSearchFilter;
   isVerified: Boolean;
   createdAt: Date;
@@ -81,8 +81,8 @@ export type SongViewSchema = {
   artist: string;
   year: string;
   code: string;
-  createdBy: UserEditorFields;
-  lastUpdatedBy: UserEditorFields;
+  createdBy: User;
+  lastUpdatedBy: User;
   isVerified: boolean;
   chordLyrics: string;
   isDeleted: boolean;
@@ -100,8 +100,8 @@ export type SongSchema = {
   artist: string;
   year: string;
   code: string;
-  createdBy: UserEditorFields;
-  lastUpdatedBy: UserEditorFields;
+  createdBy: User;
+  lastUpdatedBy: User;
   isVerified: boolean;
   chordLyrics: string;
   isDeleted: boolean;

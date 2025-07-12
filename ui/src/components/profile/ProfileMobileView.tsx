@@ -1,33 +1,11 @@
-import axios from 'axios';
-import { FC, ReactElement, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import {
-  Box,
-  Button,
-  Stack,
-  TextField,
-  Typography,
-  Container,
-  styled,
-  Divider,
-} from '@mui/material';
-import { UserEditorFields } from '../../types/user.types';
+import { FC, ReactElement } from 'react';
+import { Box, Button, Stack, TextField, Typography, Container, styled } from '@mui/material';
 import { useUser } from '../../helpers/customHooks';
-import EditModal from './EditModal';
-import ChangePasswordModal from './ChangePasswordModal';
 import { useDispatch } from 'react-redux';
-import { refetchUser, signout } from '../../reducers/userSlice';
+import { signout } from '../../reducers/userSlice';
 import PageHeader from '../navigation/PageHeader';
 import PersonIcon from '@mui/icons-material/Person';
-import CreateIcon from '@mui/icons-material/Create';
-import LockIcon from '@mui/icons-material/Lock';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { useTheme } from '@mui/material/styles';
 import LogoutIcon from '@mui/icons-material/Logout';
-import Snackbar from '@mui/material/Snackbar';
-import MuiAlert from '@mui/material/Alert';
-import CheckIcon from '@mui/icons-material/Check';
-import CloseIcon from '@mui/icons-material/Close';
 
 const RowStack = styled(Stack)({
   display: 'flex',
@@ -37,80 +15,8 @@ const RowStack = styled(Stack)({
 });
 
 const ProfileMobileView: FC = (): ReactElement => {
-  const { token, user } = useUser();
+  const { user } = useUser();
   const dispatch = useDispatch();
-  const { register, getValues } = useForm<UserEditorFields>();
-  const [showEditProfile, setShowEditProfile] = useState<boolean>(false);
-  const [showChangePassword, setShowChangePassword] = useState<boolean>(false);
-  const theme = useTheme();
-  const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
-  const [snackbarMessage, setSnackbarMessage] = useState<String>('');
-  const [snackbarStatus, setSnackbarStatus] = useState<'success' | 'error'>('success');
-
-  const handleSnackbarClose = () => {
-    setSnackbarOpen(false);
-  };
-
-  const handleEditUserInformation = async (data: UserEditorFields) => {
-    data._id = user?._id || '';
-    try {
-      const { data: updated, status } = await axios.put('/api/users/update', {
-        id: data._id,
-        fullName: data.fullName,
-      });
-      if (status === 200) {
-        dispatch(refetchUser({ token, _doc: updated }));
-        setSnackbarStatus('success');
-        setSnackbarMessage('User information updated successfully!');
-        setSnackbarOpen(true);
-      }
-    } catch (e) {
-      setSnackbarStatus('error');
-      setSnackbarMessage('Failed to update user information.');
-      setSnackbarOpen(true);
-      console.log(e);
-    }
-  };
-
-  const handleChangePassword = async (data: UserEditorFields) => {
-    data._id = user?._id || '';
-    try {
-      const { data: updated, status } = await axios.put('/api/users/change-password', {
-        id: data._id,
-        currentPassword: data.currentPassword,
-        newPassword: data.newPassword,
-      });
-      if (status === 200) {
-        dispatch(refetchUser({ token, _doc: updated }));
-        setSnackbarStatus('success');
-        setSnackbarMessage('Password changed successfully!');
-        setSnackbarOpen(true);
-      }
-    } catch (e) {
-      setSnackbarStatus('error');
-      setSnackbarMessage('Failed to change password.');
-      setSnackbarOpen(true);
-      console.log(e);
-    }
-  };
-
-  const editProfileHandler = () => {
-    setShowEditProfile(true);
-    setShowChangePassword(false);
-  };
-
-  const changePassHandler = () => {
-    setShowChangePassword(true);
-    setShowEditProfile(false);
-  };
-
-  const backProfileHandler = () => {
-    if (showEditProfile) {
-      setShowEditProfile(false);
-    } else if (showChangePassword) {
-      setShowChangePassword(false);
-    }
-  };
 
   return (
     <Container
@@ -138,96 +44,60 @@ const ProfileMobileView: FC = (): ReactElement => {
           <Typography variant="h2" sx={{ fontSize: '1.5rem', fontWeight: 700 }}>
             My Information
           </Typography>
-          <Button
-            startIcon={<CreateIcon />}
-            variant="contained"
-            color="secondary"
-            onClick={editProfileHandler}
-            style={{ borderRadius: '20px', padding: '10px 24px', fontWeight: 200 }}
-          >
-            <Typography color="inherit" variant="h5" sx={{ fontSize: '1rem' }}>
-              Edit
-            </Typography>
-          </Button>
         </RowStack>
-        {!showEditProfile && !showChangePassword && (
-          <Stack spacing={2} width="80%" mb={2}>
-            <Typography
-              sx={{
-                marginBottom: '2px',
-                fontSize: '1rem',
-                color: '#EADDFF',
-                fontWeight: '700',
-              }}
-            >
-              Full Name
-            </Typography>
-            <TextField
-              fullWidth
-              disabled
-              id="outlined-name"
-              value={user?.fullName}
-              {...register('fullName', { required: true })}
-              sx={{
-                '& .MuiInputBase-input.Mui-disabled': {
-                  WebkitTextFillColor: '#E6E0E9',
-                },
-                '& .MuiOutlinedInput-root.Mui-disabled .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#E6E0E9',
-                },
-              }}
-            />
-            <Typography
-              sx={{
-                marginBottom: '16px',
-                fontSize: '1rem',
-                color: '#EADDFF',
-                fontWeight: '700',
-              }}
-            >
-              Email
-            </Typography>
-            <TextField
-              fullWidth
-              disabled
-              id="outlined-email"
-              value={user?.email}
-              {...register('email', { required: true })}
-              sx={{
-                '& .MuiInputBase-input.Mui-disabled': {
-                  WebkitTextFillColor: '#E6E0E9',
-                },
-                '& .MuiOutlinedInput-root.Mui-disabled .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#E6E0E9',
-                },
-              }}
-            />
-          </Stack>
-        )}
-        <Box display="flex" flexDirection="column" alignItems="flex-start" gap="24px" marginTop={2}>
-          <Button
-            variant="contained"
-            color="secondary"
-            startIcon={<LockIcon />}
-            onClick={changePassHandler}
-            style={{
-              padding: '8px 16px',
-              borderRadius: '20px',
-              display: user?.password === '' ? 'none' : 'inline-flex',
+
+        <Stack spacing={2} width="80%" mb={2}>
+          <Typography
+            sx={{
+              marginBottom: '2px',
+              fontSize: '1rem',
+              color: '#EADDFF',
+              fontWeight: '700',
             }}
-            disabled={user?.password === ''}
           >
-            <Typography
-              color="inherit"
-              sx={{
-                color: ' #381E72',
-                fontSize: '1rem',
-                fontWeight: 700,
-              }}
-            >
-              {user?.password === '' ? 'Google Login cannot change password' : 'Change Password'}
-            </Typography>
-          </Button>
+            Full Name
+          </Typography>
+          <TextField
+            fullWidth
+            disabled
+            id="outlined-name"
+            value={user?.fullName}
+            sx={{
+              '& .MuiInputBase-input.Mui-disabled': {
+                WebkitTextFillColor: '#E6E0E9',
+              },
+              '& .MuiOutlinedInput-root.Mui-disabled .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#E6E0E9',
+              },
+            }}
+          />
+          <Typography
+            sx={{
+              marginBottom: '16px',
+              fontSize: '1rem',
+              color: '#EADDFF',
+              fontWeight: '700',
+            }}
+          >
+            Email
+          </Typography>
+          <TextField
+            fullWidth
+            disabled
+            id="outlined-email"
+            value={user?.email}
+            sx={{
+              '& .MuiInputBase-input.Mui-disabled': {
+                WebkitTextFillColor: '#E6E0E9',
+              },
+              '& .MuiOutlinedInput-root.Mui-disabled .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#E6E0E9',
+              },
+            }}
+          />
+        </Stack>
+
+        <Box display="flex" flexDirection="column" alignItems="flex-start" gap="24px" marginTop={2}>
           <Button
             variant="contained"
             color="secondary"
@@ -246,76 +116,8 @@ const ProfileMobileView: FC = (): ReactElement => {
               Log out
             </Typography>
           </Button>
-          <Divider
-            flexItem
-            sx={{ borderBottomWidth: '0.5px' }}
-            style={{ borderColor: theme.palette.secondary.dark, marginBottom: '8px' }}
-          />
-          <Button
-            startIcon={<DeleteIcon />}
-            variant="contained"
-            color="warning"
-            style={{ borderRadius: '20px', padding: '8px 16px', color: '#601410' }}
-          >
-            <Typography
-              sx={{
-                color: ' #601410',
-                fontSize: '1rem',
-                fontWeight: 700,
-              }}
-            >
-              Delete Account (Coming Soon)
-            </Typography>
-          </Button>
         </Box>
-        <EditModal
-          handleClose={backProfileHandler}
-          open={showEditProfile}
-          onSubmit={handleEditUserInformation}
-          getFormValues={getValues}
-          register={register}
-          user={user}
-        />
-
-        <ChangePasswordModal
-          onSubmit={handleChangePassword}
-          open={showChangePassword}
-          user={user}
-          handleClose={backProfileHandler}
-          getFormValues={getValues}
-          register={register}
-        />
       </Box>
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={3000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <MuiAlert
-          elevation={0}
-          variant="filled"
-          icon={
-            snackbarStatus === 'error' ? (
-              <CloseIcon sx={{ fontSize: 20, color: '#fff', mr: 1 }} />
-            ) : (
-              <CheckIcon sx={{ fontSize: 20, color: '#fff', mr: 1 }} />
-            )
-          }
-          sx={{
-            fontFamily: 'DM Sans, sans-serif',
-            background: '#36333b',
-            color: '#EADDFF',
-            borderRadius: 3,
-            fontWeight: 400,
-            fontSize: '1rem',
-            alignItems: 'center',
-            '.MuiAlert-icon': { marginRight: 1 },
-          }}
-        >
-          {snackbarMessage}
-        </MuiAlert>
-      </Snackbar>
     </Container>
   );
 };

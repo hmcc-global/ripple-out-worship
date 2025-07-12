@@ -13,4 +13,19 @@ module.exports = function (app) {
   );
 
   console.log('Proxy middleware setup complete');
+
+  // Proxy specifically for HMCC API
+  app.use(
+    '/external-api',
+    createProxyMiddleware({
+      target: process.env.REACT_APP_MAIN_URL,
+      changeOrigin: true,
+      pathRewrite: {
+        '^/external-api': '/api',
+      },
+      logLevel: 'debug',
+    })
+  );
+
+  console.log('Proxy middleware setup complete');
 };

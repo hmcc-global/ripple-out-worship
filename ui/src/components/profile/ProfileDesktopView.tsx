@@ -1,10 +1,7 @@
-import axios from 'axios';
-import { FC, ReactElement, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { FC, ReactElement } from 'react';
 import {
   Box,
   Button,
-  Divider,
   Stack,
   TextField,
   Typography,
@@ -12,22 +9,12 @@ import {
   styled,
   useTheme,
 } from '@mui/material';
-import { UserEditorFields } from '../../types/user.types';
-import CreateIcon from '@mui/icons-material/Create';
 import PersonIcon from '@mui/icons-material/Person';
 import { useUser } from '../../helpers/customHooks';
 import PageHeader from '../navigation/PageHeader';
-import EditModal from './EditModal';
-import ChangePasswordModal from './ChangePasswordModal';
 import { useDispatch } from 'react-redux';
-import { refetchUser, signout } from '../../reducers/userSlice';
-import LockIcon from '@mui/icons-material/Lock';
-import DeleteIcon from '@mui/icons-material/Delete';
-import Snackbar from '@mui/material/Snackbar';
-import MuiAlert from '@mui/material/Alert';
-import CheckIcon from '@mui/icons-material/Check';
+import { signout } from '../../reducers/userSlice';
 import LogoutIcon from '@mui/icons-material/Logout';
-import CloseIcon from '@mui/icons-material/Close';
 
 const RowStack = styled(Stack)({
   display: 'flex',
@@ -50,85 +37,9 @@ const DisabledTextField = styled(TextField)(({ theme }) => ({
 }));
 
 const ProfileDesktopView: FC = (): ReactElement => {
-  const { token, user } = useUser();
+  const { user } = useUser();
   const dispatch = useDispatch();
   const theme = useTheme();
-  // TO-DO refactor the use of react form to properly pass the values using the hooks instead of forcing it now.
-  const { register, getValues, setValue } = useForm<UserEditorFields>();
-
-  const [showEditProfile, setShowEditProfile] = useState<boolean>(false);
-  const [showChangePassword, setShowChangePassword] = useState<boolean>(false);
-  const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
-  const [snackbarMessage, setSnackbarMessage] = useState<String>('');
-  const [snackbarStatus, setSnackbarStatus] = useState<'success' | 'error'>('success');
-
-  const handleSnackbarClose = () => {
-    setSnackbarOpen(false);
-  };
-
-  const handleEditUserInformation = async (data: UserEditorFields) => {
-    data._id = user?._id || '';
-    try {
-      const { data: updated, status } = await axios.put('/api/users/update', {
-        id: data._id,
-        fullName: data.fullName,
-      });
-      if (status === 200) {
-        dispatch(refetchUser({ token, _doc: updated }));
-        setSnackbarStatus('success');
-        setSnackbarMessage('User information updated successfully!');
-        setSnackbarOpen(true);
-      }
-    } catch (e) {
-      setSnackbarStatus('error');
-      setSnackbarMessage('Failed to update user information.');
-      setSnackbarOpen(true);
-      console.log(e);
-    }
-  };
-
-  const handleChangePassword = async (data: UserEditorFields) => {
-    data._id = user?._id || '';
-    try {
-      const { data: updated, status } = await axios.put('/api/users/change-password', {
-        id: data._id,
-        currentPassword: data.currentPassword,
-        newPassword: data.newPassword,
-      });
-      if (status === 200) {
-        dispatch(refetchUser({ token, _doc: updated }));
-        setSnackbarStatus('success');
-        setSnackbarMessage('Password changed successfully!');
-        setSnackbarOpen(true);
-      }
-    } catch (e) {
-      console.log(e);
-      setSnackbarStatus('error');
-      setSnackbarMessage('Failed to change password.');
-      setSnackbarOpen(true);
-    }
-  };
-
-  const editProfileHandler = () => {
-    setValue('fullName', '');
-    setShowEditProfile(true);
-    setShowChangePassword(false);
-  };
-
-  const changePassHandler = () => {
-    setShowChangePassword(true);
-    setShowEditProfile(false);
-  };
-
-  const backProfileHandler = () => {
-    if (showEditProfile) {
-      setShowEditProfile(false);
-    } else if (showChangePassword) {
-      setShowChangePassword(false);
-    }
-    // return it to default
-    setValue('fullName', user?.fullName || '');
-  };
 
   return (
     <Container
@@ -169,17 +80,6 @@ const ProfileDesktopView: FC = (): ReactElement => {
         >
           <RowStack>
             <Typography variant="h2">My Information</Typography>
-            <Button
-              style={{ borderRadius: '28px', padding: '12px 24px' }}
-              startIcon={<CreateIcon />}
-              variant="contained"
-              color="secondary"
-              onClick={editProfileHandler}
-            >
-              <Typography color="inherit" variant="h5">
-                Edit
-              </Typography>
-            </Button>
           </RowStack>
           <Box>
             <Typography
@@ -198,7 +98,6 @@ const ProfileDesktopView: FC = (): ReactElement => {
               id="outlined-name"
               variant="outlined"
               value={user?.fullName}
-              {...register('fullName', { required: true })}
               sx={{ width: '75%' }}
             />
           </Box>
@@ -218,7 +117,6 @@ const ProfileDesktopView: FC = (): ReactElement => {
               disabled
               id="outlined-email"
               value={user?.email}
-              {...register('email', { required: true })}
               style={{ marginBottom: '16px' }}
               sx={{ width: '75%' }}
             />
@@ -227,32 +125,12 @@ const ProfileDesktopView: FC = (): ReactElement => {
             <Button
               variant="contained"
               color="secondary"
-              startIcon={<LockIcon />}
-              onClick={changePassHandler}
-              style={{
-                padding: '8px 16px',
-                borderRadius: '20px',
-                display: user?.password === '' ? 'none' : 'inline-flex',
-              }}
-              disabled={user?.password === ''}
-            >
-              <Typography
-                color="inherit"
-                variant="h6"
-                sx={{
-                  color: ' #381E72',
-                  fontSize: '1rem',
-                  fontWeight: 700,
-                }}
-              >
-                {user?.password === '' ? 'Google Login cannot change password' : 'Change Password'}
-              </Typography>
-            </Button>
-            <Button
-              variant="contained"
-              color="secondary"
               startIcon={<LogoutIcon />}
-              onClick={() => dispatch(signout(''))}
+              //TODO: Find a more elegant way to reset to login
+              onClick={() => {
+                dispatch(signout(''));
+                window.location.reload();
+              }}
               style={{ borderRadius: '20px', padding: '8px 16px' }}
             >
               <Typography
@@ -266,77 +144,9 @@ const ProfileDesktopView: FC = (): ReactElement => {
                 Log out
               </Typography>
             </Button>
-            <Divider
-              flexItem
-              sx={{ borderBottomWidth: '0.5px' }}
-              style={{ borderColor: theme.palette.secondary.dark, marginBottom: '8px' }}
-            />
-            <Button
-              startIcon={<DeleteIcon />}
-              variant="contained"
-              color="warning"
-              style={{ borderRadius: '20px', padding: '8px 16px' }}
-            >
-              <Typography
-                sx={{
-                  color: ' #601410',
-                  fontSize: '1rem',
-                  fontWeight: 700,
-                }}
-              >
-                Delete Account (Coming Soon)
-              </Typography>
-            </Button>
           </Box>
         </Stack>
-
-        <EditModal
-          onSubmit={handleEditUserInformation}
-          register={register}
-          getFormValues={getValues}
-          user={user}
-          open={showEditProfile}
-          handleClose={backProfileHandler}
-        />
-        <ChangePasswordModal
-          onSubmit={handleChangePassword}
-          getFormValues={getValues}
-          register={register}
-          user={user}
-          open={showChangePassword}
-          handleClose={backProfileHandler}
-        />
       </Box>
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={3000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-      >
-        <MuiAlert
-          elevation={0}
-          variant="filled"
-          icon={
-            snackbarStatus === 'error' ? (
-              <CloseIcon sx={{ fontSize: 20, color: '#fff', mr: 1 }} />
-            ) : (
-              <CheckIcon sx={{ fontSize: 20, color: '#fff', mr: 1 }} />
-            )
-          }
-          sx={{
-            fontFamily: 'DM Sans, sans-serif',
-            background: '#36333b',
-            color: '#EADDFF',
-            borderRadius: 3,
-            fontWeight: 400,
-            fontSize: '1rem',
-            alignItems: 'center',
-            '.MuiAlert-icon': { marginRight: 1 },
-          }}
-        >
-          {snackbarMessage}
-        </MuiAlert>
-      </Snackbar>
     </Container>
   );
 };

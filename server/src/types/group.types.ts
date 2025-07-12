@@ -3,7 +3,7 @@ import { MongoInjectedFields } from './mongo.types';
 
 type GroupSchema = {
   groupName: string;
-  userIds: Types.Array<Types.ObjectId>;
+  ownerships: Types.Array<Types.ObjectId>;
   setlistIds: Types.Array<Types.ObjectId>;
   createdBy: Types.ObjectId;
   lastUpdatedBy: Types.ObjectId;

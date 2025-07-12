@@ -8,7 +8,6 @@ import cors from 'cors';
 dotenv.config();
 
 const app = express();
-console.log(process.env.PORT);
 const port: number = process.env.PORT ? parseInt(process.env.PORT) : 1338; // development port is 1338
 const isDevelopment = process.env.NODE_ENV === 'test';
 
@@ -16,7 +15,14 @@ const isDevelopment = process.env.NODE_ENV === 'test';
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-app.use(cors());
+app.use(
+  cors({
+    origin: [process.env.MAIN_URL as string],
+    methods: ['GET', 'POST', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-access-token'],
+    credentials: true, 
+  })
+);
 app.use(express.json());
 app.use('/api', getRoutes());
 if (!isDevelopment) {

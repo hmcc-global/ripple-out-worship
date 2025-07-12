@@ -67,7 +67,7 @@ const ResetPasswordContainer: React.FC = () => {
       const token = query.get('token');
       const email = query.get('email');
 
-      const payload = await axios.post('/api/auth/reset-password', {
+      const payload = await axios.post('/external-api/auth/reset-password', {
         email: email,
         token: token,
         password: data.password ?? '',

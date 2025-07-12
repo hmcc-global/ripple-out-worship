@@ -5,8 +5,8 @@ const songOptionSchema = new Schema<SongOptionSchema>(
   {
     category: { type: String, required: true },
     list: [{ type: String, required: true }],
-    createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
-    lastUpdatedBy: { type: Schema.Types.ObjectId, ref: 'User' },
+    createdBy: { type: Schema.Types.ObjectId, ref: 'Ownership' },
+    lastUpdatedBy: { type: Schema.Types.ObjectId, ref: 'Ownership' },
     isDeleted: { type: Boolean, default: false },
   },
   { timestamps: true }
