@@ -1,11 +1,5 @@
 import * as React from 'react';
-import {
-  chakra,
-  keyframes,
-  ImageProps,
-  forwardRef,
-  usePrefersReducedMotion,
-} from '@chakra-ui/react';
+import { styled, keyframes } from '@mui/material/styles';
 import logo from './logo.svg';
 
 const spin = keyframes`
@@ -13,10 +7,19 @@ const spin = keyframes`
   to { transform: rotate(360deg); }
 `;
 
-export const Logo = forwardRef<ImageProps, 'img'>((props, ref) => {
-  const prefersReducedMotion = usePrefersReducedMotion();
+const LogoImg = styled('img')<{ h?: string }>(({ h }) => ({
+  height: h || '40vmin',
+  animation: `${spin} infinite 20s linear`,
+  '@media (prefers-reduced-motion)': {
+    animation: 'none',
+  },
+}));
 
-  const animation = prefersReducedMotion ? undefined : `${spin} infinite 20s linear`;
+interface LogoProps {
+  h?: string;
+  style?: React.CSSProperties;
+}
 
-  return <chakra.img animation={animation} src={logo} ref={ref} {...props} />;
-});
+export const Logo: React.FC<LogoProps> = ({ h, ...props }) => {
+  return <LogoImg src={logo} alt="logo" h={h} {...props} />;
+};
