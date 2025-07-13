@@ -1,12 +1,7 @@
-import { Box } from '@mui/material';
 import SetlistViewContainerMobile from '../../../components/setlistView/SetlistViewContainerMobile';
 
 const SetlistPreview = () => {
-  return (
-    <Box>
-      <SetlistViewContainerMobile preview={true} />
-    </Box>
-  );
+  return <SetlistViewContainerMobile preview={true} />;
 };
 
 export default SetlistPreview;

@@ -1,3 +1,5 @@
+import { styled } from '@mui/material/styles';
+// Types
 import {
   Setlist,
   SetlistEditorFields,
@@ -5,13 +7,21 @@ import {
   SetlistFolder,
 } from '../../types/setlist.types';
 import { SongSchema, SongSearchFilter, SongSetlistSchema } from '../../types/song.types';
-import { Info, MusicNote, Search, QueueMusic, AddCircleOutline } from '@mui/icons-material';
+// Components
+import HeaderWithIcon from '../custom/HeaderWithIcon';
+import PageHeader from '../navigation/PageHeader';
+import SetlistSongsTable from './SetlistSongsTable';
+import AutocompleteInput from '../custom/AutocompleteInput';
+import SongFieldArray from '../song/SongFieldArray';
+
+// MUI Components
 import {
   Alert,
   AlertTitle,
   Box,
   Button,
   Container,
+  Drawer,
   Fade,
   FormControl,
   IconButton,
@@ -21,26 +31,307 @@ import {
   TextField,
   Typography,
   useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
 import axios, { AxiosResponse } from 'axios';
-import { FC, useCallback, useEffect, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import SetlistSongCard from './SetlistSongCard';
-import HeaderWithIcon from '../custom/HeaderWithIcon';
-import PageHeader from '../navigation/PageHeader';
-import { useOwnership, useSongs } from '../../helpers/customHooks';
-import SetlistSongsTable from './SetlistSongTable';
-import AutocompleteInput from '../custom/AutocompleteInput';
+import {
+  Info,
+  MusicNote,
+  Search,
+  QueueMusic,
+  AddCircleOutline,
+  Check,
+  Add,
+  TuneOutlined,
+} from '@mui/icons-material';
 
+// Hooks
+import { useSongs, useOwnership } from '../../helpers/customHooks';
+
+// Constants
+const SONG_CARD_FIELDS = [
+  { key: 'themes', label: 'Themes' },
+  { key: 'tempo', label: 'Tempo' },
+  { key: 'originalKey', label: 'Key' },
+  { key: 'year', label: 'Year' },
+  { key: 'code', label: 'Code' },
+  { key: 'timeSignature', label: 'Time' },
+];
+
+// Styled Components
+const MainContainer = styled(Container)<{ isMobileOrSmallTablet?: boolean }>(
+  ({ isMobileOrSmallTablet }) => ({
+    paddingBlock: isMobileOrSmallTablet ? '0.75rem' : '1rem',
+    paddingInline: isMobileOrSmallTablet ? '0.75rem' : '2rem',
+    height: isMobileOrSmallTablet ? 'calc(100vh - 80px - 60px)' : '100vh',
+    minWidth: '100%',
+    overflow: 'hidden',
+    display: 'flex',
+    flexDirection: 'column',
+  })
+);
+
+const ContentWrapper = styled(Box)({
+  flex: 1,
+  display: 'flex',
+  flexDirection: 'column',
+  overflow: 'hidden',
+  height: '100%',
+});
+
+const SectionsContainer = styled(Box)<{ isMobileOrSmallTablet?: boolean }>(
+  ({ isMobileOrSmallTablet }) => ({
+    flex: 1,
+    overflow: isMobileOrSmallTablet ? 'auto' : 'hidden',
+    display: 'flex',
+    flexDirection: isMobileOrSmallTablet ? 'column' : 'row',
+    gap: '1.25rem',
+    marginBlock: '0.5rem',
+  })
+);
+
+const SetlistDetailsBox = styled(Box)<{ isMobileOrSmallTablet?: boolean }>(
+  ({ isMobileOrSmallTablet }) => ({
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 1,
+    overflow: isMobileOrSmallTablet ? 'visible' : 'hidden',
+    flexShrink: isMobileOrSmallTablet ? 0 : undefined,
+  })
+);
+
+const SetlistDetailsContent = styled(Stack)<{ isMobileOrSmallTablet?: boolean }>(
+  ({ isMobileOrSmallTablet }) => ({
+    flex: isMobileOrSmallTablet ? undefined : 1,
+    overflow: isMobileOrSmallTablet ? 'visible' : 'auto',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: isMobileOrSmallTablet ? '1rem' : '1.5rem',
+  })
+);
+
+const SongSearchBox = styled(Box)<{ isMobileOrSmallTablet?: boolean; isTablet?: boolean }>(
+  ({ isMobileOrSmallTablet, isTablet }) => ({
+    display: 'flex',
+    flexDirection: 'column',
+    width: isMobileOrSmallTablet ? '100%' : isTablet ? '47.5vw' : '57.5vw',
+    overflow: 'hidden',
+    maxHeight: isMobileOrSmallTablet ? 'calc(100vh - 5rem)' : '90vh',
+  })
+);
+
+const SongSearchContent = styled(Stack)<{ isMobileOrSmallTablet?: boolean }>(
+  ({ isMobileOrSmallTablet }) => ({
+    flex: isMobileOrSmallTablet ? undefined : 1,
+    overflow: 'hidden',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: isMobileOrSmallTablet ? '1rem' : '1.5rem',
+    maxHeight: '100%',
+  })
+);
+
+const SongSearchStack = styled(Stack)({
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: '0.5rem',
+  width: '100%',
+  overflow: 'auto',
+  maxHeight: '100%',
+});
+
+const SongResultsContainer = styled(Box)({
+  overflow: 'auto',
+  flex: 1,
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '1rem',
+  marginTop: '1rem',
+  width: '100%',
+  maxHeight: '100%',
+});
+
+const MobileActionButtonsContainer = styled(Box)({
+  position: 'fixed',
+  bottom: '80px',
+  left: 0,
+  right: 0,
+  paddingBottom: '1rem',
+  display: 'flex',
+  zIndex: 1000,
+  height: '60px',
+});
+
+const MobileSongList = styled(Box)({
+  flex: 1,
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.75rem',
+});
+
+const AddSongsSection = styled(Box)({
+  flexShrink: 0,
+  marginBottom: '1rem',
+});
+
+const AddSongsButton = styled(Button)({
+  width: '100%',
+  textTransform: 'none',
+  borderRadius: '6.25rem',
+  paddingBlock: '0.5rem',
+  fontSize: '0.875rem',
+  fontWeight: 500,
+});
+
+const StyledButton = styled(Button)({
+  textTransform: 'none',
+  borderRadius: '100px',
+  paddingBlock: '0.5rem',
+});
+
+const CancelButton = styled(Button)({
+  marginRight: '0.5rem',
+  textTransform: 'none',
+  borderRadius: '100px',
+  border: '1px solid #938F99',
+  paddingInline: '1.5rem',
+});
+
+const SearchContainer = styled(Stack)({
+  alignItems: 'center',
+  boxShadow: '0px 1px 2px 0px rgba(0, 0, 0, 0.20), 0px 0.1px 0.3px 0px rgba(0, 0, 0, 0.10)',
+  background: '#2B2930',
+  borderRadius: '100px',
+  paddingInline: '0.5rem',
+  flexShrink: 0,
+  flexDirection: 'row',
+  width: '100%',
+});
+
+const SearchIcon = styled(Search)({
+  marginInline: '0.5rem',
+  color: '#CAC4D0',
+});
+
+const FilterIconButton = styled(IconButton)<{ isFilterDrawerToggled?: boolean }>(
+  ({ theme, isFilterDrawerToggled }) => ({
+    width: '40px',
+    height: '40px',
+    border: '2px solid',
+    borderRadius: '50%',
+    borderColor: isFilterDrawerToggled ? theme.palette.primary.main : theme.palette.secondary.main,
+    color: isFilterDrawerToggled ? theme.palette.primary.main : theme.palette.secondary.main,
+    backgroundColor: isFilterDrawerToggled ? theme.palette.secondary.main : 'transparent',
+    '&:hover': {
+      borderColor: isFilterDrawerToggled
+        ? theme.palette.secondary.main
+        : theme.palette.primary.main,
+      color: isFilterDrawerToggled ? theme.palette.secondary.main : theme.palette.primary.main,
+      backgroundColor: isFilterDrawerToggled ? 'transparent' : theme.palette.secondary.main,
+    },
+  })
+);
+
+const SongSearchInput = styled(InputBase)({
+  marginBlock: '0.75rem',
+  color: '#CAC4D0',
+  backgroundColor: '#2B2930',
+  borderRadius: '20.5rem',
+});
+
+const SongCard = styled(Container)(({ theme }) => ({
+  borderRadius: '0.5rem',
+  border: '1px solid #49454F',
+  backgroundColor: theme.palette.primary.darkest,
+  padding: '1rem',
+  '&:hover': {
+    borderColor: theme.palette.secondary.main,
+    cursor: 'pointer',
+  },
+  transition: 'all 0.1s ease-in-out',
+  minWidth: '100%',
+  maxWidth: '100%',
+  flexShrink: 0,
+}));
+
+const SongCardHeader = styled(Stack)({
+  justifyContent: 'space-between',
+  width: '100%',
+  padding: 0,
+  marginBottom: '1rem',
+});
+
+const AddButton = styled(IconButton)<{ isAdded?: boolean }>(({ theme, isAdded }) => ({
+  width: '32px',
+  height: '32px',
+  border: '2px solid',
+  borderRadius: '50%',
+  color: theme.palette.primary.lighter,
+  '&:hover': {
+    color: theme.palette.secondary.main,
+  },
+  ...(isAdded && {
+    backgroundColor: theme.palette.secondary.main,
+    color: theme.palette.primary.darkest,
+  }),
+}));
+
+const SongDetails = styled(Stack)({
+  maxWidth: '100%',
+  flexWrap: 'wrap',
+  gap: '0.5rem',
+});
+
+const DetailField = styled(Stack)({
+  gap: '0.5rem',
+  width: 'fit-content',
+  maxWidth: '100%',
+  alignItems: 'center',
+  justifyContent: 'flex-start',
+});
+
+const DrawerContent = styled(Box)({
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  padding: '1rem',
+});
+
+const DrawerBody = styled(Box)({
+  flex: 1,
+  overflow: 'hidden',
+  display: 'flex',
+  flexDirection: 'column',
+});
+
+// Main Component
 const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
-  const isDesktop = useMediaQuery('(min-width: 768px)');
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isTablet = useMediaQuery(theme.breakpoints.between('md', 'xl'));
+  const isDesktop = useMediaQuery(theme.breakpoints.up('xl'));
+  const isMobileOrSmallTablet = !isTablet && !isDesktop;
 
+  const allSongs = useSongs() as SongSchema[];
+  // const allFolders = useFolders() as SetlistFolder[];
+  const ownership = useOwnership();
+
+  // Form and state management
+  const {
+    handleSubmit,
+    formState: { errors },
+    control,
+    reset,
+    register,
+  } = useForm<SetlistEditorFields>();
   const [action, setAction] = useState<string>('new');
+  // Initialize editor mode and ID from URL
   const paths: string[] = window.location.pathname.split('/');
   useEffect(() => {
     if (paths.includes('edit')) {
@@ -49,8 +340,6 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
     }
   }, [paths]);
 
-  const allSongs = useSongs() as SongSchema[];
-  const ownership = useOwnership();
   // STATES
   const [date, setDate] = useState<Dayjs | null>(null);
   const [search, setSearch] = useState<string>('');
@@ -58,20 +347,23 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
   const [filterData, setFilterData] = useState<SongSearchFilter>();
   const [showDetails, setShowDetails] = useState<boolean>(true);
 
-  const [successSnackbarOpen, setSuccessSnackbarOpen] = useState<boolean>(false);
-  const [invalidSetlist, setInvalidSetlist] = useState<string>('');
-
   const [setlist, setSetlist] = useState<SetlistEditorFields>({} as SetlistEditorFields);
   const [setlistId, setSetlistId] = useState<string>('');
-
   const [addedSongList, setAddedSongList] = useState<SongSetlistSchema[]>([]);
   const [folderList, setFolderList] = useState<string[]>([]);
   const [folderOptions, setFolderOptions] = useState<SetlistFolder[]>([]);
 
-  // FORM HANDLER
-  const { handleSubmit, formState, control, reset, register } = useForm<SetlistEditorFields>();
-  const { errors } = formState;
+  // Search state
+  const [searchString, setSearchString] = useState('');
+  const filterKeyword = useMemo(() => searchString.trim().toLowerCase(), [searchString]);
 
+  // UI state
+  const [successSnackbarOpen, setSuccessSnackbarOpen] = useState(false);
+  const [invalidSetlist, setInvalidSetlist] = useState<string>('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  // Folder Options for User
   const getFolderOptions = useCallback(async () => {
     try {
       const { data, status } = await axios.get<SetlistFolder[]>('/api/groups/get');
@@ -86,6 +378,7 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
     }
   }, [ownership]);
 
+  // Fetch setlist data for editing
   const getSetlist = useCallback(async () => {
     if (setlistId === '') return;
 
@@ -125,50 +418,7 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
     }
   }, [setlist, folderOptions, reset]);
 
-  const getSongResults = useCallback(async () => {
-    if (search !== '') {
-      const filteredSongs = allSongs.filter((song) =>
-        song.title.toLowerCase().includes(search.toLowerCase())
-      );
-      setSongResults(filteredSongs);
-    } else setSongResults(allSongs);
-  }, [search, allSongs]);
-
-  useEffect(() => {
-    getSongResults();
-  }, [getSongResults]);
-
-  // add the id to the array of clicked items if it doesn't exist but if it does exist remove it
-  // this makes sure that double clicking on an item brings it back to normal
-  // change <Add /> to <Check /> at "id"
-  const handleAddSong = (id: string) => {
-    const toRemove = addedSongList.find((song) => song._id === id);
-
-    if (toRemove) {
-      const updatedSongList = [...addedSongList];
-      updatedSongList.splice(addedSongList.indexOf(toRemove), 1);
-
-      updatedSongList.forEach((song, i) => {
-        if (song.sequence! > toRemove.sequence!) {
-          updatedSongList[i] = { ...song, sequence: song.sequence! - 1 };
-        }
-      });
-
-      setAddedSongList(updatedSongList);
-    } else {
-      const songResult = songResults.find((song) => song._id === id);
-      if (!songResult) return;
-
-      const setlistSong: SongSetlistSchema = {
-        ...songResult,
-        key: songResult.originalKey,
-        sequence: addedSongList.length + 1,
-      };
-
-      setAddedSongList([...addedSongList, setlistSong]);
-    }
-  };
-
+  // Form submission
   const handleSaveSetlist: SubmitHandler<SetlistEditorFields> = async (data) => {
     try {
       let payload: AxiosResponse<Setlist>;
@@ -244,206 +494,513 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
     }
   };
 
-  const handleCloseSuccessSnackbar = () => {
-    setSuccessSnackbarOpen(false);
+  const handleCancel = () => {
+    navigate(-1);
   };
 
+  // Song management
+  const handleAddSong = useCallback(
+    (songId: string) => {
+      const existingSongIndex = addedSongList.findIndex((song) => song._id === songId);
+
+      if (existingSongIndex >= 0) {
+        // Remove song and update sequences
+        const removedSong = addedSongList[existingSongIndex];
+        const updatedList = addedSongList
+          .filter((_, index) => index !== existingSongIndex)
+          .map((song) => ({
+            ...song,
+            sequence: song.sequence! > removedSong.sequence! ? song.sequence! - 1 : song.sequence!,
+          }));
+
+        setAddedSongList(updatedList);
+      } else {
+        // Add new song
+        const songToAdd = songResults.find((song) => song._id === songId);
+        if (!songToAdd) return;
+
+        const newSong: SongSetlistSchema = {
+          ...songToAdd,
+          key: songToAdd.originalKey,
+          sequence: addedSongList.length + 1,
+        };
+
+        setAddedSongList((prev) => [...prev, newSong]);
+      }
+
+      // Close drawer on mobile after adding song
+      if (isMobileOrSmallTablet) {
+        setDrawerOpen(false);
+      }
+    },
+    [addedSongList, songResults, isMobileOrSmallTablet]
+  );
+
+  const addedSongIds = addedSongList.map((song) => song._id);
+
+  // Filter songs based on searchString
+  const memoizedFilteredSongs = useMemo(() => {
+    if (allSongs.length === 0) return [];
+
+    if (filterKeyword.length < 2) return allSongs;
+
+    const filteredSongs = allSongs.filter((song) => {
+      const songTitle = song.title.toLowerCase();
+
+      if (songTitle.includes(filterKeyword)) {
+        return true;
+      }
+
+      return false;
+    });
+    return filteredSongs;
+  }, [filterKeyword, allSongs]);
+
+  useEffect(() => {
+    setSongResults(memoizedFilteredSongs);
+  }, [filterKeyword, memoizedFilteredSongs]);
+
+  // TODO-YY: Song Filtering
+  const [isFilterDrawerToggled, setIsFilterDrawerToggled] = useState<boolean>(false);
+
+  const handleToggleFilterDrawer = () => setIsFilterDrawerToggled(!isFilterDrawerToggled);
+
   return (
-    <Container sx={{ py: '1rem', px: '2rem', height: '100%', minWidth: '100%', overflow: 'auto' }}>
-      <Box>
-        {/* Error message */}
-        {invalidSetlist ? (
-          <Typography variant={'body2'} color={'error'}>
-            {invalidSetlist}
-          </Typography>
-        ) : null}
+    <>
+      <MainContainer isMobileOrSmallTablet={isMobileOrSmallTablet}>
+        <ContentWrapper>
+          {errorMessage && (
+            <Typography variant="body2" color="error" sx={{ mb: 2 }}>
+              {errorMessage}
+            </Typography>
+          )}
 
-        {/* Success message */}
-        <Snackbar
-          open={successSnackbarOpen}
-          onClose={handleCloseSuccessSnackbar}
-          autoHideDuration={6000}
-          TransitionComponent={Fade}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-        >
-          <Alert severity="success" onClose={handleCloseSuccessSnackbar}>
-            <AlertTitle>Success</AlertTitle>
-            Song successfully saved!
-          </Alert>
-        </Snackbar>
-
-        <form onSubmit={handleSubmit(handleSaveSetlist)}>
-          <PageHeader
-            title={action === 'edit' ? 'Edit Setlist' : 'New Setlist'}
-            icon={<QueueMusic />}
-            actionButtons={
-              <Stack direction="row">
-                <Button
-                  type={'submit'}
-                  color="secondary"
-                  variant="contained"
-                  sx={{
-                    mr: 1,
-                    textTransform: 'none',
-                    borderRadius: '100px',
-                    px: 3,
-                  }}
-                >
-                  Save
-                </Button>
-                <Button
-                  color={'secondary'}
-                  sx={{
-                    textTransform: 'none',
-                    borderRadius: '100px',
-                    border: 1,
-                    px: 2,
-                  }}
-                  onClick={() => navigate('/setlist')}
-                >
-                  Cancel
-                </Button>
-              </Stack>
-            }
+          <SuccessSnackbar
+            open={successSnackbarOpen}
+            onClose={() => setSuccessSnackbarOpen(false)}
           />
 
-          <Stack direction="row" spacing={'24px'} my={'24px'} width={'100%'}>
-            {/* setlist details and info */}
-            <Box display="flex" justifyContent="center" width={'42.5vw'}>
-              <Stack direction="column" spacing={2} width={'100%'}>
-                <HeaderWithIcon
-                  Icon={Info}
-                  headerText="Details"
-                  headerVariant="h3"
-                  iconColor="secondary.main"
-                  headerColor={'secondary.main'}
-                />
-                {/* Setlist Name Field */}
-                <Controller
-                  name="name"
-                  control={control}
-                  defaultValue=""
-                  render={({ field }) => (
-                    <TextField
-                      id="name"
-                      label="Setlist Name"
-                      error={!!errors.name}
-                      helperText={errors?.name?.message}
-                      {...field}
-                    />
-                  )}
-                />
+          <form
+            onSubmit={handleSubmit(handleSaveSetlist)}
+            style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+          >
+            <PageHeader
+              title={`${action === 'edit' ? 'Edit' : 'New'} Setlist`}
+              icon={<QueueMusic />}
+              actionButtons={!isMobileOrSmallTablet && <ActionButtons onCancel={handleCancel} />}
+            />
 
-                {/* Date Field */}
-                <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={'en'}>
-                  <DatePicker
-                    label="Date"
-                    value={date}
-                    onChange={(newValue) => {
-                      setDate(newValue);
-                      console.log(newValue);
-                    }}
+            <SectionsContainer isMobileOrSmallTablet={isMobileOrSmallTablet}>
+              {/* Setlist Details Section */}
+              <SetlistDetailsSection
+                control={control}
+                errors={errors}
+                date={date}
+                onDateChange={setDate}
+                folderOptions={folderOptions}
+                folderList={folderList}
+                onFolderChange={setFolderList}
+                register={register}
+                addedSongList={addedSongList}
+                setAddedSongList={setAddedSongList}
+                isMobileOrSmallTablet={isMobileOrSmallTablet}
+              />
+
+              {/* Song Search/List Section */}
+              {isMobileOrSmallTablet ? (
+                <MobileSongList>
+                  <HeaderWithIcon
+                    Icon={MusicNote}
+                    headerText="Songs"
+                    headerVariant="h3"
+                    iconColor="secondary.main"
+                    headerColor="secondary.main"
                   />
-                </LocalizationProvider>
-
-                {/* TODO: Add to Folder */}
-                <FormControl fullWidth>
-                  <AutocompleteInput
-                    id="folders"
-                    options={folderOptions.map((folder) => folder.groupName)}
-                    label="Folders"
-                    autoComplete="folders"
-                    value={folderList}
-                    onChange={(_, newValue) => {
-                      setFolderList(newValue as string[]);
-                    }}
-                    register={register}
-                    multiple
-                  />
-                </FormControl>
-
-                {/* Added Songs List */}
-                <Box sx={{ pt: 3 }}>
-                  <Stack direction="column" spacing={1}>
-                    {/* song list header */}
-                    <HeaderWithIcon
-                      Icon={MusicNote}
-                      headerText="Song List"
-                      headerVariant="h3"
-                      iconColor="secondary.main"
-                      headerColor={'secondary.main'}
-                    />
-                    <SetlistSongsTable songList={addedSongList} setSongList={setAddedSongList} />
-                  </Stack>
-                </Box>
-              </Stack>
-            </Box>
-
-            {/* search for songs to add */}
-            <Box display="flex" justifyContent="center" width={'42.5vw'}>
-              <Stack direction="column" spacing={2} width={'100%'}>
-                {/* header */}
-                <HeaderWithIcon
-                  Icon={AddCircleOutline}
-                  headerText="Search to Add Songs"
-                  headerVariant="h3"
-                  iconColor="secondary.main"
-                  headerColor={'secondary.main'}
+                  <AddSongsSection>
+                    <AddSongsButton
+                      variant="outlined"
+                      color="secondary"
+                      startIcon={<AddCircleOutline />}
+                      onClick={() => setDrawerOpen(true)}
+                    >
+                      Add Songs
+                    </AddSongsButton>
+                  </AddSongsSection>
+                  <SetlistSongsTable songList={addedSongList} setSongList={setAddedSongList} />
+                </MobileSongList>
+              ) : (
+                <SongSearchSection
+                  searchString={searchString}
+                  onSearchChange={setSearchString}
+                  songResults={songResults}
+                  isMobileOrSmallTablet={isMobileOrSmallTablet}
+                  isTablet={isTablet}
+                  onAddSong={handleAddSong}
+                  addedSongIds={addedSongIds}
+                  isFilterDrawerToggled={isFilterDrawerToggled}
+                  handleToggleFilterDrawer={handleToggleFilterDrawer}
                 />
+              )}
+            </SectionsContainer>
+          </form>
 
-                {/* search bar */}
-                <Stack
-                  sx={{
-                    alignItems: 'center',
-                    boxShadow:
-                      '0px 1px 2px 0px rgba(0, 0, 0, 0.20), 0px 0.1px 0.3px 0px rgba(0, 0, 0, 0.10)',
-                    background: '#2B2930',
-                    borderRadius: '100px',
-                  }}
-                  direction="row"
+          {/* Mobile Drawer for Song Search */}
+          {isMobileOrSmallTablet && (
+            <Drawer
+              anchor="bottom"
+              open={drawerOpen}
+              onClose={() => setDrawerOpen(false)}
+              PaperProps={{
+                sx: {
+                  height: '100%',
+                  bgcolor: '#171717',
+                },
+              }}
+            >
+              <DrawerContent>
+                <DrawerBody>
+                  <SongSearchSection
+                    searchString={searchString}
+                    onSearchChange={setSearchString}
+                    songResults={songResults}
+                    isMobileOrSmallTablet={isMobileOrSmallTablet}
+                    isTablet={isTablet}
+                    onAddSong={handleAddSong}
+                    addedSongIds={addedSongIds}
+                    isFilterDrawerToggled={isFilterDrawerToggled}
+                    showHeader={false}
+                    handleToggleFilterDrawer={handleToggleFilterDrawer}
+                  />
+                </DrawerBody>
+                <StyledButton
+                  color="secondary"
+                  variant="contained"
+                  onClick={() => setDrawerOpen(false)}
                 >
-                  <IconButton>
-                    <Search sx={{ mx: 2, color: '#CAC4D0' }} />
-                  </IconButton>
-                  <InputBase
-                    placeholder="Search"
-                    value={search}
-                    fullWidth
-                    onChange={(e) => {
-                      setSearch(e.target.value);
-                    }}
-                    sx={{
-                      my: 1.5,
-                      color: '#CAC4D0',
-                      backgroundColor: '#2B2930',
-                      borderRadius: '28px',
-                    }}
-                  />
-                </Stack>
-                {/* search results */}
-                {songResults.length > 0 ? (
-                  songResults.map((song, i) => (
-                    // add songs card
-                    <SetlistSongCard
-                      key={i}
-                      {...song}
-                      showDetails={showDetails}
-                      filterData={filterData}
-                      isDesktop={isDesktop}
-                      handleAddSong={handleAddSong}
-                      addedSongs={addedSongList.map((song) => song._id)}
-                    />
-                  ))
-                ) : (
-                  <Typography>Couldn't find "{search}"</Typography>
-                )}
-              </Stack>
-            </Box>
-          </Stack>
-        </form>
-      </Box>
-    </Container>
+                  Done
+                </StyledButton>
+              </DrawerContent>
+            </Drawer>
+          )}
+        </ContentWrapper>
+
+        {isMobileOrSmallTablet && <MobileActionButtons onCancel={handleCancel} />}
+      </MainContainer>
+    </>
   );
 };
+
+// Success Snackbar Component
+const SuccessSnackbar: FC<{ open: boolean; onClose: () => void }> = ({ open, onClose }) => (
+  <Snackbar
+    open={open}
+    onClose={onClose}
+    autoHideDuration={6000}
+    TransitionComponent={Fade}
+    anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+  >
+    <Alert severity="success" onClose={onClose}>
+      <AlertTitle>Success</AlertTitle>
+      Setlist successfully saved!
+    </Alert>
+  </Snackbar>
+);
+
+// Action Buttons Component
+const ActionButtons: FC<{ onCancel: () => void }> = ({ onCancel }) => (
+  <Stack direction="row">
+    <CancelButton color="secondary" onClick={onCancel}>
+      Cancel
+    </CancelButton>
+    <StyledButton type="submit" color="secondary" variant="contained">
+      Save
+    </StyledButton>
+  </Stack>
+);
+
+// Mobile Action Buttons component
+const MobileActionButtons: FC<{ onCancel: () => void }> = ({ onCancel }) => (
+  <MobileActionButtonsContainer>
+    <Stack direction="row" spacing={2} px={2} width={'100%'}>
+      <Button
+        sx={{
+          width: '50%',
+          color: 'secondary.main',
+          border: '1px solid #938F99',
+          borderRadius: '40px',
+          textTransform: 'none',
+        }}
+        onClick={onCancel}
+      >
+        Cancel
+      </Button>
+      <Button
+        type="submit"
+        form="setlist-form"
+        sx={{
+          width: '50%',
+          backgroundColor: 'secondary.main',
+          color: '#381E72',
+          borderRadius: '40px',
+          textTransform: 'none',
+        }}
+      >
+        Save
+      </Button>
+    </Stack>
+  </MobileActionButtonsContainer>
+);
+
+// Unified Setlist Details Section
+const SetlistDetailsSection: FC<{
+  control: any;
+  errors: any;
+  date: Dayjs | null;
+  onDateChange: (date: Dayjs | null) => void;
+  folderOptions: SetlistFolder[];
+  folderList: string[];
+  onFolderChange: (folders: string[]) => void;
+  register: any;
+  addedSongList: SongSetlistSchema[];
+  setAddedSongList: React.Dispatch<React.SetStateAction<SongSetlistSchema[]>>;
+  isMobileOrSmallTablet: boolean;
+}> = ({
+  control,
+  errors,
+  date,
+  onDateChange,
+  folderOptions,
+  folderList,
+  onFolderChange,
+  register,
+  addedSongList,
+  setAddedSongList,
+  isMobileOrSmallTablet,
+}) => (
+  <SetlistDetailsBox isMobileOrSmallTablet={isMobileOrSmallTablet}>
+    <SetlistDetailsContent isMobileOrSmallTablet={isMobileOrSmallTablet} direction="column">
+      <HeaderWithIcon
+        Icon={Info}
+        headerText="Details"
+        headerVariant="h3"
+        iconColor="secondary.main"
+        headerColor="secondary.main"
+      />
+
+      <Controller
+        name="name"
+        control={control}
+        defaultValue=""
+        render={({ field }) => (
+          <TextField
+            id="name"
+            label="Title"
+            error={!!errors.name}
+            helperText={errors?.name?.message}
+            {...field}
+          />
+        )}
+      />
+
+      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en">
+        <DatePicker label="Date" value={date} onChange={onDateChange} />
+      </LocalizationProvider>
+
+      <FormControl fullWidth>
+        <AutocompleteInput
+          id="folders"
+          options={folderOptions.map((folder) => folder.groupName)}
+          label="Folders"
+          autoComplete="folders"
+          value={folderList}
+          onChange={(_, newValue) => onFolderChange(newValue as string[])}
+          register={register}
+          multiple
+        />
+      </FormControl>
+
+      {/* Desktop/Tablet Song List */}
+      {!isMobileOrSmallTablet && (
+        <Box pt={3} sx={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+          <Stack direction="column" spacing={'1rem'} sx={{ height: '100%' }}>
+            <HeaderWithIcon
+              Icon={MusicNote}
+              headerText="Songs"
+              headerVariant="h3"
+              iconColor="secondary.main"
+              headerColor="secondary.main"
+            />
+            <Box sx={{ flex: 1, overflow: 'auto' }}>
+              <SetlistSongsTable songList={addedSongList} setSongList={setAddedSongList} />
+            </Box>
+          </Stack>
+        </Box>
+      )}
+    </SetlistDetailsContent>
+  </SetlistDetailsBox>
+);
+
+// Song Search Section Component
+const SongSearchSection: FC<{
+  searchString: string;
+  onSearchChange: (value: string) => void;
+  songResults: SongSchema[];
+  isMobileOrSmallTablet: boolean;
+  isTablet: boolean;
+  onAddSong: (id: string) => void;
+  addedSongIds: string[];
+  showHeader?: boolean;
+  isFilterDrawerToggled: boolean;
+  handleToggleFilterDrawer: () => void;
+}> = ({
+  searchString,
+  onSearchChange,
+  songResults,
+  isMobileOrSmallTablet,
+  isTablet,
+  onAddSong,
+  addedSongIds,
+  isFilterDrawerToggled,
+  handleToggleFilterDrawer,
+  showHeader = true,
+}) => (
+  <SongSearchBox isMobileOrSmallTablet={isMobileOrSmallTablet} isTablet={isTablet}>
+    <SongSearchContent>
+      {
+        <HeaderWithIcon
+          Icon={AddCircleOutline}
+          headerText={isMobileOrSmallTablet ? 'Add Songs' : 'Search to Add Songs'}
+          headerVariant="h3"
+          iconColor="secondary.main"
+          headerColor="secondary.main"
+        />
+      }
+
+      <SongSearchStack>
+        <SearchInputComponent
+          searchString={searchString}
+          onSearchChange={onSearchChange}
+          isFilterDrawerToggled={isFilterDrawerToggled}
+          handleToggleFilterDrawer={handleToggleFilterDrawer}
+        />
+
+        <SongResultsContainer>
+          {songResults.length > 0 ? (
+            songResults.map((song) => (
+              <SongCardComponent
+                key={song._id}
+                song={song}
+                isMobileOrSmallTablet={isMobileOrSmallTablet}
+                onAddSong={onAddSong}
+                isAdded={addedSongIds.includes(song._id)}
+              />
+            ))
+          ) : (
+            <Typography>No songs found for "{searchString}"</Typography>
+          )}
+        </SongResultsContainer>
+      </SongSearchStack>
+    </SongSearchContent>
+  </SongSearchBox>
+);
+
+// Search Input Component
+const SearchInputComponent: FC<{
+  searchString: string;
+  onSearchChange: (value: string) => void;
+  isFilterDrawerToggled: boolean;
+  handleToggleFilterDrawer: () => void;
+}> = ({ searchString, onSearchChange, isFilterDrawerToggled, handleToggleFilterDrawer }) => (
+  <SearchContainer>
+    <SearchIcon />
+    <SongSearchInput
+      placeholder="Search songs..."
+      value={searchString}
+      fullWidth
+      onChange={(e) => onSearchChange(e.target.value)}
+    />
+    <FilterIconButton
+      isFilterDrawerToggled={isFilterDrawerToggled}
+      onClick={handleToggleFilterDrawer}
+    >
+      <TuneOutlined sx={{ fontSize: '20px' }} />
+    </FilterIconButton>
+  </SearchContainer>
+);
+
+// Song Card Component
+const SongCardComponent: FC<{
+  song: SongSchema;
+  isMobileOrSmallTablet: boolean;
+  onAddSong: (id: string) => void;
+  isAdded: boolean;
+}> = ({ song, isMobileOrSmallTablet, onAddSong, isAdded }) => {
+  const { _id, title, artist, themes, tempo, originalKey, year, code, timeSignature } = song;
+
+  const songData = { themes, tempo, originalKey, year, code, timeSignature };
+
+  return (
+    <SongCard disableGutters>
+      <SongCardHeader direction="row">
+        <Stack>
+          <Typography variant="h4" color="secondary.main">
+            {title}
+          </Typography>
+          <Typography variant="subtitle2" color="secondary.main">
+            {artist}
+          </Typography>
+        </Stack>
+
+        <AddSongButton isAdded={isAdded} onClick={() => onAddSong(_id)} />
+      </SongCardHeader>
+
+      <SongDetailsComponent data={songData} isMobileOrSmallTablet={isMobileOrSmallTablet} />
+    </SongCard>
+  );
+};
+
+// Add Song Button Component
+const AddSongButton: FC<{ isAdded: boolean; onClick: () => void }> = ({ isAdded, onClick }) => (
+  <AddButton onClick={onClick} isAdded={isAdded}>
+    {isAdded ? <Check sx={{ fontSize: '20px' }} /> : <Add sx={{ fontSize: '20px' }} />}
+  </AddButton>
+);
+
+// Song Details Component
+const SongDetailsComponent: FC<{ data: Record<string, any>; isMobileOrSmallTablet: boolean }> = ({
+  data,
+  isMobileOrSmallTablet,
+}) => (
+  <SongDetails direction={isMobileOrSmallTablet ? 'column' : 'row'}>
+    {SONG_CARD_FIELDS.map((field) => (
+      <SongDetailField
+        key={field.key}
+        label={field.label}
+        value={data[field.key]}
+        isMobileOrSmallTablet={isMobileOrSmallTablet}
+      />
+    ))}
+  </SongDetails>
+);
+
+// Song Detail Field Component
+const SongDetailField: FC<{
+  label: string;
+  value: any;
+  isMobileOrSmallTablet: boolean;
+}> = ({ label, value, isMobileOrSmallTablet }) => (
+  <DetailField spacing={'0.5rem'} mr={isMobileOrSmallTablet ? 0 : '1rem'} direction={'row'}>
+    <Typography variant="body2" color="#9E9E9E" minWidth="fit-content">
+      {label}
+    </Typography>
+    {Array.isArray(value) ? (
+      <SongFieldArray data={value} />
+    ) : (
+      <Typography variant="body2" color="#CCC2DC" align="left" noWrap>
+        {value ?? '-'}
+      </Typography>
+    )}
+  </DetailField>
+);
 
 export default SetlistEditorContainer;

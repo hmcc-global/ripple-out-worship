@@ -68,6 +68,11 @@ const AutocompleteInput: FC<AutocompleteInputProps> = ({
           />
         </>
       )}
+      slotProps={{
+        clearIndicator: {
+          'aria-label': 'Clear all selected folders',
+        },
+      }}
     />
   );
 };

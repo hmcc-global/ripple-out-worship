@@ -24,13 +24,13 @@ import TuneIcon from '@mui/icons-material/Tune';
 import SetlistViewMobileDrawer from './SetlistViewMobileDrawer';
 import axios from 'axios';
 
-const SetlistViewContainerMobile = ({ preview }: { preview?: boolean }): ReactElement => {
+const SetlistViewContainerMobile = ({ preview }: { preview?: boolean }): ReactElement | null => {
   const setlistId = window.location.pathname.split('/').reverse()[0];
   const theme = useTheme();
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
   const [setlist, setSetlist] = useState<Setlist>();
   const songs = useMemo(() => (setlist && setlist.songs) || [], [setlist]);
-  const [selectedSong, setSelectedSong] = useState<SongSchema>(songs[0]);
+  const [selectedSong, setSelectedSong] = useState<SongSchema>();
   const [chordStatus, setChordStatus] = useState(false);
   const [count, setCount] = useState(0);
   const [useFlat, setUseFlat] = useState(false);
@@ -94,6 +94,8 @@ const SetlistViewContainerMobile = ({ preview }: { preview?: boolean }): ReactEl
     );
   }, [selectedSong]);
 
+  if (!setlist) return null;
+
   // TO-DO: add option to redirect to a selected song from link
   return (
     <Container
@@ -112,7 +114,7 @@ const SetlistViewContainerMobile = ({ preview }: { preview?: boolean }): ReactEl
         height="100%"
         maxHeight="100vh"
       >
-        {setlist && songs ? (
+        {songs && selectedSong ? (
           <Container
             maxWidth="xl"
             style={{
