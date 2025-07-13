@@ -23,7 +23,7 @@ const PageHeader = (props: PageHeaderProps) => {
         sx={{
           display: 'flex',
           flexDirection: 'row',
-          gap: '1rem',
+          gap: '1.5rem',
           alignItems: 'center',
         }}
       >
@@ -37,8 +37,9 @@ const PageHeader = (props: PageHeaderProps) => {
             alignItems: 'center',
             justifyContent: 'center',
             '& svg': {
-              fontSize: { xs: 16, md: 40 },
+              fontSize: { xs: 16, md: 30 },
             },
+            color: '#EADDFF',
           }}
         >
           {props.icon}

@@ -80,7 +80,7 @@ const customTheme = createTheme({
       fontSize: '2rem', // Equivalent to 32px (16 * 2)
       fontWeight: 700,
       [breakpoints.up('lg')]: {
-        fontSize: '2.5rem',
+        fontSize: '1.875rem',
       },
       [breakpoints.down('sm')]: {
         fontSize: '1.5rem',
