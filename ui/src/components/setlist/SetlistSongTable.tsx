@@ -29,156 +29,185 @@ import SetlistChangeKeyModal from './SetlistChangeKeyModal';
 
 interface SetlistSongsTableProps {
   songList: SongSetlistSchema[];
-  setSongList: React.Dispatch<React.SetStateAction<SongSetlistSchema[]>>;
+  setSongList?: React.Dispatch<React.SetStateAction<SongSetlistSchema[]>>;
+  readOnly?: boolean;
 }
 
-const SetlistSongsTable: React.FC<SetlistSongsTableProps> = ({ songList, setSongList }) => {
-  const [sortedSongList, setSortedSongList] = useState<SongSetlistSchema[]>(songList);
+const SetlistSongsTable: React.FC<SetlistSongsTableProps> = ({
+  songList,
+  setSongList,
+  readOnly = false,
+}) => {
+  // State management
+  const [sortedSongList, setSortedSongList] = useState<SongSetlistSchema[]>([]);
+  const [menuState, setMenuState] = useState({
+    anchorEl: null as HTMLElement | null,
+    currentSongId: null as string | null,
+  });
 
+  // Modal states with non-null song when open
+  const [modals, setModals] = useState({
+    preview: {
+      open: false,
+      song: null as SongSetlistSchema | null,
+    },
+    changeKey: {
+      open: false,
+      song: null as SongSetlistSchema | null,
+    },
+  });
+
+  // Sort songs whenever the songList changes
   useEffect(() => {
-    setSortedSongList(songList.sort((a, b) => (a.sequence ? a.sequence - b.sequence : 0)));
+    const sorted = [...songList].sort((a, b) => (a.sequence || 0) - (b.sequence || 0));
+    setSortedSongList(sorted);
   }, [songList]);
 
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [currentSongId, setCurrentSongId] = useState<string | null>(null);
-
+  // Menu handlers
   const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>, songId: string) => {
-    setAnchorEl(event.currentTarget);
-    setCurrentSongId(songId);
+    setMenuState({
+      anchorEl: event.currentTarget,
+      currentSongId: songId,
+    });
   };
 
   const handleMenuClose = () => {
-    setAnchorEl(null);
-    setCurrentSongId(null);
+    setMenuState({
+      anchorEl: null,
+      currentSongId: null,
+    });
   };
 
-  // Song Preview
-  const [songToPreview, setSongToPreview] = useState<SongSetlistSchema | null>(null);
-  const [songPreviewModalOpen, setSongPreviewModalOpen] = useState(false);
-
-  const handleSongPreviewModalOpen = (song: SongSetlistSchema) => {
-    setSongToPreview(song);
-    setSongPreviewModalOpen(true);
-  };
-  const handleSongPreviewModalClose = () => {
-    setSongToPreview(null);
-    setSongPreviewModalOpen(false);
-  };
-
-  // Change Key
-  const [songToChangeKey, setSongToChangeKey] = useState<SongSetlistSchema | null>(null);
-  const [changeKeyModalOpen, setChangeKeyModalOpen] = useState(false);
-
-  const handleSongChangeKeyModalOpen = (song: SongSetlistSchema) => {
-    setSongToChangeKey(song);
-    setChangeKeyModalOpen(true);
+  // Modal handlers with type safety
+  const handleModalToggle = (
+    modalType: 'preview' | 'changeKey',
+    open: boolean,
+    song: SongSetlistSchema | null = null
+  ) => {
+    setModals((prev) => ({
+      ...prev,
+      [modalType]: {
+        open,
+        song: open ? song : null,
+      },
+    }));
   };
 
-  const handleSongChangeKeyModalClose = () => {
-    setSongToChangeKey(null);
-    setChangeKeyModalOpen(false);
+  // Type-safe modal open handlers
+  const handlePreviewOpen = (song: SongSetlistSchema) => {
+    handleModalToggle('preview', true, song);
   };
 
+  const handleChangeKeyOpen = (song: SongSetlistSchema) => {
+    handleModalToggle('changeKey', true, song);
+  };
+
+  // Song manipulation handlers
   const handleSaveKey = (newKey: string) => {
-    // Handle save key action
-    setSongList((prev) =>
-      prev.map((song) => {
-        if (song._id === songToChangeKey?._id) {
-          return { ...song, key: newKey };
-        }
-        return song;
-      })
-    );
-    handleSongChangeKeyModalClose();
-  };
-
-  // Menu Actions
-  const handlePreviewSong = (songId: string) => {
-    // Handle preview song action
-    const songToPreview = songList.find((song) => song._id === songId);
-    if (songToPreview) {
-      handleSongPreviewModalOpen(songToPreview);
-    }
-    handleMenuClose();
-  };
-
-  const handleChangeKey = (songId: string) => {
-    // Handle change key action
-    const songToChangeKey = songList.find((song) => song._id === songId);
-    if (songToChangeKey) {
-      handleSongChangeKeyModalOpen(songToChangeKey);
-    }
-    handleMenuClose();
-  };
-
-  const handleMoveUp = (songId: string) => {
-    const songSequence = songList.find((song) => song._id === songId)?.sequence;
-    if (songSequence === 1 || !songSequence) {
-      return;
-    }
-    const songToSwap = songList.find((song) => song.sequence === songSequence - 1);
+    if (!modals.changeKey.song || !setSongList) return;
 
     setSongList((prev) =>
-      prev.map((song) => {
-        if (song._id === songId) {
-          return { ...song, sequence: songSequence - 1 };
-        }
-        if (song._id === songToSwap?._id) {
-          return { ...song, sequence: songSequence };
-        }
-        return song;
-      })
+      prev.map((song) =>
+        song._id === modals.changeKey.song?._id ? { ...song, key: newKey } : song
+      )
     );
-
-    handleMenuClose();
+    handleModalToggle('changeKey', false);
   };
 
-  const handleMoveDown = (songId: string) => {
-    // Handle move down action
-    const songSequence = sortedSongList.find((song) => song._id === songId)?.sequence;
-    if (songSequence === sortedSongList.length || !songSequence) {
-      return;
-    }
-    const songToSwap = sortedSongList.find((song) => song.sequence === songSequence + 1);
+  const handleMoveSong = (direction: 'up' | 'down', songId: string) => {
+    if (!setSongList) return;
 
-    setSongList((prev) =>
-      prev.map((song) => {
-        if (song._id === songId) {
-          return { ...song, sequence: songSequence + 1 };
-        } else if (song._id === songToSwap?._id) {
-          return { ...song, sequence: songSequence };
-        }
-        return song;
-      })
-    );
+    const newSortedList = [...sortedSongList];
+    const currentIndex = newSortedList.findIndex((s) => s._id === songId);
+    const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
 
+    if (newIndex < 0 || newIndex >= newSortedList.length) return;
+
+    [newSortedList[currentIndex], newSortedList[newIndex]] = [
+      newSortedList[newIndex],
+      newSortedList[currentIndex],
+    ];
+
+    newSortedList.forEach((song, index) => {
+      song.sequence = index + 1;
+    });
+
+    setSortedSongList(newSortedList);
+    setSongList(newSortedList);
     handleMenuClose();
   };
 
   const handleRemoveSong = (songId: string) => {
+    if (!setSongList) return;
+
     const songToRemove = songList.find((song) => song._id === songId);
-    const songIndexToRemove = songList.findIndex((song) => song._id === songId);
+    if (!songToRemove) return;
 
-    if (!songToRemove || songIndexToRemove === -1) return;
+    const updatedList = songList
+      .filter((song) => song._id !== songId)
+      .map((song) => ({
+        ...song,
+        sequence: song.sequence! > songToRemove.sequence! ? song.sequence! - 1 : song.sequence,
+      }));
 
-    const updatedSongList = [...songList];
-    updatedSongList.splice(songIndexToRemove, 1);
-
-    // Update the sequence of the songs below the removed song
-    updatedSongList.forEach((song, index) => {
-      if (song.sequence! > songToRemove.sequence!) {
-        updatedSongList[index] = { ...song, sequence: song.sequence! - 1 };
-      }
-    });
-
-    setSongList(updatedSongList);
+    setSongList(updatedList);
     handleMenuClose();
   };
+
+  // Styles
+  const tableCellStyles = {
+    header: {
+      color: '#938F99',
+    },
+    sequence: {
+      width: '5%',
+      color: '#938F99',
+    },
+    title: {
+      width: readOnly ? '85%' : '80%',
+      color: '#938F99',
+    },
+    key: {
+      width: '10%',
+      color: '#938F99',
+    },
+    actions: {
+      width: '5%',
+    },
+  };
+
+  const keyBoxStyles = {
+    background: '#4F378B',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: '40px',
+    width: '40px',
+    height: '40px',
+  };
+
+  // Menu item component
+  const MenuActionItem = ({
+    icon: Icon,
+    text,
+    onClick,
+  }: {
+    icon: React.ElementType;
+    text: string;
+    onClick: () => void;
+  }) => (
+    <MenuItem onClick={onClick}>
+      <ListItemIcon sx={{ color: 'secondary.main' }}>
+        <Icon />
+      </ListItemIcon>
+      <ListItemText sx={{ color: 'primary.lighter' }}>{text}</ListItemText>
+    </MenuItem>
+  );
 
   return (
     <>
       <TableContainer
-        style={{
+        sx={{
           borderRadius: '16px',
           backgroundColor: '#0F0D13',
           paddingInline: '16px',
@@ -187,155 +216,84 @@ const SetlistSongsTable: React.FC<SetlistSongsTableProps> = ({ songList, setSong
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell
-                width="10%"
-                sx={{
-                  color: '#938F99',
-                }}
-              >
-                #
-              </TableCell>
-              <TableCell
-                width="75%"
-                sx={{
-                  color: '#938F99',
-                }}
-              >
-                Song Title
-              </TableCell>
-              <TableCell
-                width="10%"
-                sx={{
-                  color: '#938F99',
-                }}
-              >
-                Key
-              </TableCell>
-              <TableCell width="5%" />
+              <TableCell sx={tableCellStyles.sequence}>#</TableCell>
+              <TableCell sx={tableCellStyles.title}>Song Title</TableCell>
+              <TableCell sx={tableCellStyles.key}>Key</TableCell>
+              {!readOnly && <TableCell sx={tableCellStyles.actions} />}
             </TableRow>
           </TableHead>
           <TableBody>
-            {sortedSongList && sortedSongList.length > 0 ? (
-              sortedSongList.map((song, i) => (
+            {sortedSongList.length > 0 ? (
+              sortedSongList.map((song, index) => (
                 <TableRow key={song._id} sx={{ '& td': { border: 0 } }}>
-                  <TableCell
-                    width="10%"
-                    sx={{
-                      color: '#938F99',
-                    }}
-                  >
-                    {i + 1}
-                  </TableCell>
-                  <TableCell width="75%">
-                    <Typography variant="h3" fontWeight={600}>
+                  <TableCell sx={tableCellStyles.sequence}>{index + 1}</TableCell>
+                  <TableCell>
+                    <Typography variant="h4" fontWeight={600} sx={{ color: '#E6E0E9' }}>
                       {song.title}
                     </Typography>
-                    <Typography variant="subtitle1" fontWeight={500} sx={{ color: '#CAC4D0' }}>
+                    <Typography variant="subtitle2" fontWeight={500} sx={{ color: '#CAC4D0' }}>
                       {song.artist}
                     </Typography>
                   </TableCell>
-                  <TableCell width="10%">
-                    <Box
-                      style={{
-                        background: '#4F378B',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        borderRadius: '40px',
-                        width: '40px',
-                        height: '40px',
-                      }}
-                    >
-                      <Typography
-                        color="secondary.light"
-                        fontSize={'1rem'}
-                        fontWeight={400}
-                        align="center"
-                      >
+                  <TableCell>
+                    <Box sx={keyBoxStyles}>
+                      <Typography color="#EADDFF" fontSize="1rem" fontWeight={400}>
                         {song.key}
                       </Typography>
                     </Box>
                   </TableCell>
-                  <TableCell width="5%">
-                    <IconButton
-                      onClick={(event) => handleMenuOpen(event, song._id)}
-                      aria-controls={`song-menu-${song._id}`}
-                      aria-haspopup="true"
-                    >
-                      <MoreVert color="secondary" />
-                    </IconButton>
-                  </TableCell>
-                  <Menu
-                    id={`song-menu-${song._id}`}
-                    anchorEl={anchorEl}
-                    open={anchorEl !== null && currentSongId === song._id}
-                    onClose={handleMenuClose}
-                    sx={{
-                      '& .MuiPaper-root': {
-                        backgroundColor: 'primary.darker',
-                      },
-                    }}
-                  >
-                    <MenuItem onClick={() => handlePreviewSong(song._id)}>
-                      <ListItemIcon
-                        sx={{
-                          color: 'secondary.main',
-                        }}
+                  {!readOnly && (
+                    <TableCell>
+                      <IconButton
+                        onClick={(e) => handleMenuOpen(e, song._id)}
+                        aria-controls={`song-menu-${song._id}`}
+                        aria-haspopup="true"
                       >
-                        <Visibility />
-                      </ListItemIcon>
-                      <ListItemText color={'primary.lighter'}>Preview</ListItemText>
-                    </MenuItem>
-                    <Divider sx={{ bgcolor: '#49454F' }} />
+                        <MoreVert color="secondary" />
+                      </IconButton>
 
-                    <MenuItem onClick={() => handleChangeKey(song._id)}>
-                      <ListItemIcon
-                        sx={{
-                          color: 'secondary.main',
-                        }}
+                      <Menu
+                        id={`song-menu-${song._id}`}
+                        anchorEl={menuState.anchorEl}
+                        open={menuState.anchorEl !== null && menuState.currentSongId === song._id}
+                        onClose={handleMenuClose}
+                        PaperProps={{ sx: { backgroundColor: 'primary.darker' } }}
                       >
-                        <Tune />
-                      </ListItemIcon>
-                      <ListItemText color={'primary.lighter'}>Change Key</ListItemText>
-                    </MenuItem>
-                    <MenuItem onClick={() => handleMoveUp(song._id)}>
-                      <ListItemIcon
-                        sx={{
-                          color: 'secondary.main',
-                        }}
-                      >
-                        <ArrowUpward />
-                      </ListItemIcon>
-                      <ListItemText color={'primary.lighter'}>Move Up</ListItemText>
-                    </MenuItem>
-                    <MenuItem onClick={() => handleMoveDown(song._id)}>
-                      <ListItemIcon
-                        sx={{
-                          color: 'secondary.main',
-                        }}
-                      >
-                        <ArrowDownward />
-                      </ListItemIcon>
-                      <ListItemText color={'primary.lighter'}>Move Down</ListItemText>
-                    </MenuItem>
-                    <Divider sx={{ bgcolor: '#49454F' }} />
-                    <MenuItem onClick={() => handleRemoveSong(song._id)}>
-                      <ListItemIcon
-                        sx={{
-                          color: 'secondary.main',
-                        }}
-                      >
-                        <Delete />
-                      </ListItemIcon>
-                      <ListItemText color={'primary.lighter'}>Remove Song</ListItemText>
-                    </MenuItem>
-                  </Menu>
+                        <MenuActionItem
+                          icon={Visibility}
+                          text="Preview"
+                          onClick={() => handlePreviewOpen(song)}
+                        />
+                        <Divider sx={{ bgcolor: '#49454F' }} />
+                        <MenuActionItem
+                          icon={Tune}
+                          text="Change Key"
+                          onClick={() => handleChangeKeyOpen(song)}
+                        />
+                        <MenuActionItem
+                          icon={ArrowUpward}
+                          text="Move Up"
+                          onClick={() => handleMoveSong('up', song._id)}
+                        />
+                        <MenuActionItem
+                          icon={ArrowDownward}
+                          text="Move Down"
+                          onClick={() => handleMoveSong('down', song._id)}
+                        />
+                        <Divider sx={{ bgcolor: '#49454F' }} />
+                        <MenuActionItem
+                          icon={Delete}
+                          text="Remove Song"
+                          onClick={() => handleRemoveSong(song._id)}
+                        />
+                      </Menu>
+                    </TableCell>
+                  )}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell width="10%" sx={{ borderBottom: 0 }} />
-                <TableCell width="55%" sx={{ borderBottom: 0 }}>
+                <TableCell colSpan={readOnly ? 3 : 4} sx={{ borderBottom: 0 }}>
                   <Typography variant="subtitle1" color="secondary.main" align="left">
                     No Songs Added
                   </Typography>
@@ -345,18 +303,20 @@ const SetlistSongsTable: React.FC<SetlistSongsTableProps> = ({ songList, setSong
           </TableBody>
         </Table>
       </TableContainer>
-      {songToPreview && (
+
+      {/* Modals */}
+      {modals.preview.open && modals.preview.song && (
         <SongPreviewModal
-          open={songPreviewModalOpen}
-          onClose={handleSongPreviewModalClose}
-          songToPreview={songToPreview}
+          open={modals.preview.open}
+          onClose={() => handleModalToggle('preview', false)}
+          songToPreview={modals.preview.song}
         />
       )}
-      {songToChangeKey && (
+      {modals.changeKey.open && modals.changeKey.song && !readOnly && (
         <SetlistChangeKeyModal
-          open={changeKeyModalOpen}
-          onClose={handleSongChangeKeyModalClose}
-          song={songToChangeKey}
+          open={modals.changeKey.open}
+          onClose={() => handleModalToggle('changeKey', false)}
+          song={modals.changeKey.song}
           handleSave={handleSaveKey}
         />
       )}
