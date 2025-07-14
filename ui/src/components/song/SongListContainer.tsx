@@ -198,7 +198,7 @@ const SongListContainer: FC = (): ReactElement => {
               variant="outlined"
               disabled={user?.accessType !== 'admin'}
               sx={{
-                display: user?.accessType !== 'admin' ? 'none' : 'flex',
+                display: { xs: 'none', sm: 'flex' },
                 border: 0,
                 padding: {
                   xs: '8px 15px',
