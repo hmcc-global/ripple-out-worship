@@ -24,6 +24,7 @@ import Typography from '@mui/material/Typography';
 import axios, { AxiosResponse } from 'axios';
 import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react';
 import HeaderWithIcon from '../custom/HeaderWithIcon';
+import { Ownership } from '#/types/ownership.types';
 
 type SetlistFolderDrawerProps = {
   openDrawer: boolean;
@@ -56,7 +57,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
 
   // handle add people modal
   const [openModal, setOpenModal] = useState<boolean>(false);
-  const [allPeople, setAllPeople] = useState<SetlistFolderMember[]>([]);
+  const [allPeople, setAllPeople] = useState<Ownership[]>([]);
   const [addedPeople, setAddedPeople] = useState<string[]>([]);
 
   const [createdDateString, setCreatedDateString] = useState<string>('');
@@ -78,7 +79,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
 
   const getPeople = useCallback(async () => {
     try {
-      const { data, status } = await axios.get('/api/users/get');
+      const { data, status } = await axios.get<Ownership[]>('/api/ownerships/get');
       if (status === 200) setAllPeople(data);
     } catch (error) {
       console.log(error);
@@ -123,7 +124,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
   }, [folderCreated, mode]);
 
   // To render the songs that are added to setlist
-  const addedPeopleList = allPeople.filter((person) => addedPeople.includes(person._id));
+  const addedPeopleList = allPeople.filter((person) => addedPeople.includes(person.userId));
   const handleAddPerson = (id: string) => {
     let result = addedPeople.includes(id)
       ? // eslint-disable-next-line eqeqeq
@@ -329,9 +330,9 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
               {addedPeopleList.length > 0 ? (
                 addedPeopleList.map((person) => (
                   <ListItem
-                    key={person._id} // Use a unique identifier
+                    key={person.userId} // Use a unique identifier
                     secondaryAction={
-                      <IconButton edge="end" onClick={() => handleRemovePerson(person._id)}>
+                      <IconButton edge="end" onClick={() => handleRemovePerson(person.userId)}>
                         <Typography color="#EFB8C8"> Remove</Typography>
                       </IconButton>
                     }
@@ -453,7 +454,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
                   secondaryAction={
                     <IconButton
                       edge="end"
-                      onClick={() => handleAddPerson(person._id)}
+                      onClick={() => handleAddPerson(person.userId)}
                       sx={{
                         width: '30px',
                         height: '30px',
@@ -467,9 +468,9 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
                           color: 'primary.darkest',
                         },
                       }}
-                      className={addedPeople.includes(person._id) ? 'Mui-selected' : ''}
+                      className={addedPeople.includes(person.userId) ? 'Mui-selected' : ''}
                     >
-                      {addedPeople.includes(person._id) ? <Check /> : <Add />}
+                      {addedPeople.includes(person.userId) ? <Check /> : <Add />}
                     </IconButton>
                   }
                 >

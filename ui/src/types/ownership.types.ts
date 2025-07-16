@@ -8,7 +8,6 @@ export type GroupOwnership = {
   id: string;
   name: string;
   createdAt: string;
-  setlists: SetlistOwnership[];
 };
 
 export type Ownership = {

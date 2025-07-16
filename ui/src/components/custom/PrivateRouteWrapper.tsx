@@ -59,7 +59,7 @@ const PrivateRouteWrapper = ({ children, permissions }: PrivateRouteProps) => {
   // Update auth state with transition to prevent UI flickering
   useEffect(() => {
     setIsChecking(true);
-    if (user && !loading) {
+    if (!loading) {
       startTransition(() => {
         setAuthState({
           isAuthenticated: !!user && Object.keys(user).length > 0,
