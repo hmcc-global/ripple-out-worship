@@ -26,6 +26,7 @@ import SetlistFolderDrawer from './SetlistFolderDrawer';
 import SetlistViewContainer from './adminView/SetlistViewContainer';
 import PageHeader from '../navigation/PageHeader';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { useOwnership } from '../../helpers/customHooks';
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
@@ -51,6 +52,7 @@ const SetlistTabPanel = (props: TabPanelProps) => {
 const SetlistListContainer: FC = (): ReactElement => {
   const isDesktop = useMediaQuery('(min-width: 768px)');
   const navigate = useNavigate();
+  const ownership = useOwnership();
 
   const [tab, setTab] = useState(0);
   const [allSetlists, setAllSetlists] = useState<Setlist[]>([]);
@@ -85,26 +87,32 @@ const SetlistListContainer: FC = (): ReactElement => {
   const [openFolders, setOpenFolders] = useState<string[]>([]);
   const toggleOpenFolder = (id: string) => {
     let result = openFolders.includes(id)
-      ? openFolders.filter((add) => add != id)
+      ? openFolders.filter((add) => add !== id)
       : [...openFolders, id];
     setOpenFolders(result);
   };
 
   const getSetlistsAndFolders = useCallback(async () => {
     try {
-      const setlistRes = await axios.get('/api/setlists/get');
+      const setlistRes = await axios.get<Setlist[]>('/api/setlists/get');
       if (setlistRes.status === 200) {
-        setAllSetlists(setlistRes.data);
+        const filteredSetlists = setlistRes.data.filter((setlist) =>
+          ownership.setlistIds.some((setlistOwnership) => setlistOwnership.id === setlist._id)
+        );
+        setAllSetlists(filteredSetlists);
       }
 
-      const folderRes = await axios.get('/api/groups/get');
+      const folderRes = await axios.get<SetlistFolder[]>('/api/groups/get');
       if (folderRes.status === 200) {
-        setAllFolders(folderRes.data);
+        const filteredFolders = folderRes.data.filter((folder) =>
+          ownership.groupIds.some((folderOwnership) => folderOwnership.id === folder._id)
+        );
+        setAllFolders(filteredFolders);
       }
     } catch (error) {
       console.log(error);
     }
-  }, []);
+  }, [ownership, setAllSetlists, setAllFolders]);
 
   const handleSelectSetlist = (id: string) => {
     navigate(`/setlist/${id}`);

@@ -1,11 +1,13 @@
-import { Schema, model, models, Types } from 'mongoose';
+import { Schema, model, models } from 'mongoose';
 import { OwnershipSchema } from '../types/ownership.types';
 
 const ownershipSchema = new Schema<OwnershipSchema>(
   {
     userId: { type: String, required: true, unique: true },
-    groupIds: [{ type: Types.ObjectId, ref: 'Group' }],
-    setlistIds: [{ type: Types.ObjectId, ref: 'Setlist' }],
+    fullName: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    groupIds: [{ type: Object, ref: 'Group' }],
+    setlistIds: [{ type: Object, ref: 'Setlist' }],
     isDeleted: { type: Boolean, default: false },
   },
   { timestamps: true }

@@ -62,7 +62,7 @@ const SetlistViewContainer: FC = (): ReactElement | null => {
       });
       if (status === 200) {
         setSetlist(data);
-        if (data.groupIds[0]) {
+        if (data.groupIds && data.groupIds.length > 0 && data.groupIds[0]) {
           setGroupId(data.groupIds[0]);
         }
       }

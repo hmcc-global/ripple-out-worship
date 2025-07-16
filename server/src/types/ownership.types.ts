@@ -3,8 +3,10 @@ import { MongoInjectedFields } from './mongo.types';
 
 type OwnershipSchema = {
   userId: string;
-  groupIds?: Types.Array<Types.ObjectId>;
-  setlistIds?: Types.Array<Types.ObjectId>;
+  fullName: string;
+  email: string;
+  groupIds?: Types.Array<Object>;
+  setlistIds?: Types.Array<Object>;
   isDeleted: boolean;
 };
 

@@ -17,20 +17,23 @@ import Language from '@mui/icons-material/Language';
 import Person from '@mui/icons-material/Person';
 import GlobalSearchModal from './GlobalSearchModal';
 import SearchIcon from '@mui/icons-material/Search';
-import { useSetlists, useSongs } from '../../helpers/customHooks';
+import { useOwnership, useSongs } from '../../helpers/customHooks';
 import { SongSchema } from '../../types/song.types';
 import { Setlist } from '../../types/setlist.types';
 import { SearchButtonBox } from './NavigationPaper';
 import { drawerWidth, mobileNavbarHeight } from '../../constants';
+import axios from 'axios';
 
 const SideBar: FC = (): ReactElement => {
   const navigate = useNavigate();
+  const ownership = useOwnership();
   const isMobile = useMediaQuery('(max-width: 768px)');
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
+
+  const [setlists, setSetlists] = useState<Setlist[]>([]);
   const isDesktop = useMediaQuery('(min-width: 769px)');
 
   const allSongs = useSongs() as SongSchema[];
-  const allSetlists = useSetlists() as Setlist[];
 
   const location = useLocation();
 
@@ -59,6 +62,26 @@ const SideBar: FC = (): ReactElement => {
     },
     height: mobileNavbarHeight,
   };
+
+  useEffect(() => {
+    const fetchSetlists = async () => {
+      if (ownership.setlistIds.length > 0) {
+        try {
+          const setlistRes = await axios.get<Setlist[]>('/api/setlists/get');
+          if (setlistRes.status === 200) {
+            const filteredSetlists = setlistRes.data.filter((setlist) =>
+              ownership.setlistIds.some((setlistOwnership) => setlistOwnership.id === setlist._id)
+            );
+            setSetlists(filteredSetlists);
+          }
+        } catch (error) {
+          console.error('Error fetching setlists:', error);
+        }
+      }
+    };
+
+    fetchSetlists();
+  }, [ownership]);
 
   useEffect(() => {
     const path = location.pathname;
@@ -241,7 +264,7 @@ const SideBar: FC = (): ReactElement => {
         isOpen={isSearchOpen}
         onClose={onSearchClose}
         allSongs={allSongs}
-        allSetlists={allSetlists}
+        allSetlists={setlists}
       />
     </>
   );
