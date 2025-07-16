@@ -39,8 +39,8 @@ export const useUser = (): { token: string; user?: User; loading: boolean } => {
             return status >= 200 && status < 500; // Don't reject on 404
           },
         });
-        if (status === 200 && ownershipData.length > 0) {
-          dispatch(fetchOwnership(ownershipData[0]));
+        if (status === 200 && ownershipData) {
+          dispatch(fetchOwnership(ownershipData));
         } else {
           const { data: createOwnership, status: createStatus } = await axios.post(
             '/api/ownerships/create',

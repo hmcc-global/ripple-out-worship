@@ -49,6 +49,7 @@ const PrivateRouteWrapper = ({ children, permissions }: PrivateRouteProps) => {
   const location = useLocation();
 
   const [isPending, startTransition] = useTransition();
+  const [isChecking, setIsChecking] = useState(true);
   const [authState, setAuthState] = useState({
     isAuthenticated: false,
     //TODO: not needed?
@@ -57,12 +58,14 @@ const PrivateRouteWrapper = ({ children, permissions }: PrivateRouteProps) => {
 
   // Update auth state with transition to prevent UI flickering
   useEffect(() => {
+    setIsChecking(true);
     if (user && !loading) {
       startTransition(() => {
         setAuthState({
           isAuthenticated: !!user && Object.keys(user).length > 0,
           isAdmin: user?.accessType === 'admin',
         });
+        setIsChecking(false);
       });
     }
   }, [user, loading]);
@@ -73,13 +76,12 @@ const PrivateRouteWrapper = ({ children, permissions }: PrivateRouteProps) => {
   const requiresAdmin = permissions.includes('admin');
   const isPublic = permissions.includes('public');
 
-  // Show loading state while determining auth status or during transition
-  if (loading || isPending) {
-    return <Skeleton />;
-  }
-
   const { isAuthenticated, isAdmin } = authState;
 
+  // Show loading state while determining auth status or during transition
+  if (loading || isPending || isChecking) {
+    return <Skeleton />;
+  }
   // CASE 2: Routes that don't care about auth status (public routes)
   if (isPublic) {
     return <PageWithNavBar children={children} />;
