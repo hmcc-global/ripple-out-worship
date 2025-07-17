@@ -43,7 +43,6 @@ const SetlistViewContainer: FC = (): ReactElement | null => {
   const [folderId, setFolderId] = useState<string>('');
   const [folderName, setFolderName] = useState<string>('');
   const [folderCreated, setFolderCreated] = useState<string>('');
-  const [folderMembers, setFolderMembers] = useState<string[]>([]);
   const toggleFolderDrawer = (newOpen: boolean) => {
     setOpenDrawer(newOpen);
   };
@@ -82,7 +81,6 @@ const SetlistViewContainer: FC = (): ReactElement | null => {
         setGroupData(data);
         setFolderId(data._id);
         setFolderName(data.groupName);
-        setFolderMembers(data.userIds);
         setFolderCreated(data.createdAt);
       }
     } catch (e) {
@@ -190,11 +188,9 @@ const SetlistViewContainer: FC = (): ReactElement | null => {
         toggleFolderDrawer={toggleFolderDrawer}
         setFolderId={setFolderId}
         setFolderName={setFolderName}
-        setFolderMembers={setFolderMembers}
         setFolderCreated={setFolderCreated}
         folderId={folderId}
         folderName={folderName}
-        folderMembers={folderMembers}
         folderCreated={folderCreated}
         mode="edit"
       />

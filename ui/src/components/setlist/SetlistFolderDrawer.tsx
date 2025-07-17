@@ -24,18 +24,16 @@ import Typography from '@mui/material/Typography';
 import axios, { AxiosResponse } from 'axios';
 import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react';
 import HeaderWithIcon from '../custom/HeaderWithIcon';
-import { Ownership } from '#/types/ownership.types';
+import { GroupOwnership, Ownership } from '../../types/ownership.types';
 
 type SetlistFolderDrawerProps = {
   openDrawer: boolean;
   toggleFolderDrawer: (newOpen: boolean) => void;
   setFolderId: Dispatch<SetStateAction<string>>;
   setFolderName: Dispatch<SetStateAction<string>>;
-  setFolderMembers: Dispatch<SetStateAction<string[]>>;
   setFolderCreated: Dispatch<SetStateAction<string>>;
   folderId: string;
   folderName: string;
-  folderMembers: string[];
   folderCreated: string;
   mode: string;
 };
@@ -46,11 +44,9 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
     toggleFolderDrawer,
     setFolderId,
     setFolderName,
-    setFolderMembers,
     setFolderCreated,
     folderId,
     folderName,
-    folderMembers,
     folderCreated,
     mode,
   } = props;
@@ -80,11 +76,17 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
   const getPeople = useCallback(async () => {
     try {
       const { data, status } = await axios.get<Ownership[]>('/api/ownerships/get');
-      if (status === 200) setAllPeople(data);
+      if (status === 200) {
+        setAllPeople(data);
+        const existingMembers = data.filter((person) =>
+          person.groupIds.find((group) => group.id === folderId)
+        );
+        setAddedPeople(existingMembers.map((person) => person.userId));
+      }
     } catch (error) {
       console.log(error);
     }
-  }, []);
+  }, [folderId, setAllPeople, setAddedPeople]);
 
   const deleteGroup = useCallback(async () => {
     try {
@@ -104,11 +106,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
 
   useEffect(() => {
     getPeople();
-  }, []);
-
-  useEffect(() => {
-    setAddedPeople(folderMembers);
-  }, [folderId]);
+  }, [getPeople]);
 
   useEffect(() => {
     if (mode === 'create') {
@@ -137,7 +135,6 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
   const cancelFolderDrawer = () => {
     setFolderName('');
     setAddedPeople([]);
-    setFolderMembers([]);
     setFolderId('');
     setFolderCreated('');
     handleCloseModal();
@@ -149,15 +146,25 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
       return;
     }
     try {
-      const payload: AxiosResponse = await axios.put('/api/groups/update', {
-        id: folderId,
-        userIds: addedPeople,
-      });
-
-      if (payload.status === 200) {
-        setInvalidFolder('');
-        return payload.data;
-      }
+      //TODO: Think of removing works
+      await Promise.all(
+        addedPeople.map(async (userId) => {
+          const currentUser = allPeople.find((person) => person.userId === userId);
+          const currentGroup: GroupOwnership = {
+            id: folderId,
+            name: folderName,
+            createdAt: folderCreated,
+          };
+          const { data, status } = await axios.put('/api/ownerships/update', {
+            ...currentUser,
+            groupIds: [currentGroup],
+          });
+          if (status === 200) {
+            setInvalidFolder('');
+            return data;
+          }
+        })
+      );
 
       setInvalidFolder('Error adding members');
       setSuccessSnackbarOpen(false);

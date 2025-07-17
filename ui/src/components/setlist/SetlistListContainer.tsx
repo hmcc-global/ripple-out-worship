@@ -65,7 +65,6 @@ const SetlistListContainer: FC = (): ReactElement => {
   const handleCreateClick = (event: MouseEvent<HTMLElement>) => {
     setCreateAnchorEl(event.currentTarget);
     setFolderName('');
-    setFolderMembers([]);
     setFolderId('');
     toggleFolderDrawer(false);
   };
@@ -78,7 +77,6 @@ const SetlistListContainer: FC = (): ReactElement => {
   const [folderId, setFolderId] = useState<string>('');
   const [folderName, setFolderName] = useState<string>('');
   const [folderCreated, setFolderCreated] = useState<string>('');
-  const [folderMembers, setFolderMembers] = useState<string[]>([]);
   const toggleFolderDrawer = (newOpen: boolean) => {
     setOpenDrawer(newOpen);
   };
@@ -413,11 +411,9 @@ const SetlistListContainer: FC = (): ReactElement => {
         toggleFolderDrawer={toggleFolderDrawer}
         setFolderId={setFolderId}
         setFolderName={setFolderName}
-        setFolderMembers={setFolderMembers}
         setFolderCreated={setFolderCreated}
         folderId={folderId}
         folderName={folderName}
-        folderMembers={folderMembers}
         folderCreated={folderCreated}
         mode={mode}
       />
