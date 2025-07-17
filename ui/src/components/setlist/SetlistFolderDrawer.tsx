@@ -157,7 +157,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
           };
           const { data, status } = await axios.put('/api/ownerships/update', {
             ...currentUser,
-            groupIds: [currentGroup],
+            groupIds: [...(currentUser?.groupIds || []), currentGroup],
           });
           if (status === 200) {
             setInvalidFolder('');
@@ -166,8 +166,8 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
         })
       );
 
-      setInvalidFolder('Error adding members');
-      setSuccessSnackbarOpen(false);
+      setInvalidFolder('');
+      setSuccessSnackbarOpen(true);
     } catch (error: any) {
       setInvalidFolder(error.response?.data || 'An error occurred');
       setSuccessSnackbarOpen(false);
