@@ -5,7 +5,6 @@ export const ownershipSlice = createSlice({
   initialState: {},
   reducers: {
     fetchOwnership: (_, action) => {
-      console.log(action);
       return action.payload;
     },
   },

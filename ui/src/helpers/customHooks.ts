@@ -35,6 +35,9 @@ export const useUser = (): { token: string; user?: User; loading: boolean } => {
           params: {
             userId: data.id,
           },
+          validateStatus: function (status) {
+            return status >= 200 && status < 500; // Don't reject on 404
+          },
         });
         if (status === 200 && ownershipData.length > 0) {
           dispatch(fetchOwnership(ownershipData[0]));
