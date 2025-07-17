@@ -26,7 +26,7 @@ export const useUser = (): { token: string; user?: User; loading: boolean } => {
     const fetchUser = async () => {
       try {
         setLoading(true);
-        const { data } = await axios.post('/external-api/auth/verify-token', {
+        const { data } = await axios.post<User>('/external-api/auth/verify-token', {
           token: token,
         });
         updateAxiosClient(token);
@@ -46,6 +46,9 @@ export const useUser = (): { token: string; user?: User; loading: boolean } => {
             '/api/ownerships/create',
             {
               userId: data.id,
+              fullName: data.fullName,
+              email: data.email,
+              accessType: data.accessType,
               setlistIds: [],
               groupIds: [],
             }

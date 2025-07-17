@@ -5,6 +5,7 @@ type OwnershipSchema = {
   userId: string;
   fullName: string;
   email: string;
+  accessType: string;
   groupIds?: Types.Array<Object>;
   setlistIds?: Types.Array<Object>;
   isDeleted: boolean;

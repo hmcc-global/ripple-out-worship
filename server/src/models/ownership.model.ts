@@ -6,6 +6,7 @@ const ownershipSchema = new Schema<OwnershipSchema>(
     userId: { type: String, required: true, unique: true },
     fullName: { type: String, required: true },
     email: { type: String, required: true, unique: true },
+    accessType: { type: String, required: true, default: 'unsigned' },
     groupIds: [{ type: Object, ref: 'Group' }],
     setlistIds: [{ type: Object, ref: 'Setlist' }],
     isDeleted: { type: Boolean, default: false },
