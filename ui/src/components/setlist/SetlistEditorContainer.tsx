@@ -17,7 +17,7 @@ import {
   Typography,
   useMediaQuery,
 } from '@mui/material';
-import { LocalizationProvider, DateField, DatePicker } from '@mui/x-date-pickers';
+import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
 import axios from 'axios';
@@ -27,7 +27,7 @@ import { useNavigate } from 'react-router-dom';
 import SetlistSongCard from './SetlistSongCard';
 import HeaderWithIcon from '../custom/HeaderWithIcon';
 import PageHeader from '../navigation/PageHeader';
-import { useFolders, useSongs } from '../../helpers/customHooks';
+import { useOwnership, useSongs } from '../../helpers/customHooks';
 import SetlistSongsTable from './SetlistSongTable';
 import AutocompleteInput from '../custom/AutocompleteInput';
 
@@ -45,8 +45,7 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
   }, [paths]);
 
   const allSongs = useSongs() as SongSchema[];
-  const allFolders = useFolders() as SetlistFolder[];
-
+  const ownership = useOwnership();
   // STATES
   const [date, setDate] = useState<Dayjs | null>(null);
   const [search, setSearch] = useState<string>('');
@@ -68,6 +67,20 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
   const { handleSubmit, formState, control, reset, register } = useForm<SetlistEditorFields>();
   const { errors } = formState;
 
+  const getFolderOptions = useCallback(async () => {
+    try {
+      const { data, status } = await axios.get<SetlistFolder[]>('/api/groups/get');
+      if (status === 200) {
+        const filteredFolders = data.filter((folder) =>
+          ownership.groupIds.some((group) => group.id === folder._id)
+        );
+        setFolderOptions(filteredFolders);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  }, [ownership]);
+
   const getSetlist = useCallback(async () => {
     if (setlistId === '') return;
 
@@ -87,7 +100,8 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
 
   useEffect(() => {
     getSetlist();
-  }, [getSetlist, setlistId]);
+    getFolderOptions();
+  }, [getSetlist, getFolderOptions]);
 
   useEffect(() => {
     if (setlist && Object.keys(setlist).length > 0) {
@@ -118,12 +132,6 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
   useEffect(() => {
     getSongResults();
   }, [getSongResults]);
-
-  useEffect(() => {
-    if (allFolders) {
-      setFolderOptions(allFolders);
-    }
-  }, [allFolders]);
 
   // add the id to the array of clicked items if it doesn't exist but if it does exist remove it
   // this makes sure that double clicking on an item brings it back to normal

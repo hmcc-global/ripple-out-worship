@@ -78,7 +78,9 @@ export const useSongs = (id?: string) => {
   }
   return allSongs;
 };
-
+/**
+ * @deprecated Use axios calls with the proper params from useOwnership instead.
+ */
 export const useSetlists = (id?: string) => {
   const allSetlists = useSelector((state: RootState) => state.setlists);
   if (id) {
@@ -87,7 +89,9 @@ export const useSetlists = (id?: string) => {
   }
   return allSetlists;
 };
-
+/**
+ * @deprecated Use axios calls with the proper params from useOwnership instead.
+ */
 export const useFolders = (id?: string) => {
   const allFolders = useSelector((state: RootState) => state.folders);
   if (id) {
