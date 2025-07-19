@@ -40,14 +40,6 @@ const SongsButtonsCard = ({ song, userView = false, userHeader = false }: SongsB
   const [showMobileInfo, setShowMobileInfo] = useState(false);
 
   const isDesktop = useMediaQuery('(min-width:768px)');
-  const navigate = useNavigate();
-  const buttonClass = {
-    display: chordStatus ? 'flex' : 'none',
-    justifyContent: 'center',
-    background: '#322F35',
-    padding: '12px 20px',
-    borderRadius: '30px',
-  };
   const switchStyle = {
     '& .Mui-checked': { color: theme.palette.secondary.main },
     '& .Mui-checked + .MuiSwitch-track': { backgroundColor: '#8175A0' },
@@ -105,8 +97,8 @@ const SongsButtonsCard = ({ song, userView = false, userHeader = false }: SongsB
           }}
         >
           <Stack direction="row" alignItems={'center'} spacing={1}>
-            <Stack
-             display={{ xs: 'none', md: 'flex !important' }}
+            {/* <Stack
+              display={{ xs: 'none', md: 'flex !important' }}
               direction="row"
               spacing={2}
               sx={{
@@ -149,7 +141,7 @@ const SongsButtonsCard = ({ song, userView = false, userHeader = false }: SongsB
                   })}
                 </Stack>
               </Box>
-            </Stack>
+            </Stack> */}
             <Box
               fontSize={{ sm: '14px', md: '26px' }}
               sx={{
@@ -183,7 +175,7 @@ const SongsButtonsCard = ({ song, userView = false, userHeader = false }: SongsB
               sx={{
                 justifyContent: 'center',
                 background: '#322F35',
-                padding: ['4px 10px', '12px 20px'],
+                padding: '4px 10px',
                 borderRadius: '30px',
                 display: chordStatus ? 'flex' : 'none',
               }}
@@ -233,7 +225,7 @@ const SongsButtonsCard = ({ song, userView = false, userHeader = false }: SongsB
               sx={{
                 justifyContent: 'center',
                 background: '#322F35',
-                padding: ['4px 10px', '12px 20px'],
+                padding: '5px 10px',
                 borderRadius: '30px',
                 display: chordStatus ? 'flex' : 'none',
               }}
@@ -324,13 +316,36 @@ const SongsButtonsCard = ({ song, userView = false, userHeader = false }: SongsB
         >
           {/* split columns settings */}
 
-          <Box display="flex" flexDirection="row" alignItems="center" gap={2}>
+          <Box
+            sx={{
+              overflowX: 'auto',
+              whiteSpace: 'nowrap',
+              display: isDesktop ? 'flex' : 'none',
+              gap: 2,
+              alignItems: 'center',
+              paddingRight: 2,
+              scrollbarWidth: 'thin',
+              '&::-webkit-scrollbar': {
+                height: 6,
+              },
+              '&::-webkit-scrollbar-thumb': {
+                backgroundColor: '#999',
+                borderRadius: 4,
+              },
+            }}
+          >
             <Stack
               direction="row"
               spacing={2}
               display={isDesktop ? 'flex !important' : 'none !important'}
               alignItems={'center'}
-              style={buttonClass}
+              sx={{
+                display: 'flex !important',
+                justifyContent: 'center',
+                background: '#322F35',
+                padding: ['4px 10px', '8px 16px', '12px 20px'],
+                borderRadius: '30px',
+              }}
             >
               <Box>
                 <Typography color="#E6E0E9">Split</Typography>
@@ -373,7 +388,7 @@ const SongsButtonsCard = ({ song, userView = false, userHeader = false }: SongsB
                 display: 'flex !important',
                 justifyContent: 'center',
                 background: '#322F35',
-                padding: ['4px 10px', '8px 16px'],
+                padding: ['4px 10px', '6px 12px', '8px 16px'],
                 borderRadius: '30px',
               }}
             >
@@ -402,7 +417,7 @@ const SongsButtonsCard = ({ song, userView = false, userHeader = false }: SongsB
               sx={{
                 justifyContent: 'center',
                 background: '#322F35',
-                padding: ['4px 10px', '8px 16px'],
+                padding: ['4px 10px', '6px 12px', '8px 16px'],
                 borderRadius: '30px',
                 display: chordStatus ? 'flex' : 'none',
               }}
@@ -450,7 +465,7 @@ const SongsButtonsCard = ({ song, userView = false, userHeader = false }: SongsB
             <Box
               fontSize={{ sm: '16px', md: '26px' }}
               sx={{
-                padding: ['4px 10px', '8px 16px'],
+                padding: ['4px 10px', '6px 12px', '10px 18px'],
                 display: chordStatus ? 'flex' : 'none',
                 justifyContent: 'center',
                 background: '#322F35',

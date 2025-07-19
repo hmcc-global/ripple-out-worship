@@ -14,6 +14,9 @@ const SongsViewContainer: FC = (): ReactElement => {
   const navigate = useNavigate();
   const isMobile = useMediaQuery('(max-width: 768px)');
 
+  // Get user information
+  const { user } = useUser();
+
   const id: string = window.location.pathname.split('/')[2];
   const [song, setSong] = useState<SongViewSchema>();
 
@@ -76,7 +79,7 @@ const SongsViewContainer: FC = (): ReactElement => {
           <Box sx={{ width: '100' }}>
             <SongsTitleCard song={song} />
           </Box>
-          {!isMobile && (
+          {!isMobile && user?.accessType === 'admin' && (
             <Button
               variant="outlined"
               onClick={() => navigate(`/song/edit/${id}`)}
@@ -94,13 +97,20 @@ const SongsViewContainer: FC = (): ReactElement => {
           )}
         </Box>
         <Stack direction={['row']}>
-          <Box sx={{ marginBottom: ['10px', '15vh'], width: ['100%', '100%', '70%'] }}>
-            <SongsButtonCard song={song} />
-          </Box>
-          {!isMobile && (
-            <Box sx={{ width: '30%' }}>
-              <SongsInfoCard song={song} />
+          {isMobile && (
+            <Box sx={{ marginBottom: ['10px', '15vh'], width: '100%' }}>
+              <SongsButtonCard song={song} />
             </Box>
+          )}
+          {!isMobile && (
+            <>
+              <Box sx={{ marginBottom: ['10px', '15vh'], width: '70%' }}>
+                <SongsButtonCard song={song} />
+              </Box>
+              <Box sx={{ width: '30%' }}>
+                <SongsInfoCard song={song} />
+              </Box>
+            </>
           )}
         </Stack>
       </Container>
