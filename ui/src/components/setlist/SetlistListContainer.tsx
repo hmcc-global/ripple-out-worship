@@ -27,6 +27,7 @@ import SetlistViewContainer from './adminView/SetlistViewContainer';
 import PageHeader from '../navigation/PageHeader';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useOwnership } from '../../helpers/customHooks';
+import { formatDate } from '../../helpers/global';
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
@@ -259,8 +260,9 @@ const SetlistListContainer: FC = (): ReactElement => {
                                   <QueueMusic sx={{ color: 'secondary.main' }} fontSize="large" />
                                 </ListItemIcon>
                                 <ListItemText>
-                                  <Typography>{subSetlist}</Typography>
-                                  <Typography>{i}</Typography>
+                                  <Typography overflow="hidden" textOverflow="ellipsis">
+                                    {subSetlist}
+                                  </Typography>
                                 </ListItemText>
                               </ListItemButton>
                             ))
@@ -284,7 +286,7 @@ const SetlistListContainer: FC = (): ReactElement => {
                           </ListItemIcon>
                           <ListItemText>
                             <Typography>{setlist.name}</Typography>
-                            <Typography>{setlist.date.toString()}</Typography>
+                            <Typography>{formatDate(setlist.date)}</Typography>
                           </ListItemText>
                         </ListItemButton>
                       </ListItem>
@@ -376,7 +378,7 @@ const SetlistListContainer: FC = (): ReactElement => {
                         </ListItemIcon>
                         <ListItemText>
                           <Typography>{setlist.name}</Typography>
-                          <Typography>{setlist.date.toString()}</Typography>
+                          <Typography>{formatDate(setlist.date)}</Typography>
                         </ListItemText>
                       </ListItemButton>
                     </ListItem>

@@ -172,24 +172,23 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
   const handleSaveSetlist: SubmitHandler<SetlistEditorFields> = async (data) => {
     try {
       let payload: AxiosResponse<Setlist>;
+      const setlistFolderIds = folderOptions
+        .filter((folder) => folderList.includes(folder.groupName))
+        .map((folder) => folder._id);
       if (action === 'edit') {
         payload = await axios.put(`/api/setlists/update`, {
           id: setlistId,
           name: data.name,
           date: date ? date.toDate() : new Date(''),
           songs: addedSongList,
-          groupIds: folderOptions
-            .filter((folder) => folderList.includes(folder.groupName))
-            .map((folder) => folder._id),
+          groupIds: setlistFolderIds,
         });
       } else {
         payload = await axios.post('/api/setlists/create', {
           name: data.name,
           date: date ? date.toDate() : new Date(''),
           songs: addedSongList,
-          groupIds: folderOptions
-            .filter((folder) => folderList.includes(folder.groupName))
-            .map((folder) => folder._id),
+          groupIds: setlistFolderIds,
           createdBy: ownership.userId,
         });
       }
@@ -207,8 +206,21 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
       //   }
 
       // })
-      console.log(payload);
       if (payload.status === 200) {
+        // Updates the ownership and folder
+        Promise.all(
+          setlistFolderIds.map((folderId) => {
+            const currentFolder = folderOptions.find((folder) => folder._id === folderId);
+            // Only updates the folder the user have access to
+            if (currentFolder) {
+              axios.put('/api/groups/update', {
+                id: folderId,
+                setlistIds: [...(currentFolder?.setlistIds || []), payload.data._id],
+              });
+            }
+          })
+        );
+
         if (!ownership.setlistIds.some((setlist) => setlist.id === payload.data._id)) {
           await axios.put('/api/ownerships/update', {
             ...ownership,
