@@ -1,4 +1,4 @@
-import { SetlistFolderMember } from '../../types/setlist.types';
+import { SetlistFolder, SetlistFolderMember } from '../../types/setlist.types';
 import { Folder, GroupAdd, Delete, Close, Check, Add } from '@mui/icons-material';
 import {
   Drawer,
@@ -25,6 +25,7 @@ import axios, { AxiosResponse } from 'axios';
 import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react';
 import HeaderWithIcon from '../custom/HeaderWithIcon';
 import { GroupOwnership, Ownership } from '../../types/ownership.types';
+import { useOwnership } from '../../helpers/customHooks';
 
 type SetlistFolderDrawerProps = {
   openDrawer: boolean;
@@ -50,6 +51,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
     folderCreated,
     mode,
   } = props;
+  const ownership = useOwnership();
 
   // handle add people modal
   const [openModal, setOpenModal] = useState<boolean>(false);
@@ -155,13 +157,16 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
             name: folderName,
             createdAt: folderCreated,
           };
-          const { data, status } = await axios.put('/api/ownerships/update', {
-            ...currentUser,
-            groupIds: [...(currentUser?.groupIds || []), currentGroup],
-          });
-          if (status === 200) {
-            setInvalidFolder('');
-            return data;
+          // Check if the user is already part of the folder
+          if (!currentUser?.groupIds?.some((group) => group.id === currentGroup.id)) {
+            const { data, status } = await axios.put('/api/ownerships/update', {
+              ...currentUser,
+              groupIds: [...(currentUser?.groupIds || []), currentGroup],
+            });
+            if (status === 200) {
+              setInvalidFolder('');
+              return data;
+            }
           }
         })
       );
@@ -177,30 +182,49 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
 
   const handleSaveFolder = async () => {
     try {
-      let payload: AxiosResponse;
+      let payload: AxiosResponse<SetlistFolder>;
 
       if (folderId) {
         payload = await axios.put('/api/groups/update', {
           id: folderId,
           groupName: folderName,
-          userIds: addedPeople,
         });
       } else {
         payload = await axios.post('/api/groups/create', {
           groupName: folderName,
-          userIds: addedPeople,
         });
       }
 
       if (payload.status === 200) {
+        //TODO: Think of removing works
+        await Promise.all(
+          addedPeople.map(async (userId) => {
+            const currentUser = allPeople.find((person) => person.userId === userId);
+            const currentGroup: GroupOwnership = {
+              id: payload.data._id,
+              name: payload.data.groupName,
+              createdAt: payload.data.createdAt,
+            };
+            // Check if the user is already part of the folder
+            if (!currentUser?.groupIds?.some((group) => group.id === currentGroup.id)) {
+              const { data, status } = await axios.put('/api/ownerships/update', {
+                ...currentUser,
+                groupIds: [...(currentUser?.groupIds || []), currentGroup],
+              });
+              if (status === 200) {
+                setInvalidFolder('');
+                return data;
+              }
+            }
+            setInvalidFolder('Some of the members are already in the folder');
+            return null;
+          })
+        );
         cancelFolderDrawer();
-        setInvalidFolder('');
         setSuccessSnackbarOpen(true);
-        return payload.data;
       }
-
-      setInvalidFolder('Error saving setlist');
-      setSuccessSnackbarOpen(false);
+      setInvalidFolder('');
+      setSuccessSnackbarOpen(true);
     } catch (error: any) {
       setInvalidFolder(error.response.data);
       setSuccessSnackbarOpen(false);
