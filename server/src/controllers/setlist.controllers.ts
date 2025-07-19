@@ -31,7 +31,7 @@ const createSetlist: RequestHandler = async (req: Request, res: Response): Promi
       });
 
       if (data) {
-        sendResponse(res, 200, 'Setlist created');
+        sendResponse(res, 200, data);
       } else {
         sendResponse(res, 404, 'Setlist not created');
       }
@@ -45,7 +45,7 @@ const createSetlist: RequestHandler = async (req: Request, res: Response): Promi
 
 const getSetlist: RequestHandler = async (req: Request, res: Response): Promise<void> => {
   const { id: setlistId } = req.query;
-  
+
   if (setlistId) {
     try {
       const data: SetlistDocument = await Setlist.findOne({

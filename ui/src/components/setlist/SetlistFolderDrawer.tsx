@@ -98,6 +98,10 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
         },
       });
       if (status === 200) {
+        await axios.put('/api/ownerships/update', {
+          ...ownership,
+          groupIds: ownership.groupIds.filter((group) => group.id !== folderId),
+        });
         setSuccessSnackbarOpen(true);
         toggleFolderDrawer(false);
       }

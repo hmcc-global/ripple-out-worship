@@ -1,4 +1,9 @@
-import { SetlistEditorFields, SetlistEditorProps, SetlistFolder } from '../../types/setlist.types';
+import {
+  Setlist,
+  SetlistEditorFields,
+  SetlistEditorProps,
+  SetlistFolder,
+} from '../../types/setlist.types';
 import { SongSchema, SongSearchFilter, SongSetlistSchema } from '../../types/song.types';
 import { Info, MusicNote, Search, QueueMusic, AddCircleOutline } from '@mui/icons-material';
 import {
@@ -20,7 +25,7 @@ import {
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { FC, useCallback, useEffect, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
@@ -166,7 +171,7 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
 
   const handleSaveSetlist: SubmitHandler<SetlistEditorFields> = async (data) => {
     try {
-      let payload;
+      let payload: AxiosResponse<Setlist>;
       if (action === 'edit') {
         payload = await axios.put(`/api/setlists/update`, {
           id: setlistId,
@@ -185,7 +190,7 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
           groupIds: folderOptions
             .filter((folder) => folderList.includes(folder.groupName))
             .map((folder) => folder._id),
-          createdBy: '',
+          createdBy: ownership.userId,
         });
       }
 
@@ -202,13 +207,20 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
       //   }
 
       // })
-
+      console.log(payload);
       if (payload.status === 200) {
+        if (!ownership.setlistIds.some((setlist) => setlist.id === payload.data._id)) {
+          await axios.put('/api/ownerships/update', {
+            ...ownership,
+            setlistIds: [
+              ...ownership.setlistIds,
+              { id: payload.data._id, name: payload.data.name, createdAt: payload.data.createdAt },
+            ],
+          });
+        }
         setInvalidSetlist('');
         setSuccessSnackbarOpen(true);
-        // TODO: redirect to setlist view page after saving
         navigate(`/setlist`);
-        return payload.data;
       }
 
       setInvalidSetlist('Error saving setlist');
@@ -275,7 +287,7 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
                     border: 1,
                     px: 2,
                   }}
-                  onClick={() => navigate('/sosetlistng')}
+                  onClick={() => navigate('/setlist')}
                 >
                   Cancel
                 </Button>
