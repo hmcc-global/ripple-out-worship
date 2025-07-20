@@ -4,6 +4,7 @@ import { getRoutes } from './src/routes';
 import * as path from 'path';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import { createProxyMiddleware } from 'http-proxy-middleware';
 
 dotenv.config();
 
@@ -20,17 +21,44 @@ app.use(
     origin: [process.env.MAIN_URL as string],
     methods: ['GET', 'POST', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization', 'x-access-token'],
-    credentials: true, 
+    credentials: true,
   })
 );
 app.use(express.json());
 app.use('/api', getRoutes());
+app.use(
+  '/external-api',
+  createProxyMiddleware({
+    target: process.env.MAIN_URL,
+    changeOrigin: true,
+    pathRewrite: {
+      '^/external-api': '/api',
+    },
+    logger: console,
+    on: {
+      proxyReq: (_, req) => {
+        console.log(
+          `[PROXY] Forwarding ${req.method} ${req.url} to ${
+            process.env.MAIN_URL
+          }/api${req.url?.replace('/external-api', '')}`
+        );
+      },
+      proxyRes: (proxyRes, req) => {
+        console.log(`[PROXY] Response status: ${proxyRes.statusCode} for ${req.url}`);
+      },
+      error: (err) => {
+        console.error(`[PROXY ERROR] ${err.message}`);
+        // Properly handle the error response
+      },
+    },
+  })
+);
 if (!isDevelopment) {
   app.use(express.static(path.join(__dirname, '/client/')));
   app.use(express.static(path.join(__dirname, '/client/images')));
   app.use(express.static(path.join(__dirname, '/client/static')));
   app.get('*', (_, res) => {
-      res.sendFile(path.join(__dirname + '/client/index.html'));
+    res.sendFile(path.join(__dirname + '/client/index.html'));
   });
 }
 
