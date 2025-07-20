@@ -24,35 +24,35 @@ app.use(
     credentials: true,
   })
 );
-app.use(express.json());
-app.use('/api', getRoutes());
+
+app.use('/external-api', (req, _, next) => {
+  console.log('Original URL:', req.originalUrl);
+  console.log('Base URL:', req.baseUrl);
+  console.log('Path:', req.path);
+  console.log('Full URL being proxied to:', `${process.env.MAIN_URL}/api${req.path}`);
+  next();
+});
+
 app.use(
-  '/external-api',
-  createProxyMiddleware({
+  createProxyMiddleware('/external-api', {
     target: process.env.MAIN_URL,
     changeOrigin: true,
+    secure: true,
     pathRewrite: {
       '^/external-api': '/api',
     },
-    logger: console,
-    on: {
-      proxyReq: (_, req) => {
-        console.log(
-          `[PROXY] Forwarding ${req.method} ${req.url} to ${
-            process.env.MAIN_URL
-          }/api${req.url?.replace('/external-api', '')}`
-        );
-      },
-      proxyRes: (proxyRes, req) => {
-        console.log(`[PROXY] Response status: ${proxyRes.statusCode} for ${req.url}`);
-      },
-      error: (err) => {
-        console.error(`[PROXY ERROR] ${err.message}`);
-        // Properly handle the error response
-      },
+    logLevel: 'debug',
+    onProxyReq: (proxyReq) => {
+      console.log('Proxying request to:', proxyReq.path);
+      console.log('Host:', proxyReq.getHeader('host'));
+    },
+    onProxyRes: (proxyRes) => {
+      console.log('Received response with status:', proxyRes.statusCode);
     },
   })
 );
+app.use(express.json());
+app.use('/api', getRoutes());
 if (!isDevelopment) {
   app.use(express.static(path.join(__dirname, '/client/')));
   app.use(express.static(path.join(__dirname, '/client/images')));
