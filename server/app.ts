@@ -25,14 +25,6 @@ app.use(
   })
 );
 
-app.use('/external-api', (req, _, next) => {
-  console.log('Original URL:', req.originalUrl);
-  console.log('Base URL:', req.baseUrl);
-  console.log('Path:', req.path);
-  console.log('Full URL being proxied to:', `${process.env.MAIN_URL}/api${req.path}`);
-  next();
-});
-
 app.use(
   createProxyMiddleware('/external-api', {
     target: process.env.MAIN_URL,
@@ -42,13 +34,6 @@ app.use(
       '^/external-api': '/api',
     },
     logLevel: 'debug',
-    onProxyReq: (proxyReq) => {
-      console.log('Proxying request to:', proxyReq.path);
-      console.log('Host:', proxyReq.getHeader('host'));
-    },
-    onProxyRes: (proxyRes) => {
-      console.log('Received response with status:', proxyRes.statusCode);
-    },
   })
 );
 app.use(express.json());
