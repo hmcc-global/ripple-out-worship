@@ -148,7 +148,7 @@ const SongListContainer: FC = (): ReactElement => {
         sx={{
           py: '1rem',
           px: '1.5rem',
-          maxHeight: '100vh',
+          maxHeight: { xs: '90vh', md: '100vh' },
           minWidth: '100%',
           overflow: 'hidden',
         }}
@@ -269,7 +269,7 @@ const SongListContainer: FC = (): ReactElement => {
                 background: '#000',
                 borderRadius: '16px',
                 width: '100%',
-                height: '100%',
+                maxHeight: { xs: '90%', md: '100%' },
               }}
             >
               <Stack
