@@ -1,13 +1,19 @@
 import { Types } from 'mongoose';
 import { MongoInjectedFields } from './mongo.types';
 
+type OwnershipGroup = {
+  id: string;
+  name: string;
+  createdAt: string;
+};
+type OwnershipSetlist = OwnershipGroup;
+
 type OwnershipSchema = {
   userId: string;
   fullName: string;
-  email: string;
   accessType: string;
-  groupIds?: Types.Array<Object>;
-  setlistIds?: Types.Array<Object>;
+  groupIds?: Types.Array<OwnershipGroup>;
+  setlistIds?: Types.Array<OwnershipSetlist>;
   isDeleted: boolean;
 };
 

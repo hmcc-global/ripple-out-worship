@@ -47,7 +47,6 @@ export const useUser = (): { token: string; user?: User; loading: boolean } => {
             {
               userId: data.id,
               fullName: data.fullName,
-              email: data.email,
               accessType: data.accessType,
               setlistIds: [],
               groupIds: [],

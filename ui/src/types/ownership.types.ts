@@ -13,7 +13,6 @@ export type GroupOwnership = {
 export type Ownership = {
   userId: string;
   fullName: string;
-  email: string;
   accessType: string;
   groupIds: GroupOwnership[];
   setlistIds: SetlistOwnership[];

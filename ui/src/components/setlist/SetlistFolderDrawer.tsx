@@ -374,7 +374,6 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
                   >
                     <Stack direction="column">
                       <Typography variant="subtitle1">{person.fullName}</Typography>
-                      <Typography variant="body2">{person.email}</Typography>
                     </Stack>
                   </ListItem>
                 ))
@@ -469,7 +468,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
           <Close />
         </IconButton>
         <InputBase
-          placeholder="Search name or email"
+          placeholder="Search by name"
           sx={{
             alignSelf: 'center',
             width: '90%',
@@ -511,7 +510,6 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
                 >
                   <Stack direction="column">
                     <Typography variant="subtitle1">{person.fullName}</Typography>
-                    <Typography variant="body2">{person.email}</Typography>
                   </Stack>
                 </ListItem>
               ))
