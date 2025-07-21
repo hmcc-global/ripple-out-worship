@@ -43,7 +43,6 @@ const SetlistViewContainer: FC = (): ReactElement | null => {
   const [folderId, setFolderId] = useState<string>('');
   const [folderName, setFolderName] = useState<string>('');
   const [folderCreated, setFolderCreated] = useState<string>('');
-  const [folderMembers, setFolderMembers] = useState<string[]>([]);
   const toggleFolderDrawer = (newOpen: boolean) => {
     setOpenDrawer(newOpen);
   };
@@ -62,7 +61,7 @@ const SetlistViewContainer: FC = (): ReactElement | null => {
       });
       if (status === 200) {
         setSetlist(data);
-        if (data.groupIds[0]) {
+        if (data.groupIds && data.groupIds.length > 0 && data.groupIds[0]) {
           setGroupId(data.groupIds[0]);
         }
       }
@@ -82,7 +81,6 @@ const SetlistViewContainer: FC = (): ReactElement | null => {
         setGroupData(data);
         setFolderId(data._id);
         setFolderName(data.groupName);
-        setFolderMembers(data.userIds);
         setFolderCreated(data.createdAt);
       }
     } catch (e) {
@@ -143,7 +141,6 @@ const SetlistViewContainer: FC = (): ReactElement | null => {
                 if (groupData) {
                   setFolderId(groupData._id);
                   setFolderName(groupData.groupName);
-                  setFolderMembers(groupData.userIds);
                   setFolderCreated(groupData.createdAt);
                   toggleFolderDrawer(true);
                 }
@@ -191,11 +188,9 @@ const SetlistViewContainer: FC = (): ReactElement | null => {
         toggleFolderDrawer={toggleFolderDrawer}
         setFolderId={setFolderId}
         setFolderName={setFolderName}
-        setFolderMembers={setFolderMembers}
         setFolderCreated={setFolderCreated}
         folderId={folderId}
         folderName={folderName}
-        folderMembers={folderMembers}
         folderCreated={folderCreated}
         mode="edit"
       />

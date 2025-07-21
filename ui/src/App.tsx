@@ -5,7 +5,6 @@ import { ThemeProvider } from '@mui/material/styles';
 import { routes as appRoutes } from './routes';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import customTheme from './theme';
-import CustomAppContainer from './components/custom/CustomAppContainer';
 import './styles.css';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import PrivateRouteWrapper from './components/custom/PrivateRouteWrapper';
@@ -17,27 +16,25 @@ function App() {
         <CssBaseline />
         <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID!}>
           <BrowserRouter>
-            <CustomAppContainer>
-              <Box
-                display="flex"
-                component="main"
-                sx={{ flexGrow: 1, width: '100%', height: '100%' }}
-              >
-                <Routes>
-                  {appRoutes.map((route) => (
-                    <Route
-                      key={route.key}
-                      path={route.path}
-                      element={
-                        <PrivateRouteWrapper permissions={route.permissions}>
-                          <route.component />
-                        </PrivateRouteWrapper>
-                      }
-                    />
-                  ))}
-                </Routes>
-              </Box>
-            </CustomAppContainer>
+            <Box
+              display="flex"
+              component="main"
+              sx={{ flexGrow: 1, width: '100%', height: '100%' }}
+            >
+              <Routes>
+                {appRoutes.map((route) => (
+                  <Route
+                    key={route.key}
+                    path={route.path}
+                    element={
+                      <PrivateRouteWrapper permissions={route.permissions}>
+                        <route.component />
+                      </PrivateRouteWrapper>
+                    }
+                  />
+                ))}
+              </Routes>
+            </Box>
           </BrowserRouter>
         </GoogleOAuthProvider>
       </ThemeProvider>

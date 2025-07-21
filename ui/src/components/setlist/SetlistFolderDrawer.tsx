@@ -1,4 +1,4 @@
-import { SetlistFolderMember } from '../../types/setlist.types';
+import { SetlistFolder, SetlistFolderMember } from '../../types/setlist.types';
 import { Folder, GroupAdd, Delete, Close, Check, Add } from '@mui/icons-material';
 import {
   Drawer,
@@ -24,17 +24,17 @@ import Typography from '@mui/material/Typography';
 import axios, { AxiosResponse } from 'axios';
 import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react';
 import HeaderWithIcon from '../custom/HeaderWithIcon';
+import { GroupOwnership, Ownership } from '../../types/ownership.types';
+import { useOwnership } from '../../helpers/customHooks';
 
 type SetlistFolderDrawerProps = {
   openDrawer: boolean;
   toggleFolderDrawer: (newOpen: boolean) => void;
   setFolderId: Dispatch<SetStateAction<string>>;
   setFolderName: Dispatch<SetStateAction<string>>;
-  setFolderMembers: Dispatch<SetStateAction<string[]>>;
   setFolderCreated: Dispatch<SetStateAction<string>>;
   folderId: string;
   folderName: string;
-  folderMembers: string[];
   folderCreated: string;
   mode: string;
 };
@@ -45,18 +45,17 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
     toggleFolderDrawer,
     setFolderId,
     setFolderName,
-    setFolderMembers,
     setFolderCreated,
     folderId,
     folderName,
-    folderMembers,
     folderCreated,
     mode,
   } = props;
+  const ownership = useOwnership();
 
   // handle add people modal
   const [openModal, setOpenModal] = useState<boolean>(false);
-  const [allPeople, setAllPeople] = useState<SetlistFolderMember[]>([]);
+  const [allPeople, setAllPeople] = useState<Ownership[]>([]);
   const [addedPeople, setAddedPeople] = useState<string[]>([]);
 
   const [createdDateString, setCreatedDateString] = useState<string>('');
@@ -78,12 +77,18 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
 
   const getPeople = useCallback(async () => {
     try {
-      const { data, status } = await axios.get('/api/users/get');
-      if (status === 200) setAllPeople(data);
+      const { data, status } = await axios.get<Ownership[]>('/api/ownerships/get');
+      if (status === 200) {
+        setAllPeople(data);
+        const existingMembers = data.filter((person) =>
+          person.groupIds.find((group) => group.id === folderId)
+        );
+        setAddedPeople(existingMembers.map((person) => person.userId));
+      }
     } catch (error) {
       console.log(error);
     }
-  }, []);
+  }, [folderId, setAllPeople, setAddedPeople]);
 
   const deleteGroup = useCallback(async () => {
     try {
@@ -93,6 +98,10 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
         },
       });
       if (status === 200) {
+        await axios.put('/api/ownerships/update', {
+          ...ownership,
+          groupIds: ownership.groupIds.filter((group) => group.id !== folderId),
+        });
         setSuccessSnackbarOpen(true);
         toggleFolderDrawer(false);
       }
@@ -103,11 +112,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
 
   useEffect(() => {
     getPeople();
-  }, []);
-
-  useEffect(() => {
-    setAddedPeople(folderMembers);
-  }, [folderId]);
+  }, [getPeople]);
 
   useEffect(() => {
     if (mode === 'create') {
@@ -123,7 +128,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
   }, [folderCreated, mode]);
 
   // To render the songs that are added to setlist
-  const addedPeopleList = allPeople.filter((person) => addedPeople.includes(person._id));
+  const addedPeopleList = allPeople.filter((person) => addedPeople.includes(person.userId));
   const handleAddPerson = (id: string) => {
     let result = addedPeople.includes(id)
       ? // eslint-disable-next-line eqeqeq
@@ -136,7 +141,6 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
   const cancelFolderDrawer = () => {
     setFolderName('');
     setAddedPeople([]);
-    setFolderMembers([]);
     setFolderId('');
     setFolderCreated('');
     handleCloseModal();
@@ -148,18 +152,31 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
       return;
     }
     try {
-      const payload: AxiosResponse = await axios.put('/api/groups/update', {
-        id: folderId,
-        userIds: addedPeople,
-      });
+      //TODO: Think of removing works
+      await Promise.all(
+        addedPeople.map(async (userId) => {
+          const currentUser = allPeople.find((person) => person.userId === userId);
+          const currentGroup: GroupOwnership = {
+            id: folderId,
+            name: folderName,
+            createdAt: folderCreated,
+          };
+          // Check if the user is already part of the folder
+          if (!currentUser?.groupIds?.some((group) => group.id === currentGroup.id)) {
+            const { data, status } = await axios.put('/api/ownerships/update', {
+              ...currentUser,
+              groupIds: [...(currentUser?.groupIds || []), currentGroup],
+            });
+            if (status === 200) {
+              setInvalidFolder('');
+              return data;
+            }
+          }
+        })
+      );
 
-      if (payload.status === 200) {
-        setInvalidFolder('');
-        return payload.data;
-      }
-
-      setInvalidFolder('Error adding members');
-      setSuccessSnackbarOpen(false);
+      setInvalidFolder('');
+      setSuccessSnackbarOpen(true);
     } catch (error: any) {
       setInvalidFolder(error.response?.data || 'An error occurred');
       setSuccessSnackbarOpen(false);
@@ -169,30 +186,49 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
 
   const handleSaveFolder = async () => {
     try {
-      let payload: AxiosResponse;
+      let payload: AxiosResponse<SetlistFolder>;
 
       if (folderId) {
         payload = await axios.put('/api/groups/update', {
           id: folderId,
           groupName: folderName,
-          userIds: addedPeople,
         });
       } else {
         payload = await axios.post('/api/groups/create', {
           groupName: folderName,
-          userIds: addedPeople,
         });
       }
 
       if (payload.status === 200) {
+        //TODO: Think of removing works
+        await Promise.all(
+          addedPeople.map(async (userId) => {
+            const currentUser = allPeople.find((person) => person.userId === userId);
+            const currentGroup: GroupOwnership = {
+              id: payload.data._id,
+              name: payload.data.groupName,
+              createdAt: payload.data.createdAt,
+            };
+            // Check if the user is already part of the folder
+            if (!currentUser?.groupIds?.some((group) => group.id === currentGroup.id)) {
+              const { data, status } = await axios.put('/api/ownerships/update', {
+                ...currentUser,
+                groupIds: [...(currentUser?.groupIds || []), currentGroup],
+              });
+              if (status === 200) {
+                setInvalidFolder('');
+                return data;
+              }
+            }
+            setInvalidFolder('Some of the members are already in the folder');
+            return null;
+          })
+        );
         cancelFolderDrawer();
-        setInvalidFolder('');
         setSuccessSnackbarOpen(true);
-        return payload.data;
       }
-
-      setInvalidFolder('Error saving setlist');
-      setSuccessSnackbarOpen(false);
+      setInvalidFolder('');
+      setSuccessSnackbarOpen(true);
     } catch (error: any) {
       setInvalidFolder(error.response.data);
       setSuccessSnackbarOpen(false);
@@ -329,16 +365,15 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
               {addedPeopleList.length > 0 ? (
                 addedPeopleList.map((person) => (
                   <ListItem
-                    key={person._id} // Use a unique identifier
+                    key={person.userId} // Use a unique identifier
                     secondaryAction={
-                      <IconButton edge="end" onClick={() => handleRemovePerson(person._id)}>
+                      <IconButton edge="end" onClick={() => handleRemovePerson(person.userId)}>
                         <Typography color="#EFB8C8"> Remove</Typography>
                       </IconButton>
                     }
                   >
                     <Stack direction="column">
                       <Typography variant="subtitle1">{person.fullName}</Typography>
-                      <Typography variant="body2">{person.email}</Typography>
                     </Stack>
                   </ListItem>
                 ))
@@ -433,7 +468,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
           <Close />
         </IconButton>
         <InputBase
-          placeholder="Search name or email"
+          placeholder="Search by name"
           sx={{
             alignSelf: 'center',
             width: '90%',
@@ -453,7 +488,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
                   secondaryAction={
                     <IconButton
                       edge="end"
-                      onClick={() => handleAddPerson(person._id)}
+                      onClick={() => handleAddPerson(person.userId)}
                       sx={{
                         width: '30px',
                         height: '30px',
@@ -467,15 +502,14 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
                           color: 'primary.darkest',
                         },
                       }}
-                      className={addedPeople.includes(person._id) ? 'Mui-selected' : ''}
+                      className={addedPeople.includes(person.userId) ? 'Mui-selected' : ''}
                     >
-                      {addedPeople.includes(person._id) ? <Check /> : <Add />}
+                      {addedPeople.includes(person.userId) ? <Check /> : <Add />}
                     </IconButton>
                   }
                 >
                   <Stack direction="column">
                     <Typography variant="subtitle1">{person.fullName}</Typography>
-                    <Typography variant="body2">{person.email}</Typography>
                   </Stack>
                 </ListItem>
               ))

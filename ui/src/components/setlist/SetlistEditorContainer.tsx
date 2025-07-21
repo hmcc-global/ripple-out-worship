@@ -1,4 +1,9 @@
-import { SetlistEditorFields, SetlistEditorProps, SetlistFolder } from '../../types/setlist.types';
+import {
+  Setlist,
+  SetlistEditorFields,
+  SetlistEditorProps,
+  SetlistFolder,
+} from '../../types/setlist.types';
 import { SongSchema, SongSearchFilter, SongSetlistSchema } from '../../types/song.types';
 import { Info, MusicNote, Search, QueueMusic, AddCircleOutline } from '@mui/icons-material';
 import {
@@ -17,17 +22,17 @@ import {
   Typography,
   useMediaQuery,
 } from '@mui/material';
-import { LocalizationProvider, DateField, DatePicker } from '@mui/x-date-pickers';
+import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { FC, useCallback, useEffect, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import SetlistSongCard from './SetlistSongCard';
 import HeaderWithIcon from '../custom/HeaderWithIcon';
 import PageHeader from '../navigation/PageHeader';
-import { useFolders, useSongs } from '../../helpers/customHooks';
+import { useOwnership, useSongs } from '../../helpers/customHooks';
 import SetlistSongsTable from './SetlistSongTable';
 import AutocompleteInput from '../custom/AutocompleteInput';
 
@@ -45,8 +50,7 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
   }, [paths]);
 
   const allSongs = useSongs() as SongSchema[];
-  const allFolders = useFolders() as SetlistFolder[];
-
+  const ownership = useOwnership();
   // STATES
   const [date, setDate] = useState<Dayjs | null>(null);
   const [search, setSearch] = useState<string>('');
@@ -68,6 +72,20 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
   const { handleSubmit, formState, control, reset, register } = useForm<SetlistEditorFields>();
   const { errors } = formState;
 
+  const getFolderOptions = useCallback(async () => {
+    try {
+      const { data, status } = await axios.get<SetlistFolder[]>('/api/groups/get');
+      if (status === 200) {
+        const filteredFolders = data.filter((folder) =>
+          ownership.groupIds.some((group) => group.id === folder._id)
+        );
+        setFolderOptions(filteredFolders);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  }, [ownership]);
+
   const getSetlist = useCallback(async () => {
     if (setlistId === '') return;
 
@@ -87,7 +105,8 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
 
   useEffect(() => {
     getSetlist();
-  }, [getSetlist, setlistId]);
+    getFolderOptions();
+  }, [getSetlist, getFolderOptions]);
 
   useEffect(() => {
     if (setlist && Object.keys(setlist).length > 0) {
@@ -118,12 +137,6 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
   useEffect(() => {
     getSongResults();
   }, [getSongResults]);
-
-  useEffect(() => {
-    if (allFolders) {
-      setFolderOptions(allFolders);
-    }
-  }, [allFolders]);
 
   // add the id to the array of clicked items if it doesn't exist but if it does exist remove it
   // this makes sure that double clicking on an item brings it back to normal
@@ -158,26 +171,25 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
 
   const handleSaveSetlist: SubmitHandler<SetlistEditorFields> = async (data) => {
     try {
-      let payload;
+      let payload: AxiosResponse<Setlist>;
+      const setlistFolderIds = folderOptions
+        .filter((folder) => folderList.includes(folder.groupName))
+        .map((folder) => folder._id);
       if (action === 'edit') {
         payload = await axios.put(`/api/setlists/update`, {
           id: setlistId,
           name: data.name,
           date: date ? date.toDate() : new Date(''),
           songs: addedSongList,
-          groupIds: folderOptions
-            .filter((folder) => folderList.includes(folder.groupName))
-            .map((folder) => folder._id),
+          groupIds: setlistFolderIds,
         });
       } else {
         payload = await axios.post('/api/setlists/create', {
           name: data.name,
           date: date ? date.toDate() : new Date(''),
           songs: addedSongList,
-          groupIds: folderOptions
-            .filter((folder) => folderList.includes(folder.groupName))
-            .map((folder) => folder._id),
-          createdBy: '',
+          groupIds: setlistFolderIds,
+          createdBy: ownership.userId,
         });
       }
 
@@ -194,13 +206,33 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
       //   }
 
       // })
-
       if (payload.status === 200) {
+        // Updates the ownership and folder
+        Promise.all(
+          setlistFolderIds.map((folderId) => {
+            const currentFolder = folderOptions.find((folder) => folder._id === folderId);
+            // Only updates the folder the user have access to
+            if (currentFolder) {
+              axios.put('/api/groups/update', {
+                id: folderId,
+                setlistIds: [...(currentFolder?.setlistIds || []), payload.data._id],
+              });
+            }
+          })
+        );
+
+        if (!ownership.setlistIds.some((setlist) => setlist.id === payload.data._id)) {
+          await axios.put('/api/ownerships/update', {
+            ...ownership,
+            setlistIds: [
+              ...ownership.setlistIds,
+              { id: payload.data._id, name: payload.data.name, createdAt: payload.data.createdAt },
+            ],
+          });
+        }
         setInvalidSetlist('');
         setSuccessSnackbarOpen(true);
-        // TODO: redirect to setlist view page after saving
         navigate(`/setlist`);
-        return payload.data;
       }
 
       setInvalidSetlist('Error saving setlist');
@@ -267,7 +299,7 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
                     border: 1,
                     px: 2,
                   }}
-                  onClick={() => navigate('/sosetlistng')}
+                  onClick={() => navigate('/setlist')}
                 >
                   Cancel
                 </Button>

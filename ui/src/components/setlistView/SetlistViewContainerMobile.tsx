@@ -14,22 +14,22 @@ import {
   Typography,
   useTheme,
 } from '@mui/material';
-import { FC, ReactElement, useEffect, useState } from 'react';
+import { ReactElement, useEffect, useMemo, useState } from 'react';
 import { HeaderSetlistView, SetlistViewFooter } from './SetlistViewPaper';
 import SetlistViewMenuMobile from './SetlistViewMenuMobile';
-import { useSetlists } from '../../helpers/customHooks';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import SongsLyrics from '../songsView/SongsLyrics';
 import { flatMusicKeysOptions, sharpMusicKeysOptions } from '../../constants';
 import TuneIcon from '@mui/icons-material/Tune';
 import SetlistViewMobileDrawer from './SetlistViewMobileDrawer';
+import axios from 'axios';
 
 const SetlistViewContainerMobile = ({ preview }: { preview?: boolean }): ReactElement => {
   const setlistId = window.location.pathname.split('/').reverse()[0];
   const theme = useTheme();
-  const setlist = useSetlists(setlistId) as Setlist;
-  const songs = setlist && setlist.songs;
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
+  const [setlist, setSetlist] = useState<Setlist>();
+  const songs = useMemo(() => (setlist && setlist.songs) || [], [setlist]);
   const [selectedSong, setSelectedSong] = useState<SongSchema>(songs[0]);
   const [chordStatus, setChordStatus] = useState(false);
   const [count, setCount] = useState(0);
@@ -53,6 +53,25 @@ const SetlistViewContainerMobile = ({ preview }: { preview?: boolean }): ReactEl
   const handleCloseMenu = () => {
     setMenuAnchor(null);
   };
+
+  useEffect(() => {
+    const fetchSetlists = async () => {
+   
+        try {
+          const { data } = await axios.get<Setlist>('/api/setlists/get', {
+            params: {
+              id: setlistId,
+            },
+          });
+          setSetlist(data);
+        } catch (error) {
+          console.error('Error fetching setlists:', error);
+        }
+      
+    };
+
+    fetchSetlists();
+  }, [ setlistId]);
 
   useEffect(() => {
     if (songs) {
@@ -135,7 +154,7 @@ const SetlistViewContainerMobile = ({ preview }: { preview?: boolean }): ReactEl
               <FormControl fullWidth>
                 <Select
                   id="song-select"
-                  value={selectedSong._id}
+                  value={selectedSong?._id}
                   onChange={(e) =>
                     setSelectedSong(songs.find((song) => song._id === e.target.value) || songs[0])
                   }

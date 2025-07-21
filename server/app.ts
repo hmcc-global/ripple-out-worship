@@ -4,6 +4,7 @@ import { getRoutes } from './src/routes';
 import * as path from 'path';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import { createProxyMiddleware } from 'http-proxy-middleware';
 
 dotenv.config();
 
@@ -20,7 +21,19 @@ app.use(
     origin: [process.env.MAIN_URL as string],
     methods: ['GET', 'POST', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization', 'x-access-token'],
-    credentials: true, 
+    credentials: true,
+  })
+);
+
+app.use(
+  createProxyMiddleware('/external-api', {
+    target: process.env.MAIN_URL,
+    changeOrigin: true,
+    secure: true,
+    pathRewrite: {
+      '^/external-api': '/api',
+    },
+    logLevel: 'debug',
   })
 );
 app.use(express.json());
@@ -30,7 +43,7 @@ if (!isDevelopment) {
   app.use(express.static(path.join(__dirname, '/client/images')));
   app.use(express.static(path.join(__dirname, '/client/static')));
   app.get('*', (_, res) => {
-      res.sendFile(path.join(__dirname + '/client/index.html'));
+    res.sendFile(path.join(__dirname + '/client/index.html'));
   });
 }
 
