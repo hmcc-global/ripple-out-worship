@@ -8,12 +8,13 @@ export type GroupOwnership = {
   id: string;
   name: string;
   createdAt: string;
-  setlists: SetlistOwnership[];
 };
 
 export type Ownership = {
   userId: string;
+  fullName: string;
+  accessType: string;
   groupIds: GroupOwnership[];
-  setlists: SetlistOwnership[];
+  setlistIds: SetlistOwnership[];
   isDeleted: boolean;
 };

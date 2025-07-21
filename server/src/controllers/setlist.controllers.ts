@@ -31,7 +31,7 @@ const createSetlist: RequestHandler = async (req: Request, res: Response): Promi
       });
 
       if (data) {
-        sendResponse(res, 200, 'Setlist created');
+        sendResponse(res, 200, data);
       } else {
         sendResponse(res, 404, 'Setlist not created');
       }
@@ -45,7 +45,7 @@ const createSetlist: RequestHandler = async (req: Request, res: Response): Promi
 
 const getSetlist: RequestHandler = async (req: Request, res: Response): Promise<void> => {
   const { id: setlistId } = req.query;
-  
+
   if (setlistId) {
     try {
       const data: SetlistDocument = await Setlist.findOne({
@@ -81,7 +81,7 @@ const updateSetlist: RequestHandler = async (req: Request, res: Response): Promi
 
   if (setlistId && Object.keys(toUpdate).length > 0) {
     try {
-      const updatedSetlist = await Setlist.updateOne(
+      const updatedSetlist: SetlistDocument = await Setlist.findOneAndUpdate(
         { _id: setlistId, isDeleted: false },
         toUpdate,
         {
@@ -91,7 +91,7 @@ const updateSetlist: RequestHandler = async (req: Request, res: Response): Promi
       );
 
       if (updatedSetlist) {
-        sendResponse(res, 200, 'Setlist updated');
+        sendResponse(res, 200, updatedSetlist);
       } else {
         sendResponse(res, 404, 'Setlist not found');
       }

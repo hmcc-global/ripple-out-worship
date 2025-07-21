@@ -26,7 +26,7 @@ export const useUser = (): { token: string; user?: User; loading: boolean } => {
     const fetchUser = async () => {
       try {
         setLoading(true);
-        const { data } = await axios.post('/external-api/auth/verify-token', {
+        const { data } = await axios.post<User>('/external-api/auth/verify-token', {
           token: token,
         });
         updateAxiosClient(token);
@@ -39,13 +39,15 @@ export const useUser = (): { token: string; user?: User; loading: boolean } => {
             return status >= 200 && status < 500; // Don't reject on 404
           },
         });
-        if (status === 200 && ownershipData.length > 0) {
-          dispatch(fetchOwnership(ownershipData[0]));
+        if (status === 200 && ownershipData) {
+          dispatch(fetchOwnership(ownershipData));
         } else {
           const { data: createOwnership, status: createStatus } = await axios.post(
             '/api/ownerships/create',
             {
               userId: data.id,
+              fullName: data.fullName,
+              accessType: data.accessType,
               setlistIds: [],
               groupIds: [],
             }
@@ -75,7 +77,9 @@ export const useSongs = (id?: string) => {
   }
   return allSongs;
 };
-
+/**
+ * @deprecated Use axios calls with the proper params from useOwnership instead.
+ */
 export const useSetlists = (id?: string) => {
   const allSetlists = useSelector((state: RootState) => state.setlists);
   if (id) {
@@ -84,7 +88,9 @@ export const useSetlists = (id?: string) => {
   }
   return allSetlists;
 };
-
+/**
+ * @deprecated Use axios calls with the proper params from useOwnership instead.
+ */
 export const useFolders = (id?: string) => {
   const allFolders = useSelector((state: RootState) => state.folders);
   if (id) {

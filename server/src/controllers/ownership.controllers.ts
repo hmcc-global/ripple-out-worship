@@ -64,7 +64,8 @@ const getOwnership: RequestHandler = async (req: Request, res: Response): Promis
 };
 
 const updateOwnership: RequestHandler = async (req: Request, res: Response): Promise<void> => {
-  const { id: ownershipId, ...toUpdate } = req.body;
+  const { _id: ownershipId, ...toUpdate } = req.body;
+  
   if (ownershipId && Object.keys(toUpdate).length > 0) {
     try {
       const data: OwnershipDocument = await Ownership.findOneAndUpdate(
@@ -90,7 +91,7 @@ const updateOwnership: RequestHandler = async (req: Request, res: Response): Pro
 };
 
 const deleteOwnership: RequestHandler = async (req: Request, res: Response): Promise<void> => {
-  const { id: ownershipId } = req.params;
+  const { userId: ownershipId } = req.params;
 
   if (ownershipId) {
     try {

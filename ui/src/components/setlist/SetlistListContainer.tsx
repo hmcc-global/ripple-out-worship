@@ -26,6 +26,8 @@ import SetlistFolderDrawer from './SetlistFolderDrawer';
 import SetlistViewContainer from './adminView/SetlistViewContainer';
 import PageHeader from '../navigation/PageHeader';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { useOwnership } from '../../helpers/customHooks';
+import { formatDate } from '../../helpers/global';
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
@@ -51,6 +53,7 @@ const SetlistTabPanel = (props: TabPanelProps) => {
 const SetlistListContainer: FC = (): ReactElement => {
   const isDesktop = useMediaQuery('(min-width: 768px)');
   const navigate = useNavigate();
+  const ownership = useOwnership();
 
   const [tab, setTab] = useState(0);
   const [allSetlists, setAllSetlists] = useState<Setlist[]>([]);
@@ -63,7 +66,6 @@ const SetlistListContainer: FC = (): ReactElement => {
   const handleCreateClick = (event: MouseEvent<HTMLElement>) => {
     setCreateAnchorEl(event.currentTarget);
     setFolderName('');
-    setFolderMembers([]);
     setFolderId('');
     toggleFolderDrawer(false);
   };
@@ -76,7 +78,6 @@ const SetlistListContainer: FC = (): ReactElement => {
   const [folderId, setFolderId] = useState<string>('');
   const [folderName, setFolderName] = useState<string>('');
   const [folderCreated, setFolderCreated] = useState<string>('');
-  const [folderMembers, setFolderMembers] = useState<string[]>([]);
   const toggleFolderDrawer = (newOpen: boolean) => {
     setOpenDrawer(newOpen);
   };
@@ -85,26 +86,32 @@ const SetlistListContainer: FC = (): ReactElement => {
   const [openFolders, setOpenFolders] = useState<string[]>([]);
   const toggleOpenFolder = (id: string) => {
     let result = openFolders.includes(id)
-      ? openFolders.filter((add) => add != id)
+      ? openFolders.filter((add) => add !== id)
       : [...openFolders, id];
     setOpenFolders(result);
   };
 
   const getSetlistsAndFolders = useCallback(async () => {
     try {
-      const setlistRes = await axios.get('/api/setlists/get');
+      const setlistRes = await axios.get<Setlist[]>('/api/setlists/get');
       if (setlistRes.status === 200) {
-        setAllSetlists(setlistRes.data);
+        const filteredSetlists = setlistRes.data.filter((setlist) =>
+          ownership.setlistIds.some((setlistOwnership) => setlistOwnership.id === setlist._id)
+        );
+        setAllSetlists(filteredSetlists);
       }
 
-      const folderRes = await axios.get('/api/groups/get');
+      const folderRes = await axios.get<SetlistFolder[]>('/api/groups/get');
       if (folderRes.status === 200) {
-        setAllFolders(folderRes.data);
+        const filteredFolders = folderRes.data.filter((folder) =>
+          ownership.groupIds.some((folderOwnership) => folderOwnership.id === folder._id)
+        );
+        setAllFolders(filteredFolders);
       }
     } catch (error) {
       console.log(error);
     }
-  }, []);
+  }, [ownership, setAllSetlists, setAllFolders]);
 
   const handleSelectSetlist = (id: string) => {
     navigate(`/setlist/${id}`);
@@ -232,7 +239,6 @@ const SetlistListContainer: FC = (): ReactElement => {
                             handleCreateClose();
                             setFolderId(folder._id);
                             setFolderName(folder.groupName);
-                            setFolderMembers(folder.userIds);
                             setFolderCreated(folder.createdAt);
                           }}
                         >
@@ -254,8 +260,9 @@ const SetlistListContainer: FC = (): ReactElement => {
                                   <QueueMusic sx={{ color: 'secondary.main' }} fontSize="large" />
                                 </ListItemIcon>
                                 <ListItemText>
-                                  <Typography>{subSetlist}</Typography>
-                                  <Typography>{i}</Typography>
+                                  <Typography overflow="hidden" textOverflow="ellipsis">
+                                    {subSetlist}
+                                  </Typography>
                                 </ListItemText>
                               </ListItemButton>
                             ))
@@ -279,7 +286,7 @@ const SetlistListContainer: FC = (): ReactElement => {
                           </ListItemIcon>
                           <ListItemText>
                             <Typography>{setlist.name}</Typography>
-                            <Typography>{setlist.date.toString()}</Typography>
+                            <Typography>{formatDate(setlist.date)}</Typography>
                           </ListItemText>
                         </ListItemButton>
                       </ListItem>
@@ -317,7 +324,6 @@ const SetlistListContainer: FC = (): ReactElement => {
                           handleCreateClose();
                           setFolderId(folder._id);
                           setFolderName(folder.groupName);
-                          setFolderMembers(folder.userIds);
                           setFolderCreated(folder.createdAt);
                         }}
                       >
@@ -372,7 +378,7 @@ const SetlistListContainer: FC = (): ReactElement => {
                         </ListItemIcon>
                         <ListItemText>
                           <Typography>{setlist.name}</Typography>
-                          <Typography>{setlist.date.toString()}</Typography>
+                          <Typography>{formatDate(setlist.date)}</Typography>
                         </ListItemText>
                       </ListItemButton>
                     </ListItem>
@@ -407,11 +413,9 @@ const SetlistListContainer: FC = (): ReactElement => {
         toggleFolderDrawer={toggleFolderDrawer}
         setFolderId={setFolderId}
         setFolderName={setFolderName}
-        setFolderMembers={setFolderMembers}
         setFolderCreated={setFolderCreated}
         folderId={folderId}
         folderName={folderName}
-        folderMembers={folderMembers}
         folderCreated={folderCreated}
         mode={mode}
       />

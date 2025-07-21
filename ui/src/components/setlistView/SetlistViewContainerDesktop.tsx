@@ -1,7 +1,7 @@
 import { Setlist } from '../../types/setlist.types';
 import { SongViewSchema } from '../../types/song.types';
 import { Box, Container, Grid, Skeleton, Stack, Typography } from '@mui/material';
-import { FC, ReactElement, useEffect, useState } from 'react';
+import { FC, ReactElement, useEffect, useMemo, useState } from 'react';
 import SongsButtonsCard from '../songsView/SongsButtonsCard';
 import {
   HeaderSetlistView,
@@ -10,16 +10,16 @@ import {
   SetlistViewFooter,
 } from './SetlistViewPaper';
 import SetlistViewMenuDesktop from './SetlistViewMenuDesktop';
-import { useSetlists } from '../../helpers/customHooks';
+import axios from 'axios';
 
 const SetlistViewContainerDesktop: FC = (): ReactElement => {
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
   const [selectedSong, setSelectedSong] = useState<SongViewSchema>();
+  const [setlist, setSetlist] = useState<Setlist>();
 
   const setlistId = window.location.pathname.split('/').reverse()[0];
   const openMenu = Boolean(menuAnchor);
-  const setlist = useSetlists(setlistId) as Setlist;
-  const songs = setlist && setlist.songs;
+  const songs = useMemo(() => (setlist && setlist.songs) || [], [setlist]);
 
   const handleSelectSong = (song: SongViewSchema) => {
     setSelectedSong(song);
@@ -32,6 +32,22 @@ const SetlistViewContainerDesktop: FC = (): ReactElement => {
   const handleCloseMenu = () => {
     setMenuAnchor(null);
   };
+
+  useEffect(() => {
+    const fetchSetlists = async () => {
+        try {
+          const { data } = await axios.get<Setlist>('/api/setlists/get', {
+            params: {
+              id: setlistId,
+            },
+          });
+          setSetlist(data);
+        } catch (error) {
+          console.error('Error fetching setlists:', error);
+        }
+    };
+    fetchSetlists();
+  }, [setlistId]);
 
   useEffect(() => {
     if (songs) {

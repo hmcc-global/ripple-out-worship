@@ -1,5 +1,5 @@
 import { Box, Stack, Typography, IconButton, InputBase } from '@mui/material';
-import { FC, ReactElement } from 'react';
+import { FC, ReactElement, useEffect, useMemo } from 'react';
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
 import QueueMusicIcon from '@mui/icons-material/QueueMusic';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
@@ -10,18 +10,40 @@ import { useTheme } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
 import { useState } from 'react';
 import GlobalSearchModal from '../navigation/GlobalSearchModal';
-import { useSetlists, useSongs } from '../../helpers/customHooks';
+import { useOwnership, useSongs } from '../../helpers/customHooks';
 import { SongSchema } from '../../types/song.types';
 import { Setlist } from '../../types/setlist.types';
+import axios from 'axios';
 
 const HomeContainer: FC = (): ReactElement => {
   const theme = useTheme();
+  const ownership = useOwnership();
   const isDesktop = useMediaQuery(theme.breakpoints.up('sm'));
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [setlists, setSetlists] = useState<Setlist[]>([]);
   const onSearchOpen = () => setIsSearchOpen(true);
   const onSearchClose = () => setIsSearchOpen(false);
   const allSongs = useSongs() as SongSchema[];
-  const allSetlists = useSetlists() as Setlist[];
+
+  useEffect(() => {
+    const fetchSetlists = async () => {
+      if (ownership.setlistIds.length > 0) {
+        try {
+          const setlistRes = await axios.get<Setlist[]>('/api/setlists/get');
+          if (setlistRes.status === 200) {
+            const filteredSetlists = setlistRes.data.filter((setlist) =>
+              ownership.setlistIds.some((setlistOwnership) => setlistOwnership.id === setlist._id)
+            );
+            setSetlists(filteredSetlists);
+          }
+        } catch (error) {
+          console.error('Error fetching setlists:', error);
+        }
+      }
+    };
+
+    fetchSetlists();
+  }, [ownership]);
 
   return (
     <>
@@ -148,7 +170,7 @@ const HomeContainer: FC = (): ReactElement => {
         isOpen={isSearchOpen}
         onClose={onSearchClose}
         allSongs={allSongs}
-        allSetlists={allSetlists}
+        allSetlists={setlists}
       />
     </>
   );
