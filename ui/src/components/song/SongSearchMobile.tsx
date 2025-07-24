@@ -197,7 +197,7 @@ const SongSearch = (props: SongSearchProps) => {
                         border: 0,
                         padding: '0.5rem 1rem',
                         marginRight: ' 0.5em',
-                        height: '6em',
+                        height: '10vh',
                         width: '90%',
                         margin: 'auto',
                       },
@@ -240,107 +240,13 @@ const SongSearch = (props: SongSearchProps) => {
                       Reset All
                     </Button>
                   </Stack>
-
-                  <Box>
-                    <Stack
-                      direction="row"
-                      justifyContent={'space-between'}
-                      width="100%"
-                      alignItems={'center'}
-                      pb="0.5rem"
-                    >
-                      <Typography variant="h4" color="#E6E0E9">
-                        Tempo
-                      </Typography>
-                      <IconButton
-                        onClick={() => setIsTempoOpen(!isTempoOpen)}
-                        sx={{
-                          color: '#E8DEF8',
-                          p: 0,
-                          transform: isTempoOpen ? '' : 'rotate(-180deg)',
-                          transition: '0.1s ease-in-out',
-                        }}
-                        disableRipple
-                        disableTouchRipple
-                      >
-                        <ArrowDropDown sx={{ color: '#CAC4D0' }} />
-                      </IconButton>
-                    </Stack>
-                    {isTempoOpen &&
-                      tempoOptions.map((item) => (
-                        <Chip
-                          sx={{
-                            backgroundColor: disabledTempo.includes(item)
-                              ? 'secondary.lighter'
-                              : 'primary.dark',
-                            borderRadius: '8px',
-                            m: 0.5,
-                            '&:hover': {
-                              backgroundColor: 'primary.dark',
-                            },
-                          }}
-                          key={item}
-                          label={item}
-                          onDelete={
-                            disabledTempo.includes(item) ? undefined : handleDeleteTempo(item)
-                          }
-                          onClick={
-                            disabledTempo.includes(item) ? handleReactivateTempo(item) : undefined
-                          }
-                        />
-                      ))}
-                  </Box>
-
-                  <Box>
-                    <Stack
-                      direction="row"
-                      justifyContent={'space-between'}
-                      width="100%"
-                      alignItems={'center'}
-                      pb="0.5rem"
-                      pt="0.5rem"
-                    >
-                      <Typography variant="h4" color="#E6E0E9">
-                        Themes
-                      </Typography>
-                      <IconButton
-                        onClick={() => setIsThemeOpen(!isThemeOpen)}
-                        sx={{
-                          color: '#E8DEF8',
-                          p: 0,
-                          transform: isThemeOpen ? '' : 'rotate(-180deg)',
-                          transition: '0.1s ease-in-out',
-                        }}
-                        disableRipple
-                        disableTouchRipple
-                      >
-                        <ArrowDropDown sx={{ color: '#CAC4D0' }} />
-                      </IconButton>
-                    </Stack>
-
-                    {isThemeOpen &&
-                      themeOptions.map((item) => (
-                        <Chip
-                          sx={{
-                            backgroundColor: disabledTheme.includes(item)
-                              ? 'secondary.lighter'
-                              : 'primary.dark',
-                            borderRadius: '8px',
-                            m: 0.5,
-                            '&:hover': {
-                              backgroundColor: 'primary.dark',
-                            },
-                          }}
-                          key={item}
-                          label={item}
-                          onDelete={
-                            disabledTheme.includes(item) ? undefined : handleDeleteTheme(item)
-                          }
-                          onClick={
-                            disabledTheme.includes(item) ? handleReactivateTheme(item) : undefined
-                          }
-                        />
-                      ))}
+                  <Box
+                    sx={{
+                      height: '50vh',
+                      overflowY: 'auto',
+                      pr: 1,
+                    }}
+                  >
                     <Box>
                       <Stack
                         direction="row"
@@ -348,17 +254,16 @@ const SongSearch = (props: SongSearchProps) => {
                         width="100%"
                         alignItems={'center'}
                         pb="0.5rem"
-                        pt="0.5rem"
                       >
                         <Typography variant="h4" color="#E6E0E9">
-                          Display Results Details
+                          Tempo
                         </Typography>
                         <IconButton
-                          onClick={() => setIsDisplayResultOpen(!isDisplayResultOpen)}
+                          onClick={() => setIsTempoOpen(!isTempoOpen)}
                           sx={{
                             color: '#E8DEF8',
                             p: 0,
-                            transform: isDisplayResultOpen ? '' : 'rotate(-180deg)',
+                            transform: isTempoOpen ? '' : 'rotate(-180deg)',
                             transition: '0.1s ease-in-out',
                           }}
                           disableRipple
@@ -367,12 +272,11 @@ const SongSearch = (props: SongSearchProps) => {
                           <ArrowDropDown sx={{ color: '#CAC4D0' }} />
                         </IconButton>
                       </Stack>
-
-                      {isDisplayResultOpen &&
-                        displayResultOptions.map((item) => (
+                      {isTempoOpen &&
+                        tempoOptions.map((item) => (
                           <Chip
                             sx={{
-                              backgroundColor: disabledDisplayResult.includes(item)
+                              backgroundColor: disabledTempo.includes(item)
                                 ? 'secondary.lighter'
                                 : 'primary.dark',
                               borderRadius: '8px',
@@ -384,43 +288,146 @@ const SongSearch = (props: SongSearchProps) => {
                             key={item}
                             label={item}
                             onDelete={
-                              disabledDisplayResult.includes(item)
-                                ? undefined
-                                : handleDeleteDisplayResult(item)
+                              disabledTempo.includes(item) ? undefined : handleDeleteTempo(item)
                             }
                             onClick={
-                              disabledDisplayResult.includes(item)
-                                ? handleReactivateDisplayResult(item)
-                                : undefined
+                              disabledTempo.includes(item) ? handleReactivateTempo(item) : undefined
                             }
                           />
                         ))}
                     </Box>
-                    <Button
-                      onClick={() => handleSearchToggle()}
-                      variant="outlined"
-                      sx={{
-                        border: 0,
-                        padding: {
-                          xs: '8px 15px',
-                          sm: '10px 25px',
-                        },
-                        borderRadius: '40px',
-                        backgroundColor: '#D0BCFF',
-                        textTransform: 'none',
-                        width: '100%',
-                        '&:hover': {
-                          backgroundColor: '#D0BCFF',
-                          opacity: '0.95',
-                        },
-                        transition: 'all 0.1s ease-in-out',
-                      }}
-                    >
-                      <Typography variant="h4" color="#381E72">
-                        Apply
-                      </Typography>
-                    </Button>
+
+                    <Box>
+                      <Stack
+                        direction="row"
+                        justifyContent={'space-between'}
+                        width="100%"
+                        alignItems={'center'}
+                        pb="0.5rem"
+                        pt="0.5rem"
+                      >
+                        <Typography variant="h4" color="#E6E0E9">
+                          Themes
+                        </Typography>
+                        <IconButton
+                          onClick={() => setIsThemeOpen(!isThemeOpen)}
+                          sx={{
+                            color: '#E8DEF8',
+                            p: 0,
+                            transform: isThemeOpen ? '' : 'rotate(-180deg)',
+                            transition: '0.1s ease-in-out',
+                          }}
+                          disableRipple
+                          disableTouchRipple
+                        >
+                          <ArrowDropDown sx={{ color: '#CAC4D0' }} />
+                        </IconButton>
+                      </Stack>
+
+                      {isThemeOpen &&
+                        themeOptions.map((item) => (
+                          <Chip
+                            sx={{
+                              backgroundColor: disabledTheme.includes(item)
+                                ? 'secondary.lighter'
+                                : 'primary.dark',
+                              borderRadius: '8px',
+                              m: 0.5,
+                              '&:hover': {
+                                backgroundColor: 'primary.dark',
+                              },
+                            }}
+                            key={item}
+                            label={item}
+                            onDelete={
+                              disabledTheme.includes(item) ? undefined : handleDeleteTheme(item)
+                            }
+                            onClick={
+                              disabledTheme.includes(item) ? handleReactivateTheme(item) : undefined
+                            }
+                          />
+                        ))}
+                      <Box>
+                        <Stack
+                          direction="row"
+                          justifyContent={'space-between'}
+                          width="100%"
+                          alignItems={'center'}
+                          pb="0.5rem"
+                          pt="0.5rem"
+                        >
+                          <Typography variant="h4" color="#E6E0E9">
+                            Display Results Details
+                          </Typography>
+                          <IconButton
+                            onClick={() => setIsDisplayResultOpen(!isDisplayResultOpen)}
+                            sx={{
+                              color: '#E8DEF8',
+                              p: 0,
+                              transform: isDisplayResultOpen ? '' : 'rotate(-180deg)',
+                              transition: '0.1s ease-in-out',
+                            }}
+                            disableRipple
+                            disableTouchRipple
+                          >
+                            <ArrowDropDown sx={{ color: '#CAC4D0' }} />
+                          </IconButton>
+                        </Stack>
+
+                        {isDisplayResultOpen &&
+                          displayResultOptions.map((item) => (
+                            <Chip
+                              sx={{
+                                backgroundColor: disabledDisplayResult.includes(item)
+                                  ? 'secondary.lighter'
+                                  : 'primary.dark',
+                                borderRadius: '8px',
+                                m: 0.5,
+                                '&:hover': {
+                                  backgroundColor: 'primary.dark',
+                                },
+                              }}
+                              key={item}
+                              label={item}
+                              onDelete={
+                                disabledDisplayResult.includes(item)
+                                  ? undefined
+                                  : handleDeleteDisplayResult(item)
+                              }
+                              onClick={
+                                disabledDisplayResult.includes(item)
+                                  ? handleReactivateDisplayResult(item)
+                                  : undefined
+                              }
+                            />
+                          ))}
+                      </Box>
+                    </Box>
                   </Box>
+                  <Button
+                    onClick={() => handleSearchToggle()}
+                    variant="outlined"
+                    sx={{
+                      border: 0,
+                      padding: {
+                        xs: '8px 15px',
+                        sm: '10px 25px',
+                      },
+                      borderRadius: '40px',
+                      backgroundColor: '#D0BCFF',
+                      textTransform: 'none',
+                      width: '100%',
+                      '&:hover': {
+                        backgroundColor: '#D0BCFF',
+                        opacity: '0.95',
+                      },
+                      transition: 'all 0.1s ease-in-out',
+                    }}
+                  >
+                    <Typography variant="h4" color="#381E72">
+                      Apply
+                    </Typography>
+                  </Button>
                 </Container>
               </Box>
             )}

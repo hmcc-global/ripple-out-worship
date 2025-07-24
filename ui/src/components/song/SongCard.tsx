@@ -1,4 +1,4 @@
-import { Box, Container, Stack, Typography } from '@mui/material';
+import { Box, Container, Stack, Typography, Grid } from '@mui/material';
 import { SongCardProps, SongSchema } from '../../types/song.types';
 import { CardFields } from '../../constants';
 import { useState } from 'react';
@@ -100,37 +100,40 @@ const SongCard = (props: SongCardProps) => {
           {CardFields &&
             showDetails !== false &&
             (isDesktop ? (
-              CardFields.map(
-                (field, i) =>
-                  displayData[i] && (
-                    <Stack
-                      direction="row"
-                      display="flex"
-                      key={i}
-                      spacing={1}
-                      width="fit-content"
-                      maxWidth="100%"
-                      alignItems={'center'}
-                      justifyContent={'flex-start'}
-                      mr={isDesktop ? '1.25rem' : 1}
-                    >
-                      <Typography variant="body2" color="#9E9E9E" minWidth={'fit-content'}>
-                        {field}
-                      </Typography>
-                      {Array.isArray(fieldData[i]) ? (
-                        <SongFieldArray data={fieldData[i]} />
-                      ) : (
-                        <Typography variant="body2" color={'#CCC2DC'} align="left" noWrap>
-                          {fieldData[i] ?? '-'}
-                        </Typography>
-                      )}
-                    </Stack>
-                  )
-              )
+              <Grid container spacing={1} wrap="wrap" maxWidth="100%">
+                {CardFields.map(
+                  (field, i) =>
+                    displayData[i] && (
+                      <Grid item xs={i <= 3 ? 4 : 12} key={i}>
+                        <Stack
+                          direction="row"
+                          display="flex"
+                          spacing={1}
+                          width="fit-content"
+                          maxWidth="100%"
+                          alignItems={'center'}
+                          justifyContent={'flex-start'}
+                          mr={isDesktop ? '1.25rem' : 1}
+                        >
+                          <Typography variant="body2" color="#9E9E9E" minWidth={'fit-content'}>
+                            {field}
+                          </Typography>
+                          {Array.isArray(fieldData[i]) ? (
+                            <SongFieldArray data={fieldData[i]} />
+                          ) : (
+                            <Typography variant="body2" color={'#CCC2DC'} align="left" noWrap>
+                              {fieldData[i] ?? '-'}
+                            </Typography>
+                          )}
+                        </Stack>
+                      </Grid>
+                    )
+                )}
+              </Grid>
             ) : (
               <>
                 {/* Mobile: group originalKey (index 2) and year (index 3) in one row */}
-                {(displayData[1] || displayData[2] || displayData[3]) && (
+                {(displayData[2] || displayData[3]) && (
                   <Stack
                     direction="row"
                     spacing={2}
@@ -139,16 +142,6 @@ const SongCard = (props: SongCardProps) => {
                     width="fit-content"
                     maxWidth="100%"
                   >
-                    {displayData[1] && (
-                      <Stack direction="row" spacing={1} alignItems="center">
-                        <Typography variant="body2" color="#9E9E9E" minWidth={'fit-content'}>
-                          {CardFields[1]}
-                        </Typography>
-                        <Typography variant="body2" color={'#CCC2DC'} align="left" noWrap>
-                          {fieldData[1] ?? '-'}
-                        </Typography>
-                      </Stack>
-                    )}
                     {displayData[2] && (
                       <Stack direction="row" spacing={1} alignItems="center">
                         <Typography variant="body2" color="#9E9E9E" minWidth={'fit-content'}>
@@ -174,7 +167,7 @@ const SongCard = (props: SongCardProps) => {
                 {/* Render the rest of the fields individually */}
                 {CardFields.map((field, i) => {
                   // Skip originalKey (2) and year (3) since already rendered above
-                  if (i === 1 || i === 2 || i === 3) return null;
+                  if (i === 2 || i === 3) return null;
                   return (
                     displayData[i] && (
                       <Stack

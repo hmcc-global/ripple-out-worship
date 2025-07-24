@@ -191,46 +191,48 @@ const SongListContainer: FC = (): ReactElement => {
             </Typography>
           </Button>
         )}
+
         <PageHeader
           title="Songs"
           icon={<MusicNote />}
           actionButtons={
-            <Button
-              variant="outlined"
-              disabled={user?.accessType !== 'admin'}
-              sx={{
-                display: { xs: 'none', sm: 'flex' },
-                border: 0,
-                padding: {
-                  xs: '8px 15px',
-                  sm: '10px 25px',
-                },
-                borderRadius: '40px',
-                backgroundColor: '#D0BCFF',
-                color: '#381E72',
-                textTransform: 'none',
-                '&:hover': {
-                  backgroundColor: '#D0BCFF',
-                  opacity: '0.95',
-                },
-                transition: 'all 0.1s ease-in-out',
-              }}
-              startIcon={<Add />}
-              onClick={() => navigate('/song/add')}
-            >
-              <Typography
-                variant="subtitle1"
-                fontWeight={700}
+            user?.accessType === 'admin' && (
+              <Button
+                variant="outlined"
                 sx={{
-                  fontSize: {
-                    xs: '0.875rem',
-                    sm: '1rem',
+                  display: { xs: 'none', sm: 'flex' },
+                  border: 0,
+                  padding: {
+                    xs: '8px 15px',
+                    sm: '10px 25px',
                   },
+                  borderRadius: '40px',
+                  backgroundColor: '#D0BCFF',
+                  color: '#381E72',
+                  textTransform: 'none',
+                  '&:hover': {
+                    backgroundColor: '#D0BCFF',
+                    opacity: '0.95',
+                  },
+                  transition: 'all 0.1s ease-in-out',
                 }}
+                startIcon={<Add />}
+                onClick={() => navigate('/song/add')}
               >
-                New Song
-              </Typography>
-            </Button>
+                <Typography
+                  variant="subtitle1"
+                  fontWeight={700}
+                  sx={{
+                    fontSize: {
+                      xs: '0.875rem',
+                      sm: '1rem',
+                    },
+                  }}
+                >
+                  New Song
+                </Typography>
+              </Button>
+            )
           }
         />
         <Box display={{ base: 'block', md: 'none' }}></Box>
