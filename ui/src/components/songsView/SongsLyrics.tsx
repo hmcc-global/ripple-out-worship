@@ -1,6 +1,6 @@
 import { Box, Chip, Grid, Stack, Typography, useMediaQuery } from '@mui/material';
 import { SongViewSchema } from '../../types/song.types';
-import { flatMusicKeysOptions, sharpMusicKeysOptions } from '../../constants';
+import { flatMusicKeysOptions, sharpMusicKeysOptions, ChordColors } from '../../constants';
 import { ReactNode, useCallback, useEffect, useState } from 'react';
 
 interface SongsLyricsProps {
@@ -22,6 +22,19 @@ const SongsLyrics = ({ chordStatus, changeKey, song, split, useFlat }: SongsLyri
     lyricsLine &&
       lyricsLine.map((line) => (line.includes('{') && line.includes('}') ? para++ : null));
     return para;
+  };
+
+  const searchChordColor = (chord: string): string | undefined => {
+    const chordKey = Object.keys(ChordColors).find(
+      (key) => key.toLowerCase() === chord.toLowerCase()
+    );
+    return chordKey ? ChordColors[chordKey] : undefined;
+  };
+
+  const getColor = (label: any) => {
+    const regexPattern = /[A-G][#b]?(m)?/;
+    label.match(regexPattern);
+    return searchChordColor(label);
   };
 
   const parseLyrics = useCallback(
@@ -102,7 +115,7 @@ const SongsLyrics = ({ chordStatus, changeKey, song, split, useFlat }: SongsLyri
                       transpossedChordBase + chord.slice(cleanedChord.length);
 
                     const textLyrics = lyric.slice(endChord + 1);
-                    const chipColor = '#000000';
+                    const chipColor = getColor(transpossedChord);
                     return (
                       <Box key={i}>
                         {chordStatus ? (

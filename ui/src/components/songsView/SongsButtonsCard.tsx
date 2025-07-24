@@ -503,7 +503,7 @@ const SongsButtonsCard = ({ song, userView = false, userHeader = false }: SongsB
                   color: 'secondary.main',
                   textTransform: 'none',
                 }}
-                startIcon={<PlaylistAdd />}S
+                startIcon={<PlaylistAdd />}
               >
                 <Typography variant="subtitle1">Add to Setlist</Typography>
               </Button>
