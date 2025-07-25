@@ -111,13 +111,13 @@ const HomeContainer: FC = (): ReactElement => {
               }}
               onClick={onSearchOpen}
             >
-              <IconButton sx={{ color: '#b39ddb' }}>
+              <IconButton sx={{ color: 'secondary.main' }}>
                 <SearchIcon />
               </IconButton>
               <Box
                 sx={{
                   ml: 1,
-                  color: '#E8DEF8',
+                  color: 'secondary.main',
                   fontFamily: 'DM Sans, sans-serif',
                   fontSize: '14px',
                 }}

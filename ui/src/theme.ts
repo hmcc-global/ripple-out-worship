@@ -2,27 +2,76 @@ import { createTheme, PaletteOptions, SimplePaletteColorOptions } from '@mui/mat
 import '@fontsource/work-sans';
 import '@fontsource/dm-sans';
 import '@mui/material/styles';
-import { createBreakpoints, fontWeight } from '@mui/system';
+import { createBreakpoints } from '@mui/system';
 const breakpoints = createBreakpoints({});
 
-// const PRIMARY_MAIN = '#4B50B4';
-const PRIMARY_MAIN = '#4F378B';
-const PRIMARY_LIGHT = '#C9CDFF';
-// const PRIMARY_LIGHTER = '#DDE0FF';
-const PRIMARY_LIGHTER = '#E6E0E9';
-// const PRIMARY_LIGHTEST = '#EEEFFF';
-const PRIMARY_LIGHTEST = '#EADDFF';
-const PRIMARY_DARK = '#6750A4';
-const PRIMARY_DARKER = '#1D192B';
-const PRIMARY_DARKEST = '#141218';
-
-const SECONDARY_MAIN = '#D0BCFE';
-const SECONDARY_LIGHT = '#EADDFF'; // grey
-const SECONDARY_LIGHTER = '#4A4458'; // purple grey
-const SECONDARY_DARK = '#EADDFF'; // grey, same as SECONDARY_LIGHT
-// const SECONDARY_DARK = '#332D41'; // previous secondary dark, causes buttons to be colored similar to BG when hovered
-
-const WARNING_MAIN = '#EFB8C8';
+// Comprehensive color palette based on design system
+const colors = {
+  // Primary scheme
+  primary: '#D0BCFE',
+  surfaceTint: '#D0BCFF',
+  onPrimary: '#381E72',
+  primaryContainer: '#4F378B',
+  onPrimaryContainer: '#EADDFF',
+  
+  // Secondary scheme  
+  secondary: '#CCC2DC',
+  onSecondary: '#332D41',
+  secondaryContainer: '#4A4458',
+  onSecondaryContainer: '#E8DEF8',
+  
+  // Tertiary scheme
+  tertiary: '#EFB8C8',
+  onTertiary: '#492532',
+  tertiaryContainer: '#633B48',
+  onTertiaryContainer: '#FFD8E4',
+  
+  // Error scheme
+  error: '#F2B8B5',
+  onError: '#601410',
+  errorContainer: '#8C1D18',
+  onErrorContainer: '#F9DEDC',
+  
+  // Background scheme
+  background: '#141218',
+  onBackground: '#E6E0E9',
+  surface: '#141218',
+  onSurface: '#E6E0E9',
+  surfaceVariant: '#49454F',
+  onSurfaceVariant: '#CAC4D0',
+  outline: '#938F99',
+  outlineVariant: '#49454F',
+  shadow: '#000000',
+  scrim: '#000000',
+  inverseSurface: '#E6E0E9',
+  inverseOnSurface: '#322F35',
+  inversePrimary: '#6750A4',
+  primaryFixed: '#EADDFF',
+  onPrimaryFixed: '#21005D',
+  primaryFixedDim: '#D0BCFF',
+  onPrimaryFixedVariant: '#4F378B',
+  
+  // Secondary fixed
+  secondaryFixed: '#E8DEF8',
+  onSecondaryFixed: '#1D192B',
+  secondaryFixedDim: '#CCC2DC',
+  onSecondaryFixedVariant: '#4A4458',
+  
+  // Tertiary fixed
+  tertiaryFixed: '#FFD8E4',
+  onTertiaryFixed: '#31111D',
+  tertiaryFixedDim: '#EFB8C8',
+  onTertiaryFixedVariant: '#633B48',
+  
+  // Surface variants
+  surfaceDim: '#141218',
+  surfaceBright: '#3B383E',
+  surfaceContainerLowest: '#0F0D13',
+  surfaceContainerLow: '#1D1B20',
+  surfaceContainer: '#211F26',
+  surfaceContainerHigh: '#2B2930',
+  surfaceContainerHighest: '#36343B'
+};
 
 declare module '@mui/material/styles/createPalette' {
   interface PaletteColor {
@@ -32,7 +81,94 @@ declare module '@mui/material/styles/createPalette' {
     darkest?: string;
     contrastText: string;
   }
+  
+  interface Palette {
+    surfaceTint: string;
+    onPrimary: string;
+    onPrimaryContainer: string;
+    onSecondary: string;
+    onSecondaryContainer: string;
+    tertiary: PaletteColor;
+    onTertiary: string;
+    onTertiaryContainer: string;
+    onError: string;
+    onErrorContainer: string;
+    onBackground: string;
+    onSurface: string;
+    surfaceVariant: string;
+    onSurfaceVariant: string;
+    outline: string;
+    outlineVariant: string;
+    shadow: string;
+    scrim: string;
+    inverseSurface: string;
+    inverseOnSurface: string;
+    inversePrimary: string;
+    primaryFixed: string;
+    onPrimaryFixed: string;
+    primaryFixedDim: string;
+    onPrimaryFixedVariant: string;
+    secondaryFixed: string;
+    onSecondaryFixed: string;
+    secondaryFixedDim: string;
+    onSecondaryFixedVariant: string;
+    tertiaryFixed: string;
+    onTertiaryFixed: string;
+    tertiaryFixedDim: string;
+    onTertiaryFixedVariant: string;
+    surfaceDim: string;
+    surfaceBright: string;
+    surfaceContainerLowest: string;
+    surfaceContainerLow: string;
+    surfaceContainer: string;
+    surfaceContainerHigh: string;
+    surfaceContainerHighest: string;
+  }
+  
+  interface PaletteOptions {
+    surfaceTint?: string;
+    onPrimary?: string;
+    onPrimaryContainer?: string;
+    onSecondary?: string;
+    onSecondaryContainer?: string;
+    tertiary?: PaletteColorOptions;
+    onTertiary?: string;
+    onTertiaryContainer?: string;
+    onError?: string;
+    onErrorContainer?: string;
+    onBackground?: string;
+    onSurface?: string;
+    surfaceVariant?: string;
+    onSurfaceVariant?: string;
+    outline?: string;
+    outlineVariant?: string;
+    shadow?: string;
+    scrim?: string;
+    inverseSurface?: string;
+    inverseOnSurface?: string;
+    inversePrimary?: string;
+    primaryFixed?: string;
+    onPrimaryFixed?: string;
+    primaryFixedDim?: string;
+    onPrimaryFixedVariant?: string;
+    secondaryFixed?: string;
+    onSecondaryFixed?: string;
+    secondaryFixedDim?: string;
+    onSecondaryFixedVariant?: string;
+    tertiaryFixed?: string;
+    onTertiaryFixed?: string;
+    tertiaryFixedDim?: string;
+    onTertiaryFixedVariant?: string;
+    surfaceDim?: string;
+    surfaceBright?: string;
+    surfaceContainerLowest?: string;
+    surfaceContainerLow?: string;
+    surfaceContainer?: string;
+    surfaceContainerHigh?: string;
+    surfaceContainerHighest?: string;
+  }
 }
+
 interface ExtendedPaletteColorOptions extends SimplePaletteColorOptions {
   darker?: string;
   lighter?: string;
@@ -43,33 +179,89 @@ interface ExtendedPaletteColorOptions extends SimplePaletteColorOptions {
 interface ExtendedPaletteOptions extends PaletteOptions {
   primary: ExtendedPaletteColorOptions;
   secondary: ExtendedPaletteColorOptions;
+  tertiary: ExtendedPaletteColorOptions;
 }
+
 const palette: ExtendedPaletteOptions = {
   primary: {
-    main: PRIMARY_MAIN,
-    light: PRIMARY_LIGHT,
-    lighter: PRIMARY_LIGHTER,
-    lightest: PRIMARY_LIGHTEST,
-    dark: PRIMARY_DARK,
-    darker: PRIMARY_DARKER,
-    darkest: PRIMARY_DARKEST,
+    main: colors.primary,
+    light: colors.primaryFixedDim,
+    lighter: colors.onBackground,
+    lightest: colors.onPrimaryContainer,
+    dark: colors.inversePrimary,
+    darker: colors.onSecondaryFixed,
+    darkest: colors.background,
   },
   secondary: {
-    main: SECONDARY_MAIN,
-    light: SECONDARY_LIGHT,
-    lighter: SECONDARY_LIGHTER,
-    dark: SECONDARY_DARK,
+    main: colors.secondary,
+    light: colors.onPrimaryContainer,
+    lighter: colors.secondaryContainer,
+    dark: colors.onPrimaryContainer,
+  },
+  tertiary: {
+    main: colors.tertiary,
+    light: colors.tertiaryFixed,
+    lighter: colors.tertiaryFixedDim,
+    dark: colors.onTertiary,
+    darker: colors.onTertiaryFixed,
+    darkest: colors.tertiaryContainer,
   },
   background: {
-    default: '#171717',
-    paper: '#0F0D13',
+    default: colors.background,
+    paper: colors.surfaceContainerLowest,
+  },
+  error: {
+    main: colors.error,
+    light: colors.onErrorContainer,
+    dark: colors.onError,
   },
   warning: {
-    main: WARNING_MAIN,
+    main: colors.tertiary,
   },
   text: {
-    primary: '#fff',
+    primary: colors.onSurface,
+    secondary: colors.onSurfaceVariant,
   },
+  // Extended color properties
+  surfaceTint: colors.surfaceTint,
+  onPrimary: colors.onPrimary,
+  onPrimaryContainer: colors.onPrimaryContainer,
+  onSecondary: colors.onSecondary,
+  onSecondaryContainer: colors.onSecondaryContainer,
+  onTertiary: colors.onTertiary,
+  onTertiaryContainer: colors.onTertiaryContainer,
+  onError: colors.onError,
+  onErrorContainer: colors.onErrorContainer,
+  onBackground: colors.onBackground,
+  onSurface: colors.onSurface,
+  surfaceVariant: colors.surfaceVariant,
+  onSurfaceVariant: colors.onSurfaceVariant,
+  outline: colors.outline,
+  outlineVariant: colors.outlineVariant,
+  shadow: colors.shadow,
+  scrim: colors.scrim,
+  inverseSurface: colors.inverseSurface,
+  inverseOnSurface: colors.inverseOnSurface,
+  inversePrimary: colors.inversePrimary,
+  primaryFixed: colors.primaryFixed,
+  onPrimaryFixed: colors.onPrimaryFixed,
+  primaryFixedDim: colors.primaryFixedDim,
+  onPrimaryFixedVariant: colors.onPrimaryFixedVariant,
+  secondaryFixed: colors.secondaryFixed,
+  onSecondaryFixed: colors.onSecondaryFixed,
+  secondaryFixedDim: colors.secondaryFixedDim,
+  onSecondaryFixedVariant: colors.onSecondaryFixedVariant,
+  tertiaryFixed: colors.tertiaryFixed,
+  onTertiaryFixed: colors.onTertiaryFixed,
+  tertiaryFixedDim: colors.tertiaryFixedDim,
+  onTertiaryFixedVariant: colors.onTertiaryFixedVariant,
+  surfaceDim: colors.surfaceDim,
+  surfaceBright: colors.surfaceBright,
+  surfaceContainerLowest: colors.surfaceContainerLowest,
+  surfaceContainerLow: colors.surfaceContainerLow,
+  surfaceContainer: colors.surfaceContainer,
+  surfaceContainerHigh: colors.surfaceContainerHigh,
+  surfaceContainerHighest: colors.surfaceContainerHighest,
 };
 const customTheme = createTheme({
   palette: palette,
@@ -138,9 +330,9 @@ const customTheme = createTheme({
     MuiInputLabel: {
       styleOverrides: {
         root: {
-          color: PRIMARY_LIGHTER,
+          color: colors.onBackground,
           '&.Mui-focused': {
-            color: PRIMARY_LIGHTER,
+            color: colors.onBackground,
           },
         },
       },
@@ -149,11 +341,11 @@ const customTheme = createTheme({
       styleOverrides: {
         root: {
           fontWeight: 500,
-          color: PRIMARY_LIGHTER,
-          background: '#1D1B20',
-          border: '1px solid {theme.palette.primary.main}',
+          color: colors.onBackground,
+          background: colors.surfaceContainerLow,
+          border: `1px solid ${colors.primary}`,
           '& .MuiOutlinedInput-notchedOutline': {
-            borderColor: '#938F99',
+            borderColor: colors.outline,
           },
         },
       },
@@ -162,26 +354,26 @@ const customTheme = createTheme({
       styleOverrides: {
         root: {
           '& label': {
-            color: PRIMARY_LIGHTER,
+            color: colors.onBackground,
             '&.Mui-focused': {
-              color: PRIMARY_LIGHTER,
+              color: colors.onBackground,
             },
           },
         },
         paper: {
-          backgroundColor: '#1D1B20',
-          color: PRIMARY_LIGHTER,
+          backgroundColor: colors.surfaceContainerLow,
+          color: colors.onBackground,
         },
         popupIndicator: {
-          color: PRIMARY_LIGHTER,
+          color: colors.onBackground,
         },
         option: {
           '&.Mui-focused, &.Mui-selected, &.Mui-selected.Mui-focused': {
             backgroundColor: 'rgba(255, 255, 255, 0.16)',
-            color: PRIMARY_LIGHTER,
+            color: colors.onBackground,
           },
           '& ::placeholder': {
-            color: PRIMARY_LIGHTER,
+            color: colors.onBackground,
           },
         },
       },
@@ -189,15 +381,15 @@ const customTheme = createTheme({
     MuiTab: {
       styleOverrides: {
         root: {
-          color: PRIMARY_LIGHTER,
+          color: colors.onBackground,
         },
       },
     },
     MuiMenu: {
       styleOverrides: {
         paper: {
-          backgroundColor: PRIMARY_DARKEST, // Set the background color of the menu
-          color: PRIMARY_LIGHTER, // Set the text color of the menu
+          backgroundColor: colors.background,
+          color: colors.onBackground,
         },
       },
     },
@@ -205,7 +397,7 @@ const customTheme = createTheme({
       styleOverrides: {
         root: {
           '&:hover': {
-            backgroundColor: PRIMARY_DARK, // Set the hover background color of the menu items
+            backgroundColor: colors.inversePrimary,
           },
         },
       },
@@ -213,14 +405,14 @@ const customTheme = createTheme({
     MuiDrawer: {
       styleOverrides: {
         paper: {
-          backgroundColor: '#2B2930', // Set the background color of the drawer
+          backgroundColor: colors.surfaceContainerHigh,
         },
       },
     },
     MuiDialog: {
       styleOverrides: {
         paper: {
-          backgroundColor: '#2B2930', // Set the background color of the dialog
+          backgroundColor: colors.surfaceContainerHigh,
         },
       },
     },
@@ -228,9 +420,9 @@ const customTheme = createTheme({
       styleOverrides: {
         root: {
           '&.Mui-selected': {
-            backgroundColor: PRIMARY_DARKEST,
+            backgroundColor: colors.background,
             '&:hover': {
-              backgroundColor: PRIMARY_DARKEST,
+              backgroundColor: colors.background,
             },
           },
         },

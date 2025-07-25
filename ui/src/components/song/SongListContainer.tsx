@@ -164,11 +164,11 @@ const SongListContainer: FC = (): ReactElement => {
                 border: 0,
                 padding: '10px 25px',
                 borderRadius: '40px',
-                backgroundColor: '#D0BCFF',
-                color: '#381E72',
+                backgroundColor: 'primary.main',
+                color: 'onPrimary',
                 textTransform: 'none',
                 '&:hover': {
-                  backgroundColor: '#D0BCFF',
+                  backgroundColor: 'primary.main',
                   opacity: '0.95',
                 },
                 transition: 'all 0.1s ease-in-out',
@@ -221,7 +221,7 @@ const SongListContainer: FC = (): ReactElement => {
                 spacing="space-between"
                 maxWidth="100%"
               >
-                <Typography variant="h3" color="#FFFFFF">
+                <Typography variant="h3" color="text.primary">
                   Search Results
                 </Typography>
                 <ButtonGroup variant="outlined">{/* Button group code */}</ButtonGroup>

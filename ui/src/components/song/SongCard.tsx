@@ -113,13 +113,13 @@ const SongCard = (props: SongCardProps) => {
                     justifyContent={'flex-start'}
                     mr={isDesktop ? '1.25rem' : 1}
                   >
-                    <Typography variant="body2" color="#9E9E9E" minWidth={'fit-content'}>
+                    <Typography variant="body2" color="text.secondary" minWidth={'fit-content'}>
                       {field}
                     </Typography>
                     {Array.isArray(fieldData[i]) ? (
                       <SongFieldArray data={fieldData[i]} />
                     ) : (
-                      <Typography variant="body2" color={'#CCC2DC'} align="left" noWrap>
+                      <Typography variant="body2" color={'secondary.main'} align="left" noWrap>
                         {fieldData[i] ?? '-'}
                       </Typography>
                     )}

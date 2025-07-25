@@ -7,6 +7,7 @@ import {
   Button,
   Chip,
   IconButton,
+  useTheme,
 } from '@mui/material';
 import { SongSearchProps } from '../../types/song.types';
 import { useState, useEffect } from 'react';
@@ -16,6 +17,7 @@ import HeaderWithIcon from '../custom/HeaderWithIcon';
 import { useLocation } from 'react-router-dom';
 
 const SongSearch = (props: SongSearchProps) => {
+  const theme = useTheme();
   const [searchString, setSearchString] = useState<string>('');
   const [tempoList, setTempoList] = useState<string[]>([]);
   const [disabledTempo, setDisabledTempo] = useState<string[]>(tempoOptions);
@@ -121,8 +123,8 @@ const SongSearch = (props: SongSearchProps) => {
   const [isDisplayResultOpen, setIsDisplayResultOpen] = useState<boolean>(true);
 
   return (
-    <Container sx={{ py: '1em', background: '#000', borderRadius: '16px' }}>
-      <Box sx={{ color: '#9E9E9E' }}>
+    <Container sx={{ py: '1em', background: 'shadow', borderRadius: '16px' }}>
+      <Box sx={{ color: 'text.secondary' }}>
         {/* filter heading and reset button */}
         <Stack
           direction="row"
@@ -154,7 +156,7 @@ const SongSearch = (props: SongSearchProps) => {
 
         <Stack direction="column" gap={'1.25rem'}>
           <Box>
-            <Typography variant="h4" color="#E6E0E9" pb={'0.5rem'}>
+            <Typography variant="h4" color="text.primary" pb={'0.5rem'}>
               Search Keywords
             </Typography>
             <TextField
@@ -163,8 +165,8 @@ const SongSearch = (props: SongSearchProps) => {
               InputProps={{
                 style: {
                   fontSize: '1rem',
-                  color: '#CAC4D0',
-                  background: '#4A4458',
+                  color: theme.palette.text.secondary,
+                  background: theme.palette.secondary.lighter,
                   borderRadius: '8px',
                   border: 0,
                   padding: '0.5rem 1rem',
@@ -187,13 +189,13 @@ const SongSearch = (props: SongSearchProps) => {
               alignItems={'center'}
               pb="0.5rem"
             >
-              <Typography variant="h4" color="#E6E0E9">
+              <Typography variant="h4" color="text.primary">
                 Tempo
               </Typography>
               <IconButton
                 onClick={() => setIsTempoOpen(!isTempoOpen)}
                 sx={{
-                  color: '#E8DEF8',
+                  color: 'secondary.main',
                   p: 0,
                   transform: isTempoOpen ? '' : 'rotate(-180deg)',
                   transition: '0.1s ease-in-out',
@@ -201,7 +203,7 @@ const SongSearch = (props: SongSearchProps) => {
                 disableRipple
                 disableTouchRipple
               >
-                <ArrowDropDown sx={{ color: '#CAC4D0' }} />
+                <ArrowDropDown sx={{ color: 'text.secondary' }} />
               </IconButton>
             </Stack>
             {isTempoOpen &&
@@ -233,13 +235,13 @@ const SongSearch = (props: SongSearchProps) => {
               alignItems={'center'}
               pb="0.5rem"
             >
-              <Typography variant="h4" color="#E6E0E9">
+              <Typography variant="h4" color="text.primary">
                 Themes
               </Typography>
               <IconButton
                 onClick={() => setIsThemeOpen(!isThemeOpen)}
                 sx={{
-                  color: '#E8DEF8',
+                  color: 'secondary.main',
                   p: 0,
                   transform: isThemeOpen ? '' : 'rotate(-180deg)',
                   transition: '0.1s ease-in-out',
@@ -247,7 +249,7 @@ const SongSearch = (props: SongSearchProps) => {
                 disableRipple
                 disableTouchRipple
               >
-                <ArrowDropDown sx={{ color: '#CAC4D0' }} />
+                <ArrowDropDown sx={{ color: 'text.secondary' }} />
               </IconButton>
             </Stack>
 
@@ -280,13 +282,13 @@ const SongSearch = (props: SongSearchProps) => {
               alignItems={'center'}
               pb="0.5rem"
             >
-              <Typography variant="h4" color="#E6E0E9">
+              <Typography variant="h4" color="text.primary">
                 Display Results Details
               </Typography>
               <IconButton
                 onClick={() => setIsDisplayResultOpen(!isDisplayResultOpen)}
                 sx={{
-                  color: '#E8DEF8',
+                  color: 'secondary.main',
                   p: 0,
                   transform: isDisplayResultOpen ? '' : 'rotate(-180deg)',
                   transition: '0.1s ease-in-out',
@@ -294,7 +296,7 @@ const SongSearch = (props: SongSearchProps) => {
                 disableRipple
                 disableTouchRipple
               >
-                <ArrowDropDown sx={{ color: '#CAC4D0' }} />
+                <ArrowDropDown sx={{ color: 'text.secondary' }} />
               </IconButton>
             </Stack>
 
@@ -333,7 +335,7 @@ const SongSearch = (props: SongSearchProps) => {
             alignItems="center"
             gap={'0.5rem'}
           >
-            <Info sx={{ color: '#E8DEF8' }} />
+            <Info sx={{ color: 'secondary.main' }} />
             <Typography variant="body2">Song Title will be displayed by default</Typography>
           </Stack>
         </Stack>

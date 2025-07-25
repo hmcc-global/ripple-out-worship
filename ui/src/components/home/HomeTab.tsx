@@ -44,7 +44,7 @@ const HomeTab: FC<HomeTabProps> = ({ title, description, Icon, route }): ReactEl
             sx={{
               fontSize: ['0.875rem', '1.rem'],
               fontWeight: 400,
-              color: '#CAC4D0',
+              color: 'text.secondary',
               fontFamily: 'DM Sans, sans-serif',
             }}
           >
