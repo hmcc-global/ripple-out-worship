@@ -146,7 +146,7 @@ const SetlistViewContainer: FC = (): ReactElement | null => {
                 }
               }}
             >
-              <FolderIcon fontSize="small" sx={{ color: '#4A4458' }} />
+              <FolderIcon fontSize="small" sx={{ color: 'secondary.lighter' }} />
               <Typography variant="body1">{groupData ? ` ${groupData.groupName}` : ' '}</Typography>
             </IconButton>
           </Box>

@@ -397,13 +397,13 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
                     alignItems: 'center',
                     boxShadow:
                       '0px 1px 2px 0px rgba(0, 0, 0, 0.20), 0px 0.1px 0.3px 0px rgba(0, 0, 0, 0.10)',
-                    background: '#2B2930',
+                    background: 'background.paper',
                     borderRadius: '100px',
                   }}
                   direction="row"
                 >
                   <IconButton>
-                    <Search sx={{ mx: 2, color: '#CAC4D0' }} />
+                    <Search sx={{ mx: 2, color: 'text.secondary' }} />
                   </IconButton>
                   <InputBase
                     placeholder="Search"
@@ -414,8 +414,8 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
                     }}
                     sx={{
                       my: 1.5,
-                      color: '#CAC4D0',
-                      backgroundColor: '#2B2930',
+                      color: 'text.secondary',
+                      backgroundColor: 'background.paper',
                       borderRadius: '28px',
                     }}
                   />

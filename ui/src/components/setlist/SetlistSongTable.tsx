@@ -190,7 +190,7 @@ const SetlistSongsTable: React.FC<SetlistSongsTableProps> = ({ songList, setSong
               <TableCell
                 width="10%"
                 sx={{
-                  color: '#938F99',
+                  color: 'text.secondary',
                 }}
               >
                 #
@@ -198,7 +198,7 @@ const SetlistSongsTable: React.FC<SetlistSongsTableProps> = ({ songList, setSong
               <TableCell
                 width="75%"
                 sx={{
-                  color: '#938F99',
+                  color: 'text.secondary',
                 }}
               >
                 Song Title
@@ -206,7 +206,7 @@ const SetlistSongsTable: React.FC<SetlistSongsTableProps> = ({ songList, setSong
               <TableCell
                 width="10%"
                 sx={{
-                  color: '#938F99',
+                  color: 'text.secondary',
                 }}
               >
                 Key
@@ -221,7 +221,7 @@ const SetlistSongsTable: React.FC<SetlistSongsTableProps> = ({ songList, setSong
                   <TableCell
                     width="10%"
                     sx={{
-                      color: '#938F99',
+                      color: 'text.secondary',
                     }}
                   >
                     {i + 1}
@@ -230,14 +230,14 @@ const SetlistSongsTable: React.FC<SetlistSongsTableProps> = ({ songList, setSong
                     <Typography variant="h3" fontWeight={600}>
                       {song.title}
                     </Typography>
-                    <Typography variant="subtitle1" fontWeight={500} sx={{ color: '#CAC4D0' }}>
+                    <Typography variant="subtitle1" fontWeight={500} sx={{ color: 'text.secondary' }}>
                       {song.artist}
                     </Typography>
                   </TableCell>
                   <TableCell width="10%">
                     <Box
                       style={{
-                        background: '#4F378B',
+                        background: 'primary.main',
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'center',
@@ -286,7 +286,7 @@ const SetlistSongsTable: React.FC<SetlistSongsTableProps> = ({ songList, setSong
                       </ListItemIcon>
                       <ListItemText color={'primary.lighter'}>Preview</ListItemText>
                     </MenuItem>
-                    <Divider sx={{ bgcolor: '#49454F' }} />
+                    <Divider sx={{ bgcolor: 'divider' }} />
 
                     <MenuItem onClick={() => handleChangeKey(song._id)}>
                       <ListItemIcon
@@ -318,7 +318,7 @@ const SetlistSongsTable: React.FC<SetlistSongsTableProps> = ({ songList, setSong
                       </ListItemIcon>
                       <ListItemText color={'primary.lighter'}>Move Down</ListItemText>
                     </MenuItem>
-                    <Divider sx={{ bgcolor: '#49454F' }} />
+                    <Divider sx={{ bgcolor: 'divider' }} />
                     <MenuItem onClick={() => handleRemoveSong(song._id)}>
                       <ListItemIcon
                         sx={{

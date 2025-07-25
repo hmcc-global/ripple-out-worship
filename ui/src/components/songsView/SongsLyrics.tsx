@@ -65,7 +65,7 @@ const SongsLyrics = ({ chordStatus, changeKey, song, split, useFlat }: SongsLyri
                     width: 'inline-flex',
                     alignItems: 'center',
                     whiteSpace: 'none',
-                    color: '#A9A9A9',
+                    color: 'text.secondary',
                     fontWeight: 'bold',
                     borderRadius: 4,
                     border: '2',
