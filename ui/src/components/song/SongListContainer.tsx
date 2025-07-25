@@ -12,6 +12,7 @@ import { FC, ReactElement, useEffect, useState, useCallback } from 'react';
 import { SongSchema, SongSearchFilter } from '../../types/song.types';
 import SongCard from './SongCard';
 import SongSearch from './SongSearch';
+import SongSearchMobile from './SongSearchMobile';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Add, MusicNote } from '@mui/icons-material';
 import PageHeader from '../navigation/PageHeader';
@@ -147,39 +148,91 @@ const SongListContainer: FC = (): ReactElement => {
         sx={{
           py: '1rem',
           px: '1.5rem',
-          maxHeight: '100vh',
+          maxHeight: { xs: '90vh', md: '100vh' },
           minWidth: '100%',
           overflow: 'hidden',
         }}
       >
+        {user?.accessType === 'admin' && (
+          <Button
+            variant="outlined"
+            sx={{
+              zIndex: 9,
+              display: {
+                xs: 'flex',
+                sm: 'none',
+              },
+              position: 'fixed',
+              bottom: '90px',
+              right: '40px',
+              border: 0,
+              padding: '5px 10px',
+              borderRadius: '40px',
+              backgroundColor: '#D0BCFF',
+              color: '#381E72',
+              textTransform: 'none',
+              '&:hover': {
+                backgroundColor: '#D0BCFF',
+                opacity: '0.95',
+              },
+              transition: 'all 0.1s ease-in-out',
+            }}
+            startIcon={<Add />}
+            onClick={() => navigate('/song/add')}
+          >
+            <Typography
+              variant="subtitle1"
+              fontWeight={700}
+              sx={{
+                fontSize: '1rem',
+              }}
+            >
+              New Song
+            </Typography>
+          </Button>
+        )}
+
         <PageHeader
           title="Songs"
           icon={<MusicNote />}
           actionButtons={
-            <Button
-              variant="outlined"
-              disabled={user?.accessType !== 'admin'}
-              sx={{
-                display: user?.accessType !== 'admin' ? 'none' : 'flex',
-                border: 0,
-                padding: '10px 25px',
-                borderRadius: '40px',
-                backgroundColor: '#D0BCFF',
-                color: '#381E72',
-                textTransform: 'none',
-                '&:hover': {
+            user?.accessType === 'admin' && (
+              <Button
+                variant="outlined"
+                sx={{
+                  display: { xs: 'none', sm: 'flex' },
+                  border: 0,
+                  padding: {
+                    xs: '8px 15px',
+                    sm: '10px 25px',
+                  },
+                  borderRadius: '40px',
                   backgroundColor: '#D0BCFF',
-                  opacity: '0.95',
-                },
-                transition: 'all 0.1s ease-in-out',
-              }}
-              startIcon={<Add />}
-              onClick={() => navigate('/song/add')}
-            >
-              <Typography variant="subtitle1" fontWeight={700}>
-                New Song
-              </Typography>
-            </Button>
+                  color: '#381E72',
+                  textTransform: 'none',
+                  '&:hover': {
+                    backgroundColor: '#D0BCFF',
+                    opacity: '0.95',
+                  },
+                  transition: 'all 0.1s ease-in-out',
+                }}
+                startIcon={<Add />}
+                onClick={() => navigate('/song/add')}
+              >
+                <Typography
+                  variant="subtitle1"
+                  fontWeight={700}
+                  sx={{
+                    fontSize: {
+                      xs: '0.875rem',
+                      sm: '1rem',
+                    },
+                  }}
+                >
+                  New Song
+                </Typography>
+              </Button>
+            )
           }
         />
         <Box display={{ base: 'block', md: 'none' }}></Box>
@@ -190,8 +243,18 @@ const SongListContainer: FC = (): ReactElement => {
           width="100%"
           gap={'1%'}
         >
-          <Box>
+          <Box display={isDesktop ? 'flex' : 'none'}>
             <SongSearch
+              filterData={filterData}
+              setFilterData={setFilterData}
+              onClose={handleClose}
+              songs={allSongs}
+              setSearch={setSearch}
+              isDesktop={isDesktop}
+            />
+          </Box>
+          <Box display={isDesktop ? 'none' : 'flex'}>
+            <SongSearchMobile
               filterData={filterData}
               setFilterData={setFilterData}
               onClose={handleClose}
@@ -209,7 +272,7 @@ const SongListContainer: FC = (): ReactElement => {
                 background: '#000',
                 borderRadius: '16px',
                 width: '100%',
-                height: '100%',
+                maxHeight: { xs: '90%', md: '100%' },
               }}
             >
               <Stack
@@ -233,6 +296,16 @@ const SongListContainer: FC = (): ReactElement => {
                 overflow="auto"
                 maxWidth="100%"
                 id="search-display"
+                sx={{
+                  '&::-webkit-scrollbar': {
+                    display: 'none',
+                  },
+                  '@media (min-width: 600px)': {
+                    '&::-webkit-scrollbar': {
+                      display: 'block',
+                    },
+                  },
+                }}
               >
                 {loading && songResults.length == 0 ? (
                   <Stack height="80%" justifyContent="center" alignItems="center" width={'400'}>
