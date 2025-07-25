@@ -192,7 +192,7 @@ const GlobalSearchModal = (props: GlobalSearchModalProps) => {
             p: '0.75rem',
           }}
         >
-          <Typography variant="body1" color="#CAC4D0">
+          <Typography variant="body1" color="text.secondary">
             No songs found
           </Typography>
         </Box>
@@ -236,7 +236,7 @@ const GlobalSearchModal = (props: GlobalSearchModalProps) => {
           p: '0.75rem',
         }}
       >
-        <Typography variant="body1" color="#CAC4D0">
+        <Typography variant="body1" color="text.secondary">
           No setlists found
         </Typography>
       </Box>
@@ -302,13 +302,13 @@ const GlobalSearchModal = (props: GlobalSearchModalProps) => {
                   style: {
                     fontFamily: 'DM Sans, sans-serif',
                     fontSize: '1rem',
-                    color: '#CAC4D0',
-                    background: '#211F26',
+                    color: 'text.secondary',
+                    background: 'background.paper',
                   },
                   disableUnderline: true,
                   startAdornment: (
                     <InputAdornment position="start">
-                      <SearchIcon sx={{ color: '#CAC4D0' }} />
+                      <SearchIcon sx={{ color: 'text.secondary' }} />
                     </InputAdornment>
                   ),
                 }}
@@ -321,9 +321,9 @@ const GlobalSearchModal = (props: GlobalSearchModalProps) => {
                 sx={{
                   flexGrow: 1,
                   '& .MuiInputBase-root': {
-                    color: '#211F26',
+                    color: 'text.primary',
                     '&::placeholder': {
-                      color: '#211F26',
+                      color: 'text.primary',
                     },
                   },
                 }}
@@ -346,7 +346,7 @@ const GlobalSearchModal = (props: GlobalSearchModalProps) => {
               }}
             >
               {loading ? (
-                <Box sx={{ fontSize: '1rem', color: 'black', p: 2, backgroundColor: '#211F26' }}>
+                <Box sx={{ fontSize: '1rem', color: 'text.primary', p: 2, backgroundColor: 'background.paper' }}>
                   Loading...
                 </Box>
               ) : (
