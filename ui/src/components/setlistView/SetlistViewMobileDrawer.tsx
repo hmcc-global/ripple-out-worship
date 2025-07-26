@@ -83,48 +83,6 @@ const SetlistViewMobileDrawer = (props: MobileDrawerProps) => {
           Song Controls
         </Typography>
         <Stack direction="column" spacing={2} alignItems="flex-start">
-          {/* split columns settings */}
-          <Stack
-            direction="row"
-            spacing={2}
-            display={isDesktop ? 'flex !important' : 'none !important'}
-            alignItems={'center'}
-            style={buttonClass}
-          >
-            <Box>
-              <Typography color="secondary.main">Split</Typography>
-            </Box>
-            <Box
-              bgcolor={'primary.main'}
-              height="30px"
-              width="30px"
-              borderRadius="4px"
-              onClick={handleSplit}
-            >
-              <Stack
-                direction="row"
-                height="100%"
-                width="100%"
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-                spacing={0.2}
-              >
-                {Array.from({ length: split }, (e, i) => {
-                  return (
-                    <Box
-                      key={i}
-                      bgcolor="primary.lightest"
-                      height="15px"
-                      width="6px"
-                      borderRadius="2px"
-                    />
-                  );
-                })}
-              </Stack>
-            </Box>
-          </Stack>
-
           {/* chords toggle */}
           <Box
             fontSize={{ sm: '16px', md: '26px' }}

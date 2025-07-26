@@ -65,8 +65,8 @@ const SongsLyrics = ({ chordStatus, changeKey, song, split, useFlat }: SongsLyri
                     width: 'inline-flex',
                     alignItems: 'center',
                     whiteSpace: 'none',
-                    color: '#A9A9A9',
-                    fontWeight: 'bold',
+                    color: '#D0BCFF',
+                    borderColor: '#D0BCFF',
                     borderRadius: 4,
                     border: '2',
                     fontSize: '14px',
@@ -128,7 +128,8 @@ const SongsLyrics = ({ chordStatus, changeKey, song, split, useFlat }: SongsLyri
                                 alignItems: 'center',
                                 whiteSpace: 'none',
                                 fontWeight: 'bold',
-                                fontSize: '11px',
+                                fontSize: '13px',
+                                color: '#EADDFF',
                               },
                             }}
                             style={{
@@ -139,14 +140,18 @@ const SongsLyrics = ({ chordStatus, changeKey, song, split, useFlat }: SongsLyri
                             }}
                           />
                         ) : null}
-                        <Typography style={{ whiteSpace: 'pre-wrap' }}>{textLyrics}</Typography>
+                        <Typography style={{ whiteSpace: 'pre-wrap', color: '#CCC2DC' }}>
+                          {textLyrics}
+                        </Typography>
                       </Box>
                     );
                   } else {
                     return (
                       <Box key={i}>
                         {chordStatus ? <Chip sx={{ visibility: 'hidden' }} /> : null}
-                        <Typography style={{ whiteSpace: 'pre-wrap' }}>{lyric}</Typography>
+                        <Typography style={{ whiteSpace: 'pre-wrap', color: '#CCC2DC' }}>
+                          {lyric}
+                        </Typography>
                       </Box>
                     );
                   }
@@ -202,7 +207,7 @@ const SongsLyrics = ({ chordStatus, changeKey, song, split, useFlat }: SongsLyri
   }, [parseLyrics, song, groupLyricsToParagraphs]);
   return (
     <>
-      <Grid container width={'100%'} spacing={2}>
+      <Grid container width={'100%'} spacing={2} marginTop={1} marginBottom={1}>
         {finalLyrics &&
           finalLyrics.map((chunk, i) => {
             return (

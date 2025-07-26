@@ -12,13 +12,13 @@ const SongsTitleCard = (props: SongTitleCardProps) => {
     <>
       <Container>
         <Box sx={{ minWidth: 150 }}>
-          <Typography variant="h2" fontSize={{ sm: '28px', md: '34px' }}>
+          <Typography variant="h2" fontSize={{ sm: '24px', md: '34px' }}>
             {song && song.title}
           </Typography>
           <Typography
             variant="subtitle2"
             color="primary.lightest"
-            fontSize={{ sm: '16px', md: '26px' }}
+            fontSize={{ sm: '14px', md: '26px' }}
           >
             {song && song.artist}
           </Typography>
