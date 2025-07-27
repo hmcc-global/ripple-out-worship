@@ -8,6 +8,8 @@ import SongsViewContainer from './components/songsView/SongsViewContainer';
 import SetlistListContainer from './components/setlist/SetlistListContainer';
 import SetlistEditorContainer from './components/setlist/SetlistEditorContainer';
 import SetlistViewContainer from './components/setlistView/SetlistViewContainer';
+import SetlistAdminViewContainer from './components/setlist/adminView/SetlistAdminViewContainer';
+import SetlistFolderDetail from './components/setlist/SetlistFolderDetail';
 
 // interface
 interface Route {
@@ -110,6 +112,22 @@ export const routes: Array<Route> = [
     path: '/setlist/:id?',
     enabled: true,
     component: SetlistListContainer,
+    permissions: ['user'],
+  },
+  {
+    key: 'setlist-route',
+    title: 'Setlist',
+    path: '/setlist/details/:id?',
+    enabled: true,
+    component: SetlistAdminViewContainer,
+    permissions: ['user'],
+  },
+  {
+    key: 'setlist-route',
+    title: 'Setlist',
+    path: '/setlist/folder/:id?',
+    enabled: true,
+    component: SetlistFolderDetail,
     permissions: ['user'],
   },
   {

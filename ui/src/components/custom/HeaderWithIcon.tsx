@@ -18,12 +18,8 @@ const HeaderWithIcon: FC<HeaderWithIconProps> = ({
   headerColor,
 }): ReactElement => {
   return (
-    <Box
-      style={{
-        marginBottom: '8px',
-      }}
-    >
-      <Stack direction="row" alignItems="center" spacing={1}>
+    <Box>
+      <Stack direction="row" alignItems="center" spacing={'1rem'}>
         <Icon sx={{ color: iconColor }} />
 
         <Typography variant={headerVariant} sx={{ color: headerColor }}>

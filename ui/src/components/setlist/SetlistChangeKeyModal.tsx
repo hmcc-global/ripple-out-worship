@@ -113,7 +113,7 @@ const SetlistChangeKeyModal: React.FC<SetlistChangeKeyModalProps> = ({
         />
         <Stack
           direction="row"
-          spacing={{ sm: 1, md: 1.5 }}
+          spacing={{ xs: '1rem', lg: '1.5rem' }}
           alignItems={'center'}
           justifyContent={'center'}
           width={'100%'}

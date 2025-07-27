@@ -2,7 +2,7 @@ import { createTheme, PaletteOptions, SimplePaletteColorOptions } from '@mui/mat
 import '@fontsource/work-sans';
 import '@fontsource/dm-sans';
 import '@mui/material/styles';
-import { createBreakpoints, fontWeight } from '@mui/system';
+import { createBreakpoints } from '@mui/system';
 const breakpoints = createBreakpoints({});
 
 // const PRIMARY_MAIN = '#4B50B4';
@@ -23,6 +23,75 @@ const SECONDARY_DARK = '#EADDFF'; // grey, same as SECONDARY_LIGHT
 // const SECONDARY_DARK = '#332D41'; // previous secondary dark, causes buttons to be colored similar to BG when hovered
 
 const WARNING_MAIN = '#EFB8C8';
+
+// Module augmentation to include @mui/x-date-pickers components
+declare module '@mui/material/styles' {
+  interface Components {
+    MuiPickersPopper?: {
+      styleOverrides?: {
+        root?: {
+          '& .MuiPaper-root'?: {
+            backgroundColor?: string;
+            color?: string;
+            border?: string;
+            borderRadius?: string;
+            boxShadow?: string;
+          };
+          '& .MuiDayPicker-header .MuiTypography-root'?: {
+            color?: string;
+            fontSize?: string;
+            fontWeight?: number;
+          };
+          '& .MuiDayCalendar-weekDayLabel'?: {
+            color?: string;
+            fontSize?: string;
+            fontWeight?: number;
+          };
+        };
+      };
+    };
+    MuiPickersCalendarHeader?: {
+      styleOverrides?: {
+        root?: {
+          color?: string;
+          '& .MuiIconButton-root'?: {
+            color?: string;
+            '&:hover'?: {
+              backgroundColor?: string;
+            };
+          };
+        };
+        label?: {
+          fontSize?: string;
+        };
+      };
+    };
+    MuiPickersToolbar?: {
+      styleOverrides?: {
+        root?: {
+          color?: string;
+          fontSize?: string;
+        };
+        '& .MuiTypography-root'?: {
+          color?: string;
+        };
+      };
+    };
+    MuiDayCalendar?: {
+      styleOverrides?: {
+        root?: {
+          color?: string;
+          fontSize?: string;
+        };
+        '& .MuiDayCalendar-header .MuiTypography-root-MuiDayCalendar-weekDayLabel'?: {
+          color?: string;
+          fontSize?: string;
+          fontWeight?: number;
+        };
+      };
+    };
+  }
+}
 
 declare module '@mui/material/styles/createPalette' {
   interface PaletteColor {
@@ -80,7 +149,7 @@ const customTheme = createTheme({
       fontSize: '2rem', // Equivalent to 32px (16 * 2)
       fontWeight: 700,
       [breakpoints.up('lg')]: {
-        fontSize: '2.5rem',
+        fontSize: '1.875rem',
       },
       [breakpoints.down('sm')]: {
         fontSize: '1.5rem',
@@ -158,6 +227,29 @@ const customTheme = createTheme({
         },
       },
     },
+    MuiInputAdornment: {
+      styleOverrides: {
+        root: {
+          color: PRIMARY_LIGHTER,
+          '& .MuiButtonBase-root': {
+            color: PRIMARY_LIGHTER,
+            padding: '0.5rem',
+            '&:hover': {
+              color: '#fff',
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              borderRadius: '50%',
+            },
+            '&.Mui-focused': {
+              color: '#fff',
+              backgroundColor: 'rgba(255, 255, 255, 0.15)',
+            },
+            '& svg': {
+              fontSize: '16px',
+            },
+          },
+        },
+      },
+    },
     MuiAutocomplete: {
       styleOverrides: {
         root: {
@@ -171,18 +263,135 @@ const customTheme = createTheme({
         paper: {
           backgroundColor: '#1D1B20',
           color: PRIMARY_LIGHTER,
+          borderRadius: '8px',
+          boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.3)',
+          border: '1px solid #938F99',
+        },
+        listbox: {
+          maxHeight: '300px',
+          overflowY: 'auto',
+          padding: '8px 0',
+          '&::-webkit-scrollbar': {
+            width: '8px',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: '#888',
+            borderRadius: '4px',
+          },
+          '&::-webkit-scrollbar-track': {
+            backgroundColor: '#1D1B20',
+          },
+        },
+        option: {
+          color: PRIMARY_LIGHTER,
+          fontSize: '0.875rem',
+          padding: '8px 16px',
+          '&:hover': {
+            backgroundColor: PRIMARY_MAIN,
+            color: '#fff',
+          },
+          '&[aria-selected="true"]': {
+            backgroundColor: PRIMARY_DARK,
+            color: '#fff',
+          },
+          '&.Mui-focused': {
+            backgroundColor: PRIMARY_MAIN,
+            color: '#fff',
+          },
+        },
+        noOptions: {
+          color: PRIMARY_LIGHTER,
+          fontSize: '0.875rem',
+          padding: '8px 16px',
+          '&:hover': {
+            backgroundColor: PRIMARY_MAIN,
+            color: '#fff',
+          },
+          '&[aria-selected="true"]': {
+            backgroundColor: PRIMARY_DARK,
+            color: '#fff',
+          },
+          '&.Mui-focused': {
+            backgroundColor: PRIMARY_MAIN,
+            color: '#fff',
+          },
         },
         popupIndicator: {
           color: PRIMARY_LIGHTER,
         },
-        option: {
-          '&.Mui-focused, &.Mui-selected, &.Mui-selected.Mui-focused': {
-            backgroundColor: 'rgba(255, 255, 255, 0.16)',
-            color: PRIMARY_LIGHTER,
+        clearIndicator: {
+          color: PRIMARY_LIGHTER,
+          padding: '4px',
+          '&:hover': {
+            color: '#fff',
+            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+            borderRadius: '50%',
           },
-          '& ::placeholder': {
-            color: PRIMARY_LIGHTER,
+          '&.Mui-focused': {
+            color: '#fff',
+            backgroundColor: 'rgba(255, 255, 255, 0.15)',
           },
+          '& svg': {
+            fontSize: '16px',
+          },
+        },
+      },
+    },
+    MuiPickersPopper: {
+      styleOverrides: {
+        root: {
+          '& .MuiPaper-root': {
+            backgroundColor: '#1D1B20',
+            color: PRIMARY_LIGHTER,
+            border: '1px solid #938F99',
+            borderRadius: '8px',
+            boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.3)',
+          },
+          '& .MuiDayCalendar-weekDayLabel': {
+            color: '#fff !important',
+            fontSize: '0.875rem',
+            fontWeight: 600,
+          },
+        },
+      },
+    },
+    MuiPickersCalendarHeader: {
+      styleOverrides: {
+        root: {
+          color: PRIMARY_LIGHTER,
+          '& .MuiIconButton-root': {
+            color: PRIMARY_LIGHTER,
+            '&:hover': {
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+            },
+          },
+        },
+        label: {
+          fontSize: '0.875rem',
+        },
+      },
+    },
+    MuiPickersToolbar: {
+      styleOverrides: {
+        root: {
+          color: '#FFF !important',
+          fontSize: '1rem',
+        },
+        '& .MuiTypography-root': {
+          color: '#FFF !important',
+        },
+      },
+    },
+    MuiDayCalendar: {
+      styleOverrides: {
+        root: {
+          color: '#FFF !important',
+          fontSize: '1rem',
+        },
+        '& .MuiDayCalendar-header .MuiTypography-root-MuiDayCalendar-weekDayLabel': {
+          color: '#FFFFFF !important',
+          fontSize: '0.875rem',
+          fontWeight: 600,
         },
       },
     },

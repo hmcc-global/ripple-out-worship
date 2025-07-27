@@ -15,15 +15,14 @@ const PageHeader = (props: PageHeaderProps) => {
         justifyContent: 'space-between',
         alignItems: 'center',
         width: '100%',
-        mb: '1rem',
-        height: '6vh',
+        height: { xs: '6vh', xl: '8vh' },
       }}
     >
       <Box
         sx={{
           display: 'flex',
           flexDirection: 'row',
-          gap: '1rem',
+          gap: ['1rem', '1.5rem'],
           alignItems: 'center',
         }}
       >
@@ -31,14 +30,15 @@ const PageHeader = (props: PageHeaderProps) => {
           sx={{
             backgroundColor: 'primary.main',
             borderRadius: '100%',
-            padding: ['0.5rem', '1rem'],
+            padding: '12px',
             display: 'flex',
             flexDir: 'column',
             alignItems: 'center',
             justifyContent: 'center',
             '& svg': {
-              fontSize: { xs: 16, md: 40 },
+              fontSize: { xs: '24px', md: '32px' },
             },
+            color: '#EADDFF',
           }}
         >
           {props.icon}
