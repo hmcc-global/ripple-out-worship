@@ -1,4 +1,5 @@
 import {
+  Close,
   Delete,
   Edit,
   ExpandLess,
@@ -24,6 +25,7 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  Snackbar,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
@@ -208,8 +210,9 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
     handleMenuClose();
   };
   // TODO-YY: Implement action functions
-  const handleCopyLink = (publicLink: string) => {
-    console.log(`Copy link ${publicLink}`);
+  const handleCopyLink = async (publicLink: string) => {
+    await navigator.clipboard.writeText(publicLink);
+    setSnackbar({ open: true, message: 'Link copied to clipboard' });
     handleMenuClose();
   };
 
@@ -222,6 +225,22 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
     console.log(`Delete setlist ${setlistId}`);
     handleMenuClose();
   };
+
+  // Snackbar
+  interface SnackbarState {
+    open: boolean;
+    message: string;
+  }
+  const SNACKBAR_AUTO_HIDE_DURATION = 5000;
+  const [snackbar, setSnackbar] = useState<SnackbarState>({
+    open: false,
+    message: '',
+  });
+
+  const handleCloseSnackbar = useCallback((_: any, reason?: string) => {
+    if (reason === 'clickaway') return;
+    setSnackbar((prev) => ({ ...prev, open: false }));
+  }, []);
 
   // Render Helper Functions
   const renderNestedSetlistItem = (setlistId: string, folderId: string) => {
@@ -477,6 +496,17 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
         folderName={folderName}
         folderCreated={folderCreated}
         mode={'edit'}
+      />
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={SNACKBAR_AUTO_HIDE_DURATION}
+        onClose={handleCloseSnackbar}
+        message={snackbar.message}
+        action={
+          <IconButton size="small" color="inherit" onClick={handleCloseSnackbar} aria-label="close">
+            <Close fontSize="small" />
+          </IconButton>
+        }
       />
     </Box>
   );
