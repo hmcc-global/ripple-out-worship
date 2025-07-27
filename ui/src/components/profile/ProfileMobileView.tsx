@@ -102,7 +102,10 @@ const ProfileMobileView: FC = (): ReactElement => {
             variant="contained"
             color="secondary"
             startIcon={<LogoutIcon />}
-            onClick={() => dispatch(signout(''))}
+            onClick={() => {
+              dispatch(signout(''));
+              window.location.reload();
+            }}
             style={{ borderRadius: '20px', padding: '8px 16px' }}
           >
             <Typography

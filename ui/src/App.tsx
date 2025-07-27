@@ -19,7 +19,7 @@ function App() {
             <Box
               display="flex"
               component="main"
-              sx={{ flexGrow: 1, width: '100%', height: '100%' }}
+              sx={{ flexGrow: 1, width: '100%', height: '100vh' }}
             >
               <Routes>
                 {appRoutes.map((route) => (

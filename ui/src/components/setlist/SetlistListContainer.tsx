@@ -70,7 +70,6 @@ const SetlistListContainer: FC = (): ReactElement => {
           <Stack direction="row" width="100%">
             {/* Tabs section displaying setlists and folders */}
             <SetlistTabsContainer />
-
             {/* Setlist View (detail) Container */}
             <Box display="flex" flexDirection={'row'} width="70%" gap={'0'} paddingX={'1rem'}>
               <Box flex="0 0 55%">
