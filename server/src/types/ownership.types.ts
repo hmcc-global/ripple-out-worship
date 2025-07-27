@@ -2,7 +2,7 @@ import { Types } from 'mongoose';
 import { MongoInjectedFields } from './mongo.types';
 
 type OwnershipGroup = {
-  id: string;
+  id: Types.ObjectId;
   name: string;
   createdAt: string;
 };
