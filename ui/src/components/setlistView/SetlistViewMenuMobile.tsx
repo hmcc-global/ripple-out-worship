@@ -60,7 +60,7 @@ const SetlistViewMenuMobile = (props: Props) => {
         open={open}
         autoHideDuration={5000}
         onClose={handleCloseSnackbar}
-        message="Link copied to clipboard!"
+        message="Setlist Public Link copied to clipboard"
         action={
           <IconButton size="small" aria-label="close" color="inherit" onClick={handleCloseSnackbar}>
             <CloseIcon fontSize="small" />

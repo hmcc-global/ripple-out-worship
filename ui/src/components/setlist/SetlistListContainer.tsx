@@ -6,7 +6,7 @@ import SetlistViewContainer from './adminView/SetlistAdminViewContainer';
 import SetlistTabsContainer from './SetlistTabsContainer';
 import PageHeader from '../navigation/PageHeader';
 import SetlistPreview from './adminView/SetlistPreview';
-import SetlistActionMenu from './SetlistActionMenu';
+import SetlistActionMenu from './SetlistPageActionMenu';
 
 const SetlistListContainer: FC = (): ReactElement => {
   const theme = useTheme();
@@ -17,7 +17,7 @@ const SetlistListContainer: FC = (): ReactElement => {
   const [createAnchorEl, setCreateAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleCreateClick = (event: MouseEvent<HTMLElement>) => {
-    setCreateAnchorEl(event.currentTarget);
+    setCreateAnchorEl((prev) => (prev ? null : event.currentTarget));
   };
 
   return (
@@ -54,7 +54,14 @@ const SetlistListContainer: FC = (): ReactElement => {
                   transition: 'all 0.1s ease-in-out',
                 }}
                 startIcon={<Add />}
-                endIcon={<ExpandMore />}
+                endIcon={
+                  <ExpandMore
+                    sx={{
+                      transform: createAnchorEl ? 'rotate(180deg)' : 'rotate(0deg)',
+                      transition: 'transform 0.2s ease-in-out',
+                    }}
+                  />
+                }
                 onClick={handleCreateClick}
               >
                 <Typography variant="subtitle1" fontWeight={700}>
@@ -64,18 +71,18 @@ const SetlistListContainer: FC = (): ReactElement => {
             ) : undefined
           }
         />
-        <SetlistActionMenu anchorEl={createAnchorEl} />
+        <SetlistActionMenu anchorEl={createAnchorEl} setAnchorEl={setCreateAnchorEl} />
 
         {isDesktop ? (
           <Stack direction="row" width="100%">
             {/* Tabs section displaying setlists and folders */}
             <SetlistTabsContainer />
             {/* Setlist View (detail) Container */}
-            <Box display="flex" flexDirection={'row'} width="70%" gap={'0'} paddingX={'1rem'}>
-              <Box flex="0 0 55%">
+            <Box display="flex" flexDirection={'row'} width="72.5%" gap={'0'} paddingX={'1rem'}>
+              <Box flex="0 0 50%">
                 <SetlistViewContainer />
               </Box>
-              <Box flex="0 0 45%">
+              <Box flex="0 0 50%">
                 <SetlistPreview />
               </Box>
             </Box>

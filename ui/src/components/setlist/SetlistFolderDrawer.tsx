@@ -37,9 +37,9 @@ interface SetlistFolderDrawerProps {
   setFolderId: Dispatch<SetStateAction<string>>;
   setFolderName: Dispatch<SetStateAction<string>>;
   setFolderCreated: Dispatch<SetStateAction<string>>;
-  folderId: string;
-  folderName: string;
-  folderCreated: string;
+  folderId?: string;
+  folderName?: string;
+  folderCreated?: string;
   mode: string;
 }
 
@@ -111,8 +111,8 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
           const currentUser = allPeople.find((person) => person.userId === userId);
           const currentGroup: GroupOwnership = {
             id: folderId,
-            name: folderName,
-            createdAt: folderCreated,
+            name: folderName ?? '',
+            createdAt: folderCreated ?? Date.now.toString(),
           };
           // Check if the user is already part of the folder
           if (!currentUser?.groupIds?.some((group) => group.id === currentGroup.id)) {
@@ -347,7 +347,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
     if (mode === 'create') {
       setCreatedDateString('');
     } else {
-      const date = new Date(folderCreated);
+      const date = new Date(folderCreated ?? '');
       setCreatedDateString(
         `Created at ${date.getFullYear()}-${(date.getMonth() + 1)
           .toString()

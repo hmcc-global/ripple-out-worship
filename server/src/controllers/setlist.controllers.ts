@@ -119,13 +119,13 @@ const updateSetlist: RequestHandler = async (req: Request, res: Response): Promi
 };
 
 const deleteSetlist: RequestHandler = async (req: Request, res: Response): Promise<void> => {
-  const { id: setlistId } = req.params;
+  const setlistId = req.body.params.id;
 
   if (setlistId) {
     try {
       const data = await Setlist.updateOne(
         { _id: setlistId, isDeleted: false },
-        { isDeleted: true }
+        { $set: { isDeleted: true } }
       );
 
       if (data) {
