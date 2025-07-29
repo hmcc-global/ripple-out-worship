@@ -21,6 +21,7 @@ import {
   TextField,
   Typography,
   useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -37,6 +38,7 @@ import SetlistSongsTable from './SetlistSongTable';
 import AutocompleteInput from '../custom/AutocompleteInput';
 
 const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
+  const theme = useTheme();
   const isDesktop = useMediaQuery('(min-width: 768px)');
   const navigate = useNavigate();
 
@@ -403,7 +405,7 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
                   direction="row"
                 >
                   <IconButton>
-                    <Search sx={{ mx: 2, color: 'text.secondary' }} />
+                    <Search sx={{ mx: 2, color: theme.palette.text.secondary }} />
                   </IconButton>
                   <InputBase
                     placeholder="Search"
@@ -414,7 +416,7 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
                     }}
                     sx={{
                       my: 1.5,
-                      color: 'text.secondary',
+                      color: theme.palette.text.secondary,
                       backgroundColor: 'background.paper',
                       borderRadius: '28px',
                     }}

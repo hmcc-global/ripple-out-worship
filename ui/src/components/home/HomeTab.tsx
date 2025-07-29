@@ -1,4 +1,4 @@
-import { Box, Typography, Stack } from '@mui/material';
+import { Box, Typography, Stack, useTheme } from '@mui/material';
 import { ElementType, FC, ReactElement } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -11,6 +11,7 @@ type HomeTabProps = {
 
 const HomeTab: FC<HomeTabProps> = ({ title, description, Icon, route }): ReactElement => {
   const navigate = useNavigate();
+  const theme = useTheme();
 
   return (
     <Box
@@ -44,7 +45,7 @@ const HomeTab: FC<HomeTabProps> = ({ title, description, Icon, route }): ReactEl
             sx={{
               fontSize: ['0.875rem', '1.rem'],
               fontWeight: 400,
-              color: 'text.secondary',
+              color: theme.palette.text.secondary,
               fontFamily: 'DM Sans, sans-serif',
             }}
           >

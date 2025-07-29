@@ -124,7 +124,7 @@ const SongSearch = (props: SongSearchProps) => {
 
   return (
     <Container sx={{ py: '1em', background: 'shadow', borderRadius: '16px' }}>
-      <Box sx={{ color: 'text.secondary' }}>
+      <Box sx={{ color: theme.palette.text.secondary }}>
         {/* filter heading and reset button */}
         <Stack
           direction="row"
@@ -203,7 +203,7 @@ const SongSearch = (props: SongSearchProps) => {
                 disableRipple
                 disableTouchRipple
               >
-                <ArrowDropDown sx={{ color: 'text.secondary' }} />
+                <ArrowDropDown sx={{ color: theme.palette.text.secondary }} />
               </IconButton>
             </Stack>
             {isTempoOpen &&
@@ -249,7 +249,7 @@ const SongSearch = (props: SongSearchProps) => {
                 disableRipple
                 disableTouchRipple
               >
-                <ArrowDropDown sx={{ color: 'text.secondary' }} />
+                <ArrowDropDown sx={{ color: theme.palette.text.secondary }} />
               </IconButton>
             </Stack>
 
@@ -296,7 +296,7 @@ const SongSearch = (props: SongSearchProps) => {
                 disableRipple
                 disableTouchRipple
               >
-                <ArrowDropDown sx={{ color: 'text.secondary' }} />
+                <ArrowDropDown sx={{ color: theme.palette.text.secondary }} />
               </IconButton>
             </Stack>
 

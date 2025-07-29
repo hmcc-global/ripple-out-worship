@@ -1,4 +1,4 @@
-import { Box, Chip, Grid, Stack, Typography, useMediaQuery } from '@mui/material';
+import { Box, Chip, Grid, Stack, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { SongViewSchema } from '../../types/song.types';
 import { flatMusicKeysOptions, sharpMusicKeysOptions, ChordColors } from '../../constants';
 import { ReactNode, useCallback, useEffect, useState } from 'react';
@@ -12,6 +12,7 @@ interface SongsLyricsProps {
 }
 
 const SongsLyrics = ({ chordStatus, changeKey, song, split, useFlat }: SongsLyricsProps) => {
+  const theme = useTheme();
   const isDesktop = useMediaQuery('(min-width:768px)');
   const noSplit = isDesktop ? split : 1;
   const [finalLyrics, setFinalLyrics] = useState<ReactNode[]>();
@@ -65,7 +66,7 @@ const SongsLyrics = ({ chordStatus, changeKey, song, split, useFlat }: SongsLyri
                     width: 'inline-flex',
                     alignItems: 'center',
                     whiteSpace: 'none',
-                    color: 'text.secondary',
+                    color: theme.palette.text.secondary,
                     fontWeight: 'bold',
                     borderRadius: 4,
                     border: '2',
@@ -157,7 +158,7 @@ const SongsLyrics = ({ chordStatus, changeKey, song, split, useFlat }: SongsLyri
         });
       return result;
     },
-    [changeKey, chordStatus, useFlat]
+    [changeKey, chordStatus, useFlat, getColor, theme.palette.text.secondary]
   );
 
   // needs improvement

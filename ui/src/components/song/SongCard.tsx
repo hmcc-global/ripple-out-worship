@@ -1,4 +1,4 @@
-import { Box, Container, Stack, Typography } from '@mui/material';
+import { Box, Container, Stack, Typography, useTheme } from '@mui/material';
 import { SongCardProps, SongSchema } from '../../types/song.types';
 import { CardFields } from '../../constants';
 import { useState } from 'react';
@@ -8,6 +8,7 @@ import SongFieldArray from './SongFieldArray';
 import SongPreviewModal from '../utility/SongPreviewModal';
 
 const SongCard = (props: SongCardProps) => {
+  const theme = useTheme();
   const {
     _id,
     title,
@@ -113,7 +114,7 @@ const SongCard = (props: SongCardProps) => {
                     justifyContent={'flex-start'}
                     mr={isDesktop ? '1.25rem' : 1}
                   >
-                    <Typography variant="body2" color="text.secondary" minWidth={'fit-content'}>
+                    <Typography variant="body2" color={theme.palette.text.secondary} minWidth={'fit-content'}>
                       {field}
                     </Typography>
                     {Array.isArray(fieldData[i]) ? (

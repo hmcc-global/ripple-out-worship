@@ -14,6 +14,7 @@ import {
   TableHead,
   TableRow,
   Typography,
+  useTheme,
 } from '@mui/material';
 import {
   MoreVert,
@@ -33,6 +34,7 @@ interface SetlistSongsTableProps {
 }
 
 const SetlistSongsTable: React.FC<SetlistSongsTableProps> = ({ songList, setSongList }) => {
+  const theme = useTheme();
   const [sortedSongList, setSortedSongList] = useState<SongSetlistSchema[]>(songList);
 
   useEffect(() => {
@@ -190,7 +192,7 @@ const SetlistSongsTable: React.FC<SetlistSongsTableProps> = ({ songList, setSong
               <TableCell
                 width="10%"
                 sx={{
-                  color: 'text.secondary',
+                  color: theme.palette.text.secondary,
                 }}
               >
                 #
@@ -198,7 +200,7 @@ const SetlistSongsTable: React.FC<SetlistSongsTableProps> = ({ songList, setSong
               <TableCell
                 width="75%"
                 sx={{
-                  color: 'text.secondary',
+                  color: theme.palette.text.secondary,
                 }}
               >
                 Song Title
@@ -206,7 +208,7 @@ const SetlistSongsTable: React.FC<SetlistSongsTableProps> = ({ songList, setSong
               <TableCell
                 width="10%"
                 sx={{
-                  color: 'text.secondary',
+                  color: theme.palette.text.secondary,
                 }}
               >
                 Key
@@ -221,7 +223,7 @@ const SetlistSongsTable: React.FC<SetlistSongsTableProps> = ({ songList, setSong
                   <TableCell
                     width="10%"
                     sx={{
-                      color: 'text.secondary',
+                      color: theme.palette.text.secondary,
                     }}
                   >
                     {i + 1}
@@ -230,7 +232,7 @@ const SetlistSongsTable: React.FC<SetlistSongsTableProps> = ({ songList, setSong
                     <Typography variant="h3" fontWeight={600}>
                       {song.title}
                     </Typography>
-                    <Typography variant="subtitle1" fontWeight={500} sx={{ color: 'text.secondary' }}>
+                    <Typography variant="subtitle1" fontWeight={500} sx={{ color: theme.palette.text.secondary }}>
                       {song.artist}
                     </Typography>
                   </TableCell>

@@ -5,6 +5,7 @@ import {
   AccordionSummary,
   AccordionDetails,
   Typography,
+  useTheme,
 } from '@mui/material';
 import { SongViewSchema } from '../../types/song.types';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -18,6 +19,7 @@ type SongTitleCardProps = {
 };
 
 const SongsInfoCard = (props: SongTitleCardProps) => {
+  const theme = useTheme();
   const song = props.song;
   const [open, setOpen] = useState(false);
 
@@ -56,7 +58,7 @@ const SongsInfoCard = (props: SongTitleCardProps) => {
             <Box sx={{ flexGrow: 1 }}>
               <Grid container spacing={2}>
                 <Grid item xs={3} md={4}>
-                  <Typography color={'text.secondary'}>Themes</Typography>
+                  <Typography color={theme.palette.text.secondary}>Themes</Typography>
                 </Grid>
                 <Grid container item xs={9} md={8} spacing={1}>
                   {song &&
@@ -73,7 +75,7 @@ const SongsInfoCard = (props: SongTitleCardProps) => {
                     })}
                 </Grid>
                 <Grid item xs={3} md={4}>
-                  <Typography color={'text.secondary'}>Tempo</Typography>
+                  <Typography color={theme.palette.text.secondary}>Tempo</Typography>
                 </Grid>
                 <Grid item xs={9} md={8}>
                   {song &&
@@ -88,13 +90,13 @@ const SongsInfoCard = (props: SongTitleCardProps) => {
                     })}
                 </Grid>
                 <Grid item xs={3} md={4}>
-                  <Typography color={'text.secondary'}>Original Key</Typography>
+                  <Typography color={theme.palette.text.secondary}>Original Key</Typography>
                 </Grid>
                 <Grid item xs={9} md={8}>
                   <Typography color="secondary.main">{song && song.originalKey}</Typography>
                 </Grid>
                 <Grid item xs={3} md={4}>
-                  <Typography style={{ wordWrap: 'break-word' }} color={'text.secondary'}>
+                  <Typography style={{ wordWrap: 'break-word' }} color={theme.palette.text.secondary}>
                     Suggested Key(s)
                   </Typography>
                 </Grid>
@@ -102,13 +104,13 @@ const SongsInfoCard = (props: SongTitleCardProps) => {
                   <Typography color="secondary.main">{song && song.originalKey}</Typography>
                 </Grid>
                 <Grid item xs={3} md={4}>
-                  <Typography color={'text.secondary'}>Year</Typography>
+                  <Typography color={theme.palette.text.secondary}>Year</Typography>
                 </Grid>
                 <Grid item xs={9} md={8}>
                   <Typography color="secondary.main">{song && song.year}</Typography>
                 </Grid>
                 <Grid item xs={3} md={4}>
-                  <Typography color={'text.secondary'}>Code</Typography>
+                  <Typography color={theme.palette.text.secondary}>Code</Typography>
                 </Grid>
                 <Grid item xs={9} md={8}>
                   <Typography color="secondary.main">{song && song.code}</Typography>

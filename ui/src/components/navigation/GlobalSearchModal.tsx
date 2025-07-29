@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
-import { Box, Fade, InputAdornment, Modal, TextField, Typography } from '@mui/material';
+import { Box, Fade, InputAdornment, Modal, TextField, Typography, useTheme } from '@mui/material';
 
 import SongSearchResult from './searchModalComponents/SongSearchResult';
 import { useNavigate } from 'react-router-dom';
@@ -17,6 +17,7 @@ type GlobalSearchModalProps = {
 };
 
 const GlobalSearchModal = (props: GlobalSearchModalProps) => {
+  const theme = useTheme();
   const { isOpen, onClose, allSongs, allSetlists } = props;
 
   const radioFilters = ['Songs', 'Setlists'];
@@ -302,13 +303,13 @@ const GlobalSearchModal = (props: GlobalSearchModalProps) => {
                   style: {
                     fontFamily: 'DM Sans, sans-serif',
                     fontSize: '1rem',
-                    color: 'text.secondary',
+                    color: theme.palette.text.secondary,
                     background: 'background.paper',
                   },
                   disableUnderline: true,
                   startAdornment: (
                     <InputAdornment position="start">
-                      <SearchIcon sx={{ color: 'text.secondary' }} />
+                      <SearchIcon sx={{ color: theme.palette.text.secondary }} />
                     </InputAdornment>
                   ),
                 }}
