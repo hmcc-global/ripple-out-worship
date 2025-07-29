@@ -55,8 +55,8 @@ const HomeTab: FC<HomeTabProps> = ({ title, description, Icon, route }): ReactEl
 
         <Icon
           sx={{
-            color: 'primary.lightest',
-            backgroundColor: 'primary.dark',
+            color: theme.palette.primary.lightest,
+            backgroundColor: theme.palette.primary.dark,
             borderRadius: '50%',
             width: '2em',
             height: '2em',

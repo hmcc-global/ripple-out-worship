@@ -281,19 +281,19 @@ const SetlistSongsTable: React.FC<SetlistSongsTableProps> = ({ songList, setSong
                     <MenuItem onClick={() => handlePreviewSong(song._id)}>
                       <ListItemIcon
                         sx={{
-                          color: 'secondary.main',
+                          color: theme.palette.secondary.main,
                         }}
                       >
                         <Visibility />
                       </ListItemIcon>
                       <ListItemText color={'primary.lighter'}>Preview</ListItemText>
                     </MenuItem>
-                    <Divider sx={{ bgcolor: 'divider' }} />
+                    <Divider sx={{ bgcolor: theme.palette.divider }} />
 
                     <MenuItem onClick={() => handleChangeKey(song._id)}>
                       <ListItemIcon
                         sx={{
-                          color: 'secondary.main',
+                          color: theme.palette.secondary.main,
                         }}
                       >
                         <Tune />
@@ -303,7 +303,7 @@ const SetlistSongsTable: React.FC<SetlistSongsTableProps> = ({ songList, setSong
                     <MenuItem onClick={() => handleMoveUp(song._id)}>
                       <ListItemIcon
                         sx={{
-                          color: 'secondary.main',
+                          color: theme.palette.secondary.main,
                         }}
                       >
                         <ArrowUpward />
@@ -313,18 +313,18 @@ const SetlistSongsTable: React.FC<SetlistSongsTableProps> = ({ songList, setSong
                     <MenuItem onClick={() => handleMoveDown(song._id)}>
                       <ListItemIcon
                         sx={{
-                          color: 'secondary.main',
+                          color: theme.palette.secondary.main,
                         }}
                       >
                         <ArrowDownward />
                       </ListItemIcon>
                       <ListItemText color={'primary.lighter'}>Move Down</ListItemText>
                     </MenuItem>
-                    <Divider sx={{ bgcolor: 'divider' }} />
+                    <Divider sx={{ bgcolor: theme.palette.divider }} />
                     <MenuItem onClick={() => handleRemoveSong(song._id)}>
                       <ListItemIcon
                         sx={{
-                          color: 'secondary.main',
+                          color: theme.palette.secondary.main,
                         }}
                       >
                         <Delete />

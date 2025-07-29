@@ -144,7 +144,7 @@ const SongSearch = (props: SongSearchProps) => {
               padding: '7.5px 15px',
               borderRadius: '10px',
               backgroundColor: '#000',
-              color: 'secondary.main',
+              color: theme.palette.secondary.main,
               textTransform: 'none',
             }}
             startIcon={<Refresh />}
@@ -195,7 +195,7 @@ const SongSearch = (props: SongSearchProps) => {
               <IconButton
                 onClick={() => setIsTempoOpen(!isTempoOpen)}
                 sx={{
-                  color: 'secondary.main',
+                  color: theme.palette.secondary.main,
                   p: 0,
                   transform: isTempoOpen ? '' : 'rotate(-180deg)',
                   transition: '0.1s ease-in-out',
@@ -241,7 +241,7 @@ const SongSearch = (props: SongSearchProps) => {
               <IconButton
                 onClick={() => setIsThemeOpen(!isThemeOpen)}
                 sx={{
-                  color: 'secondary.main',
+                  color: theme.palette.secondary.main,
                   p: 0,
                   transform: isThemeOpen ? '' : 'rotate(-180deg)',
                   transition: '0.1s ease-in-out',
@@ -288,7 +288,7 @@ const SongSearch = (props: SongSearchProps) => {
               <IconButton
                 onClick={() => setIsDisplayResultOpen(!isDisplayResultOpen)}
                 sx={{
-                  color: 'secondary.main',
+                  color: theme.palette.secondary.main,
                   p: 0,
                   transform: isDisplayResultOpen ? '' : 'rotate(-180deg)',
                   transition: '0.1s ease-in-out',
@@ -335,7 +335,7 @@ const SongSearch = (props: SongSearchProps) => {
             alignItems="center"
             gap={'0.5rem'}
           >
-            <Info sx={{ color: 'secondary.main' }} />
+            <Info sx={{ color: theme.palette.secondary.main }} />
             <Typography variant="body2">Song Title will be displayed by default</Typography>
           </Stack>
         </Stack>

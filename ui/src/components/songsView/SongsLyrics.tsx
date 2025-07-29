@@ -32,11 +32,11 @@ const SongsLyrics = ({ chordStatus, changeKey, song, split, useFlat }: SongsLyri
     return chordKey ? ChordColors[chordKey] : undefined;
   };
 
-  const getColor = (label: any) => {
+  const getColor = useCallback((label: any) => {
     const regexPattern = /[A-G][#b]?(m)?/;
     label.match(regexPattern);
     return searchChordColor(label);
-  };
+  }, []);
 
   const parseLyrics = useCallback(
     (inputSong: SongViewSchema | undefined, songChunk: string[]) => {

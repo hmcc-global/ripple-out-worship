@@ -87,7 +87,7 @@ const SongCard = (props: SongCardProps) => {
                   modalOpen ? handleClose() : handleOpen();
                 }}
                 // onMouseLeave={handleClose}
-                sx={{ color: 'secondary.main' }}
+                sx={{ color: theme.palette.secondary.main }}
               />
             </Box>
           </>

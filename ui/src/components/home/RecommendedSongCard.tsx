@@ -1,4 +1,4 @@
-import { Box, Stack, Typography } from '@mui/material';
+import { Box, Stack, Typography, useTheme } from '@mui/material';
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
 import { FC, ReactElement } from 'react';
 
@@ -11,23 +11,24 @@ const RecommendedSongCard: FC<RecommendedSongCardProps> = ({
   songTitle,
   artistName,
 }): ReactElement => {
+  const theme = useTheme();
   return (
     <Box
       sx={{
         borderRadius: '12px',
-        backgroundColor: '#141218',
+        backgroundColor: theme.palette.background.default,
         border: 1,
-        borderColor: '#49454F',
+        borderColor: theme.palette.surfaceVariant,
         p: 3,
         width: ['100%', '38%'],
         '&:hover': {
           cursor: 'pointer',
-          backgroundColor: '#1E1B26',
+          backgroundColor: theme.palette.surfaceContainerLow,
         },
       }}
     >
       <Stack direction={'row'} alignItems="center" gap={2}>
-        <MusicNoteIcon sx={{ color: 'primary.light', width: '1.5em', height: '1.5em' }} />
+        <MusicNoteIcon sx={{ color: theme.palette.primary.light, width: '1.5em', height: '1.5em' }} />
         <Stack direction="column">
           <Typography variant="h4" sx={{ pb: 1 }}>
             {songTitle}
