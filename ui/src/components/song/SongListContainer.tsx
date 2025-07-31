@@ -261,22 +261,22 @@ const SongListContainer: FC = (): ReactElement => {
           </Grid>
 
           {/* Song cards search results */}
-          <Grid item xs={isDesktop ? 8 : 12}>
+          <Grid item xs={isDesktop ? 8 : 12} height="100%">
             <Container
               sx={{
                 py: '1em',
                 background: '#000',
                 borderRadius: '16px',
                 width: '100%',
+                height: '100%',
                 maxHeight: { xs: '90%', md: '100%' },
               }}
             >
               <Stack
                 direction="row"
                 alignItems="center"
-                justifyContent={'space-between'}
-                pb={'1em'}
-                height="3%"
+                justifyContent="space-between"
+                pb="1em"
                 spacing="space-between"
                 maxWidth="100%"
               >
