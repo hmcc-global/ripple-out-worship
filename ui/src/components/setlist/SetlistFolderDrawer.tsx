@@ -228,10 +228,25 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
   }, [folderId, ownership, toggleFolderDrawer]);
 
   const handleRemovePerson = useCallback(
-    (id: string) => {
+    async (id: string) => {
+      try {
+        const { data, status } = await axios.get<Ownership>('/api/ownerships/get', {
+          params: {
+            userId: id,
+          },
+        });
+        if (status === 200) {
+          await axios.put('/api/ownerships/update', {
+            ...data,
+            groupIds: data.groupIds.filter((group) => group.id !== folderId),
+          });
+        }
+      } catch (e) {
+        console.log(e);
+      }
       setAddedPeople(addedPeople.filter((add) => add !== id));
     },
-    [addedPeople]
+    [addedPeople, folderId]
   );
 
   const handleAddPerson = useCallback(
@@ -349,7 +364,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
       </Stack>
     </ListItem>
   );
-  console.log(addedPeople);
+
   // Main Render
   return (
     <>
