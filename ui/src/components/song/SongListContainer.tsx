@@ -9,7 +9,7 @@ import {
   ButtonGroup,
   Grid,
 } from '@mui/material';
-import { FC, ReactElement, useEffect, useState, useCallback } from 'react';
+import { FC, ReactElement, useEffect, useState, useCallback, useRef } from 'react';
 import { SongSchema, SongSearchFilter } from '../../types/song.types';
 import SongCard from './SongCard';
 import SongSearch from './SongSearch';
@@ -29,6 +29,7 @@ const SongListContainer: FC = (): ReactElement => {
   const [search, setSearch] = useState('');
   const [open, setOpen] = useState(false);
   const [showDetails, setShowDetails] = useState(true);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -40,30 +41,6 @@ const SongListContainer: FC = (): ReactElement => {
   const allSongs = useSongs() as SongSchema[];
 
   const [loading, setLoading] = useState(true);
-
-  const handleScroll = () => {
-    const searchDisplayBox = document.getElementById('search-display');
-    if (searchDisplayBox) {
-      const { scrollTop, scrollHeight, clientHeight } = searchDisplayBox;
-      const isAtBottom = scrollTop + clientHeight >= scrollHeight - 5;
-      if (!loading && isAtBottom && page < totalPages) {
-        setPage((page) => page + 1);
-        searchDisplayBox.scrollTop = scrollTop - 30;
-      }
-    }
-  };
-
-  useEffect(() => {
-    const searchDisplayBox = document.getElementById('search-display');
-    if (searchDisplayBox) {
-      searchDisplayBox.addEventListener('scroll', handleScroll);
-    }
-    return () => {
-      if (searchDisplayBox) {
-        searchDisplayBox.removeEventListener('scroll', handleScroll);
-      }
-    };
-  }, [loading, page, totalPages]);
 
   const getSongResults = useCallback(async () => {
     if (filterData) {
@@ -98,8 +75,39 @@ const SongListContainer: FC = (): ReactElement => {
     }
   }, [filterData, page]);
 
+  const handleScroll = useCallback(() => {
+    const searchDisplayBox = document.getElementById('search-display');
+    if (searchDisplayBox) {
+      const { scrollTop, scrollHeight, clientHeight } = searchDisplayBox;
+      const isAtBottom = scrollTop + clientHeight >= scrollHeight - 5;
+      if (isAtBottom && timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      if (!loading && isAtBottom && page < totalPages) {
+        setLoading(true);
+        timeoutRef.current = setTimeout(() => {
+          setPage((prevPage) => prevPage + 1);
+          getSongResults();
+        }, 300);
+        setLoading(false);
+        searchDisplayBox.scrollTop = scrollTop - 30;
+      }
+    }
+  }, [loading, page, totalPages]);
+
   useEffect(() => {
-    setLoading(true);
+    const searchDisplayBox = document.getElementById('search-display');
+    if (searchDisplayBox) {
+      searchDisplayBox.addEventListener('scroll', handleScroll);
+    }
+    return () => {
+      if (searchDisplayBox) {
+        searchDisplayBox.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, [loading, page, totalPages]);
+
+  useEffect(() => {
     setSongResults([]);
     setPage(1);
 
@@ -119,12 +127,6 @@ const SongListContainer: FC = (): ReactElement => {
     }
     return;
   }, [filterData]);
-
-  useEffect(() => {
-    if (page >= 2) {
-      getSongResults();
-    }
-  }, [page]);
 
   useEffect(() => {
     if (location.search) {
