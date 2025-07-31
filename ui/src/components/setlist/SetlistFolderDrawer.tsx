@@ -23,7 +23,7 @@ import {
 } from '@mui/material';
 import { Folder, GroupAdd, Delete, Close, Check, Add } from '@mui/icons-material';
 import axios, { AxiosResponse } from 'axios';
-import { SetlistFolder, SetlistFolderMember } from '../../types/setlist.types';
+import { SetlistFolder } from '../../types/setlist.types';
 import HeaderWithIcon from '../custom/HeaderWithIcon';
 import { GroupOwnership, Ownership } from '../../types/ownership.types';
 import { useOwnership } from '../../helpers/customHooks';
@@ -63,7 +63,6 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
   const isMobileAndSmallTablet = !isTablet && !isDesktop;
 
   // State
-  const [allFolders, setAllFolders] = useState<SetlistFolder[]>([]);
   const [allPeople, setAllPeople] = useState<Ownership[]>([]);
   const [addedPeople, setAddedPeople] = useState<string[]>([]);
   const [openModal, setOpenModal] = useState<boolean>(false);
@@ -75,20 +74,12 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
 
   // To render the songs that are added to setlist
   const addedPeopleList = allPeople.filter((person) => addedPeople.includes(person.userId));
-  const handleAddPerson = (id: string) => {
-    let result = addedPeople.includes(id)
-      ? // eslint-disable-next-line eqeqeq
-        addedPeople.filter((add) => add != id)
-      : [...addedPeople, id];
-    setAddedPeople(result);
-  };
 
   const handleSaveMembers = useCallback(async () => {
     if (!folderId || !addedPeople.length) {
       return;
     }
     try {
-      //TODO: Think of removing works
       await Promise.all(
         addedPeople.map(async (userId) => {
           const currentUser = allPeople.find((person) => person.userId === userId);
@@ -136,7 +127,6 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
       }
 
       if (payload.status === 200) {
-        //TODO: Think of removing works
         await Promise.all(
           addedPeople.map(async (userId) => {
             const currentUser = allPeople.find((person) => person.userId === userId);
@@ -191,11 +181,8 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
   // API Calls
   const fetchFolderDetails = useCallback(async () => {
     if (mode === 'create') return;
-
     try {
-      console.log(folderId);
       const { data } = await axios.get<SetlistFolder>(`/api/groups/get?id=${folderId}`);
-      console.log(data);
       if (data) {
         setFolderName(data.groupName);
         setFolderCreated(data.createdAt);
@@ -222,7 +209,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
 
   const deleteGroup = useCallback(async () => {
     try {
-      const { data, status } = await axios.put(`/api/groups/delete`, {
+      const { status } = await axios.put(`/api/groups/delete`, {
         params: {
           id: folderId,
         },
@@ -240,14 +227,6 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
     }
   }, [folderId, ownership, toggleFolderDrawer]);
 
-  const handleOpenModal = useCallback(() => setOpenModal(true), []);
-
-  const handleCloseModal = useCallback(() => {
-    setOpenModal(false);
-    handleSaveMembers();
-    setSearchString('');
-  }, [handleSaveMembers]);
-
   const handleRemovePerson = useCallback(
     (id: string) => {
       setAddedPeople(addedPeople.filter((add) => add !== id));
@@ -255,9 +234,27 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
     [addedPeople]
   );
 
+  const handleAddPerson = useCallback(
+    (id: string) => {
+      addedPeople.includes(id)
+        ? // eslint-disable-next-line eqeqeq
+          handleRemovePerson(id)
+        : setAddedPeople([...addedPeople, id]);
+    },
+    [handleRemovePerson, setAddedPeople, addedPeople]
+  );
+
+  const handleOpenModal = useCallback(() => setOpenModal(true), [setOpenModal]);
+
+  const handleCloseModal = useCallback(() => {
+    setOpenModal(false);
+    handleSaveMembers();
+    setSearchString('');
+  }, [setOpenModal, handleSaveMembers, setSearchString]);
+
   const handleCloseSuccessSnackbar = useCallback(() => {
     setSuccessSnackbarOpen(false);
-  }, []);
+  }, [setSuccessSnackbarOpen]);
 
   // Effects
   useEffect(() => {
@@ -352,7 +349,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
       </Stack>
     </ListItem>
   );
-
+  console.log(addedPeople);
   // Main Render
   return (
     <>
@@ -479,6 +476,10 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
                 Add people
               </Button>
             </Stack>
+            <Typography variant="caption">
+              No need to save for removing members. It is immediately saved after clicking the
+              button.
+            </Typography>
             <List>
               {addedPeopleList.length > 0 ? (
                 addedPeopleList.map((person) => (
