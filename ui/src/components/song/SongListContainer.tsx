@@ -7,6 +7,7 @@ import {
   Modal,
   useMediaQuery,
   ButtonGroup,
+  Grid,
 } from '@mui/material';
 import { FC, ReactElement, useEffect, useState, useCallback } from 'react';
 import { SongSchema, SongSearchFilter } from '../../types/song.types';
@@ -236,36 +237,31 @@ const SongListContainer: FC = (): ReactElement => {
           }
         />
         <Box display={{ base: 'block', md: 'none' }}></Box>
-        <Stack
-          direction={{ base: 'column', md: 'row' }}
-          maxWidth="100%"
-          height="90vh"
-          width="100%"
-          gap={'1%'}
-        >
-          <Box display={isDesktop ? 'flex' : 'none'}>
-            <SongSearch
-              filterData={filterData}
-              setFilterData={setFilterData}
-              onClose={handleClose}
-              songs={allSongs}
-              setSearch={setSearch}
-              isDesktop={isDesktop}
-            />
-          </Box>
-          <Box display={isDesktop ? 'none' : 'flex'}>
-            <SongSearchMobile
-              filterData={filterData}
-              setFilterData={setFilterData}
-              onClose={handleClose}
-              songs={allSongs}
-              setSearch={setSearch}
-              isDesktop={isDesktop}
-            />
-          </Box>
+        <Grid container maxWidth="100%" height="90vh" width="100%" spacing={1}>
+          <Grid item xs={isDesktop ? 4 : 12}>
+            {isDesktop ? (
+              <SongSearch
+                filterData={filterData}
+                setFilterData={setFilterData}
+                onClose={handleClose}
+                songs={allSongs}
+                setSearch={setSearch}
+                isDesktop={isDesktop}
+              />
+            ) : (
+              <SongSearchMobile
+                filterData={filterData}
+                setFilterData={setFilterData}
+                onClose={handleClose}
+                songs={allSongs}
+                setSearch={setSearch}
+                isDesktop={isDesktop}
+              />
+            )}
+          </Grid>
 
           {/* Song cards search results */}
-          <Box display="flex" height="100%">
+          <Grid item xs={isDesktop ? 8 : 12}>
             <Container
               sx={{
                 py: '1em',
@@ -332,8 +328,8 @@ const SongListContainer: FC = (): ReactElement => {
                 )}
               </Stack>
             </Container>
-          </Box>
-        </Stack>
+          </Grid>
+        </Grid>
       </Container>
 
       <Modal
