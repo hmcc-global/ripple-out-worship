@@ -21,7 +21,6 @@ const SongCard = (props: SongCardProps) => {
     chordLyrics,
     firstLine,
     filterData,
-    showDetails,
     isDesktop,
   } = props;
 
@@ -98,7 +97,6 @@ const SongCard = (props: SongCardProps) => {
           rowGap={'0.5rem'}
         >
           {CardFields &&
-            showDetails !== false &&
             (isDesktop ? (
               CardFields.map(
                 (field, i) =>

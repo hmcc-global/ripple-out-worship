@@ -26,9 +26,7 @@ const SongListContainer: FC = (): ReactElement => {
   const { user } = useUser();
   const [songResults, setSongResults] = useState<SongSchema[]>([]);
   const [filterData, setFilterData] = useState<SongSearchFilter>();
-  const [search, setSearch] = useState('');
   const [open, setOpen] = useState(false);
-  const [showDetails, setShowDetails] = useState(true);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const [page, setPage] = useState(1);
@@ -73,7 +71,7 @@ const SongListContainer: FC = (): ReactElement => {
     } else {
       setSongResults(allSongs);
     }
-  }, [filterData, page]);
+  }, [filterData, page, allSongs]);
 
   const handleScroll = useCallback(() => {
     const searchDisplayBox = document.getElementById('search-display');
@@ -93,7 +91,7 @@ const SongListContainer: FC = (): ReactElement => {
         searchDisplayBox.scrollTop = scrollTop - 30;
       }
     }
-  }, [loading, page, totalPages]);
+  }, [loading, page, totalPages, getSongResults]);
 
   useEffect(() => {
     const searchDisplayBox = document.getElementById('search-display');
@@ -105,7 +103,7 @@ const SongListContainer: FC = (): ReactElement => {
         searchDisplayBox.removeEventListener('scroll', handleScroll);
       }
     };
-  }, [loading, page, totalPages]);
+  }, [loading, page, totalPages, handleScroll]);
 
   useEffect(() => {
     setSongResults([]);
@@ -126,14 +124,14 @@ const SongListContainer: FC = (): ReactElement => {
       };
     }
     return;
-  }, [filterData]);
+  }, [filterData, getSongResults]);
 
   useEffect(() => {
     if (location.search) {
       const searchQuery = new URLSearchParams(location.search).get('q');
       setFilterData({ ...filterData, search: searchQuery });
     }
-  }, [location.search]);
+  }, [location.search, filterData]);
 
   const modalSearchStyle = {
     width: '100vw',
@@ -141,8 +139,6 @@ const SongListContainer: FC = (): ReactElement => {
     bgcolor: 'background.paper',
     p: '32px 16px',
   };
-
-  const [viewOption, setViewOption] = useState<string>('cards');
 
   return (
     <>
@@ -247,7 +243,6 @@ const SongListContainer: FC = (): ReactElement => {
                 setFilterData={setFilterData}
                 onClose={handleClose}
                 songs={allSongs}
-                setSearch={setSearch}
                 isDesktop={isDesktop}
               />
             ) : (
@@ -256,7 +251,6 @@ const SongListContainer: FC = (): ReactElement => {
                 setFilterData={setFilterData}
                 onClose={handleClose}
                 songs={allSongs}
-                setSearch={setSearch}
                 isDesktop={isDesktop}
               />
             )}
@@ -305,7 +299,7 @@ const SongListContainer: FC = (): ReactElement => {
                   },
                 }}
               >
-                {loading && songResults.length == 0 ? (
+                {loading && songResults.length === 0 ? (
                   <Stack height="80%" justifyContent="center" alignItems="center" width={'400'}>
                     <CircularProgress />
                   </Stack>
@@ -314,7 +308,6 @@ const SongListContainer: FC = (): ReactElement => {
                     <SongCard
                       key={i}
                       {...song}
-                      showDetails={showDetails}
                       filterData={filterData}
                       isDesktop={isDesktop}
                       firstLine={getFirstLineLyrics(song.chordLyrics)}
@@ -346,7 +339,6 @@ const SongListContainer: FC = (): ReactElement => {
             setFilterData={setFilterData}
             onClose={handleClose}
             songs={allSongs}
-            setSearch={setSearch}
             isDesktop={false}
           />
         </Box>
