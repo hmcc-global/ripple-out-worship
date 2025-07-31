@@ -51,6 +51,7 @@ export type SongSearchProps = {
   filterData: SongSearchFilter | undefined;
   setFilterData: React.Dispatch<React.SetStateAction<SongSearchFilter | undefined>>;
   onClose: () => void;
+  setSearch?: React.Dispatch<React.SetStateAction<string>>;
   isDesktop: boolean;
 };
 

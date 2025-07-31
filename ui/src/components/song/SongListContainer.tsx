@@ -124,7 +124,7 @@ const SongListContainer: FC = (): ReactElement => {
       };
     }
     return;
-  }, [filterData, getSongResults]);
+  }, [filterData]);
 
   useEffect(() => {
     if (location.search) {
