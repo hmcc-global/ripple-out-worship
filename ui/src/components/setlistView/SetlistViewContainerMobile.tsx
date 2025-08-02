@@ -199,7 +199,7 @@ const SetlistViewContainerMobile = ({ preview }: { preview?: boolean }): ReactEl
               </Stack>
             </Box>
             {preview ? null : (
-              <SetlistViewFooter style={{ width: '100vw', margin: '0 0 -16px -16px' }}>
+              <SetlistViewFooter style={{ width: '100vw', margin: '8px 0 -16px -16px' }}>
                 <Typography>Created by HMCC T3CH</Typography>
               </SetlistViewFooter>
             )}
