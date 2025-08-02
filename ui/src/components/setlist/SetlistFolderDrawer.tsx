@@ -11,10 +11,8 @@ import {
   IconButton,
   Dialog,
   DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
   InputBase,
+  DialogContent,
   Alert,
   AlertTitle,
   Fade,
@@ -44,13 +42,6 @@ interface SetlistFolderDrawerProps {
   mode: string;
 }
 
-// Snackbar message types
-interface SnackbarState {
-  open: boolean;
-  message: string;
-  severity: 'success' | 'error' | 'warning' | 'info';
-}
-
 // Component
 const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
   const {
@@ -74,29 +65,12 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
   // State
   const [allPeople, setAllPeople] = useState<Ownership[]>([]);
   const [addedPeople, setAddedPeople] = useState<string[]>([]);
-  const [openAddModal, setOpenAddModal] = useState<boolean>(false);
-  const [openRemoveModal, setOpenRemoveModal] = useState<boolean>(false);
-  const [personToRemove, setPersonToRemove] = useState<Ownership | null>(null);
-  const [snackbar, setSnackbar] = useState<SnackbarState>({
-    open: false,
-    message: '',
-    severity: 'success',
-  });
+  const [openModal, setOpenModal] = useState<boolean>(false);
+  const [successSnackbarOpen, setSuccessSnackbarOpen] = useState<boolean>(false);
+  const [invalidFolder, setInvalidFolder] = useState<string>('');
   const [createdDateString, setCreatedDateString] = useState<string>('');
   const [searchString, setSearchString] = useState('');
   const [filteredPeople, setFilteredPeople] = useState<Ownership[]>([]);
-
-  // Helper function to show snackbar messages
-  const showSnackbar = useCallback(
-    (message: string, severity: 'success' | 'error' | 'warning' | 'info' = 'success') => {
-      setSnackbar({
-        open: true,
-        message,
-        severity,
-      });
-    },
-    []
-  );
 
   // To render the songs that are added to setlist
   const addedPeopleList = allPeople.filter((person) => addedPeople.includes(person.userId));
@@ -114,23 +88,28 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
             name: folderName,
             createdAt: folderCreated,
           };
+          // Check if the user is already part of the folder
           if (!currentUser?.groupIds?.some((group) => group.id === currentGroup.id)) {
-            const { data, status } = await axios.put(`/api/ownerships/${userId}`, {
+            const { data, status } = await axios.put('/api/ownerships/update', {
               ...currentUser,
               groupIds: [...(currentUser?.groupIds || []), currentGroup],
             });
             if (status === 200) {
+              setInvalidFolder('');
               return data;
             }
           }
         })
       );
-      showSnackbar('Members successfully added to folder!');
+
+      setInvalidFolder('');
+      setSuccessSnackbarOpen(true);
     } catch (error: any) {
-      showSnackbar('Failed to add members to folder', 'error');
-      console.error('Error saving members:', error);
+      setInvalidFolder(error.response?.data || 'An error occurred');
+      setSuccessSnackbarOpen(false);
+      console.log(error);
     }
-  }, [addedPeople, allPeople, folderCreated, folderId, folderName, showSnackbar]);
+  }, [addedPeople, allPeople, folderCreated, folderId, folderName]);
 
   const handleSaveFolder = async () => {
     try {
@@ -148,10 +127,6 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
       }
 
       if (payload.status === 200) {
-        setFolderId(payload.data._id);
-        setFolderName(payload.data.groupName);
-        setFolderCreated(payload.data.createdAt);
-
         await Promise.all(
           addedPeople.map(async (userId) => {
             const currentUser = allPeople.find((person) => person.userId === userId);
@@ -160,32 +135,30 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
               name: payload.data.groupName,
               createdAt: payload.data.createdAt,
             };
+            // Check if the user is already part of the folder
             if (!currentUser?.groupIds?.some((group) => group.id === currentGroup.id)) {
               const { data, status } = await axios.put('/api/ownerships/update', {
                 ...currentUser,
                 groupIds: [...(currentUser?.groupIds || []), currentGroup],
               });
               if (status === 200) {
+                setInvalidFolder('');
                 return data;
               }
             }
+            setInvalidFolder('Some of the members are already in the folder');
             return null;
           })
         );
-
         cancelFolderDrawer();
-
-        // Show specific message based on action
-        if (mode === 'create') {
-          showSnackbar(`Folder "${folderName}" created successfully!`);
-        } else {
-          showSnackbar(`Folder "${folderName}" updated successfully!`);
-        }
+        setSuccessSnackbarOpen(true);
       }
+      setInvalidFolder('');
+      setSuccessSnackbarOpen(true);
     } catch (error: any) {
-      const action = folderId ? 'update' : 'create';
-      showSnackbar(`Failed to ${action} folder`, 'error');
-      console.error('Error saving folder:', error);
+      setInvalidFolder(error.response.data);
+      setSuccessSnackbarOpen(false);
+      console.log(error);
     }
   };
 
@@ -207,56 +180,56 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
 
   // API Calls
   const fetchFolderDetails = useCallback(async () => {
-    if (mode === 'create' || !folderId) return;
+    if (mode === 'create') return;
     try {
       const { data } = await axios.get<SetlistFolder>(`/api/groups/get?id=${folderId}`);
       if (data) {
         setFolderName(data.groupName);
         setFolderCreated(data.createdAt);
       }
-    } catch (err: any) {
-      showSnackbar('Failed to load folder details', 'error');
+    } catch (err) {
       console.error('Error fetching folder:', err);
     }
-  }, [mode, folderId, setFolderName, setFolderCreated, showSnackbar]);
+  }, [mode, folderId, setFolderName, setFolderCreated]);
 
   const getPeople = useCallback(async () => {
     try {
       const { data, status } = await axios.get<Ownership[]>('/api/ownerships/get');
       if (status === 200) {
         setAllPeople(data);
-        const existingMembers = data.filter(
-          (person) => person.groupIds?.some((group) => group.id === folderId)
+        const existingMembers = data.filter((person) =>
+          person.groupIds.find((group) => group.id === folderId)
         );
         setAddedPeople(existingMembers.map((person) => person.userId));
       }
-    } catch (error: any) {
-      showSnackbar('Failed to load users', 'error');
-      console.error('Error fetching users:', error);
+    } catch (error) {
+      console.log(error);
     }
-  }, [folderId, showSnackbar]);
+  }, [folderId, setAllPeople, setAddedPeople]);
 
   const deleteGroup = useCallback(async () => {
     try {
-      const { status } = await axios.delete(`/api/folders/${folderId}`);
+      const { status } = await axios.put(`/api/groups/delete`, {
+        params: {
+          id: folderId,
+        },
+      });
       if (status === 200) {
-        await axios.put(`/api/ownerships/${ownership.userId}`, {
+        await axios.put('/api/ownerships/update', {
           ...ownership,
           groupIds: ownership.groupIds.filter((group) => group.id !== folderId),
         });
-        showSnackbar(`Folder "${folderName}" deleted successfully!`);
+        setSuccessSnackbarOpen(true);
         toggleFolderDrawer(false);
       }
-    } catch (error: any) {
-      showSnackbar('Failed to delete folder', 'error');
-      console.error('Error deleting folder:', error);
+    } catch (e) {
+      console.log(e);
     }
-  }, [folderId, ownership, toggleFolderDrawer, folderName, showSnackbar]);
+  }, [folderId, ownership, toggleFolderDrawer]);
 
   const handleRemovePerson = useCallback(
     async (id: string) => {
       try {
-        const personToRemove = allPeople.find((person) => person.userId === id);
         const { data, status } = await axios.get<Ownership>('/api/ownerships/get', {
           params: {
             userId: id,
@@ -267,54 +240,36 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
             ...data,
             groupIds: data.groupIds.filter((group) => group.id !== folderId),
           });
-          setAddedPeople(addedPeople.filter((add) => add !== id));
-          showSnackbar(`${personToRemove?.fullName || 'Member'} removed from folder`);
         }
-      } catch (error: any) {
-        showSnackbar('Failed to remove member from folder', 'error');
-        console.error('Error removing person:', error);
+      } catch (e) {
+        console.log(e);
       }
+      setAddedPeople(addedPeople.filter((add) => add !== id));
     },
-    [addedPeople, folderId, allPeople, showSnackbar]
+    [addedPeople, folderId]
   );
 
   const handleAddPerson = useCallback(
     (id: string) => {
       addedPeople.includes(id)
-        ? setPersonToRemove(allPeople.find((person) => person.userId === id) || null)
+        ? // eslint-disable-next-line eqeqeq
+          handleRemovePerson(id)
         : setAddedPeople([...addedPeople, id]);
     },
-    [addedPeople, allPeople]
+    [handleRemovePerson, setAddedPeople, addedPeople]
   );
 
-  const handleOpenRemoveModal = useCallback((person: Ownership) => {
-    setPersonToRemove(person);
-    setOpenRemoveModal(true);
-  }, []);
+  const handleOpenModal = useCallback(() => setOpenModal(true), [setOpenModal]);
 
-  const handleCloseRemoveModal = useCallback(() => {
-    setOpenRemoveModal(false);
-    setPersonToRemove(null);
-  }, []);
-
-  const handleConfirmRemove = useCallback(() => {
-    if (personToRemove) {
-      handleRemovePerson(personToRemove.userId);
-    }
-    handleCloseRemoveModal();
-  }, [personToRemove, handleCloseRemoveModal, handleRemovePerson]);
-
-  const handleOpenAddModal = useCallback(() => setOpenAddModal(true), []);
-
-  const handleCloseAddModal = useCallback(() => {
-    setOpenAddModal(false);
+  const handleCloseModal = useCallback(() => {
+    setOpenModal(false);
     handleSaveMembers();
     setSearchString('');
-  }, [handleSaveMembers]);
+  }, [setOpenModal, handleSaveMembers, setSearchString]);
 
-  const handleCloseSnackbar = useCallback(() => {
-    setSnackbar((prev) => ({ ...prev, open: false }));
-  }, []);
+  const handleCloseSuccessSnackbar = useCallback(() => {
+    setSuccessSnackbarOpen(false);
+  }, [setSuccessSnackbarOpen]);
 
   // Effects
   useEffect(() => {
@@ -338,15 +293,13 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
     }
   }, [folderCreated, mode]);
 
-  // Cancel button on drawer
+  // cancel button on drawer
   const cancelFolderDrawer = () => {
     setFolderName('');
     setAddedPeople([]);
     setFolderId('');
     setFolderCreated('');
-    setOpenAddModal(false);
-    setOpenRemoveModal(false);
-    setPersonToRemove(null);
+    handleCloseModal();
     toggleFolderDrawer(false);
   };
 
@@ -357,7 +310,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
       secondaryAction={
         <IconButton
           edge="end"
-          onClick={() => handleOpenRemoveModal(person)}
+          onClick={() => handleRemovePerson(person.userId)}
           sx={{
             padding: '8px 20px',
             borderRadius: '40px',
@@ -415,116 +368,26 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
   // Main Render
   return (
     <>
-      {/* Improved Snackbar with specific messages */}
+      {/* Error Message */}
+      {invalidFolder && (
+        <Typography variant="body2" color="error">
+          {invalidFolder}
+        </Typography>
+      )}
+
+      {/* Success Snackbar */}
       <Snackbar
-        open={snackbar.open}
-        onClose={handleCloseSnackbar}
+        open={successSnackbarOpen}
+        onClose={handleCloseSuccessSnackbar}
         autoHideDuration={6000}
         TransitionComponent={Fade}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
-        <Alert severity={snackbar.severity} onClose={handleCloseSnackbar}>
-          <AlertTitle>
-            {snackbar.severity === 'success'
-              ? 'Success'
-              : snackbar.severity === 'error'
-              ? 'Error'
-              : snackbar.severity === 'warning'
-              ? 'Warning'
-              : 'Info'}
-          </AlertTitle>
-          {snackbar.message}
+        <Alert severity="success" onClose={handleCloseSuccessSnackbar}>
+          <AlertTitle>Success</AlertTitle>
+          Folder successfully saved/removed!
         </Alert>
       </Snackbar>
-
-      {/* Remove Person Confirmation Modal */}
-      <Dialog
-        open={openRemoveModal}
-        onClose={handleCloseRemoveModal}
-        aria-labelledby="remove-person-dialog-title"
-        aria-describedby="remove-person-dialog-description"
-        PaperProps={{
-          sx: { width: '30rem', borderRadius: '1.75rem', padding: '0.5rem' },
-        }}
-      >
-        <DialogTitle id="remove-person-dialog-title">Remove Person</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="remove-person-dialog-description">
-            Are you sure you want to remove {personToRemove?.fullName} from the folder "{folderName}
-            "? {`\n`} This action cannot be undone.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseRemoveModal} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleConfirmRemove} color="error" autoFocus>
-            Remove
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Add People Modal */}
-      <Dialog
-        open={openAddModal}
-        onClose={handleCloseAddModal}
-        PaperProps={{
-          sx: { width: '30rem', height: '30rem', borderRadius: '1.75rem', padding: '0.5rem' },
-        }}
-      >
-        <DialogTitle
-          display="flex"
-          flexDirection="row"
-          alignItems="center"
-          justifyContent="space-between"
-        >
-          <HeaderWithIcon
-            Icon={GroupAdd}
-            headerText="Add People"
-            headerVariant="h3"
-            iconColor="secondary.main"
-          />
-          <IconButton
-            aria-label="close"
-            onClick={handleCloseAddModal}
-            sx={{ color: (theme) => theme.palette.grey[500] }}
-          >
-            <Close />
-          </IconButton>
-        </DialogTitle>
-        <InputBase
-          placeholder="Search by name"
-          sx={{
-            alignSelf: 'center',
-            width: '90%',
-            px: '1.25rem',
-            py: '0.75rem',
-            color: 'secondary.light',
-            backgroundColor: 'secondary.lighter',
-            borderRadius: '1.75rem',
-            fontWeight: 400,
-            fontSize: '1rem',
-          }}
-          value={searchString}
-          onChange={(e) => setSearchString(e.target.value)}
-          autoFocus
-        />
-        <DialogContent sx={{ pt: 0 }}>
-          <List>
-            {filteredPeople.length > 0 ? (
-              filteredPeople.map((person) => (
-                <AddPersonListItem key={person.userId} person={person} />
-              ))
-            ) : (
-              <ListItem>
-                <Typography variant="subtitle1" color="primary.lighter">
-                  No users found
-                </Typography>
-              </ListItem>
-            )}
-          </List>
-        </DialogContent>
-      </Dialog>
 
       {/* Folder Drawer */}
       <Drawer
@@ -568,7 +431,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
           {mode === 'edit' && (
             <Box sx={{ p: '1.125rem' }}>
               <Typography fontSize="0.75rem" fontStyle="italic" color="#CCC2DC">
-                {createdDateString || 'Created on unknown date'}
+                {createdDateString || 'Created on INSERT DATE'}
               </Typography>
             </Box>
           )}
@@ -615,7 +478,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
               </Typography>
               <Button
                 startIcon={<GroupAdd />}
-                onClick={handleOpenAddModal}
+                onClick={handleOpenModal}
                 sx={{
                   color: 'secondary.main',
                   padding: '8px 20px',
@@ -628,6 +491,10 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
                 Add people
               </Button>
             </Stack>
+            <Typography variant="caption">
+              No need to save for removing members. It is immediately saved after clicking the
+              button.
+            </Typography>
             <List>
               {addedPeopleList.length > 0 ? (
                 addedPeopleList.map((person) => (
@@ -700,6 +567,68 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
           )}
         </Box>
       </Drawer>
+
+      {/* Add People Modal */}
+      <Dialog
+        open={openModal}
+        onClose={handleCloseModal}
+        PaperProps={{
+          sx: { width: '30rem', height: '30rem', borderRadius: '1.75rem', padding: '0.5rem' },
+        }}
+      >
+        <DialogTitle
+          display="flex"
+          flexDirection="row"
+          alignItems="center"
+          justifyContent="space-between"
+        >
+          <HeaderWithIcon
+            Icon={GroupAdd}
+            headerText="Add People"
+            headerVariant="h3"
+            iconColor="secondary.main"
+          />
+          <IconButton
+            aria-label="close"
+            onClick={handleCloseModal}
+            sx={{ color: (theme) => theme.palette.grey[500] }}
+          >
+            <Close />
+          </IconButton>
+        </DialogTitle>
+        <InputBase
+          placeholder="Search by name"
+          sx={{
+            alignSelf: 'center',
+            width: '90%',
+            px: '1.25rem',
+            py: '0.75rem',
+            color: 'secondary.light',
+            backgroundColor: 'secondary.lighter',
+            borderRadius: '1.75rem',
+            fontWeight: 400,
+            fontSize: '1rem',
+          }}
+          value={searchString}
+          onChange={(e) => setSearchString(e.target.value)}
+          autoFocus
+        />
+        <DialogContent sx={{ pt: 0 }}>
+          <List>
+            {filteredPeople.length > 0 ? (
+              filteredPeople.map((person) => (
+                <AddPersonListItem key={person.userId} person={person} />
+              ))
+            ) : (
+              <ListItem>
+                <Typography variant="subtitle1" color="primary.lighter">
+                  No users exist or failed retrieving users
+                </Typography>
+              </ListItem>
+            )}
+          </List>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
