@@ -12,8 +12,6 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogContentText,
-  DialogActions,
   InputBase,
   Alert,
   AlertTitle,
@@ -29,6 +27,7 @@ import { SetlistFolder } from '../../types/setlist.types';
 import HeaderWithIcon from '../custom/HeaderWithIcon';
 import { GroupOwnership, Ownership } from '../../types/ownership.types';
 import { useOwnership } from '../../helpers/customHooks';
+import ConfirmationDialog from '../custom/ConfirmationDialog';
 
 // Types
 interface SetlistFolderDrawerProps {
@@ -49,52 +48,6 @@ interface SnackbarState {
   message: string;
   severity: 'success' | 'error' | 'warning' | 'info';
 }
-
-interface ConfirmationDialogProps {
-  open: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-  title: string;
-  message: string;
-  confirmText?: string;
-  cancelText?: string;
-  confirmColor?: 'primary' | 'error' | 'warning' | 'success';
-}
-
-// Reusable Confirmation Dialog Component
-const ConfirmationDialog = ({
-  open,
-  onClose,
-  onConfirm,
-  title,
-  message,
-  confirmText = 'Confirm',
-  cancelText = 'Cancel',
-  confirmColor = 'primary',
-}: ConfirmationDialogProps) => (
-  <Dialog
-    open={open}
-    onClose={onClose}
-    aria-labelledby="confirmation-dialog-title"
-    aria-describedby="confirmation-dialog-description"
-    PaperProps={{
-      sx: { width: '30rem', borderRadius: '1.75rem', padding: '0.5rem' },
-    }}
-  >
-    <DialogTitle id="confirmation-dialog-title">{title}</DialogTitle>
-    <DialogContent>
-      <DialogContentText id="confirmation-dialog-description">{message}</DialogContentText>
-    </DialogContent>
-    <DialogActions>
-      <Button onClick={onClose} color="primary">
-        {cancelText}
-      </Button>
-      <Button onClick={onConfirm} color={confirmColor} autoFocus>
-        {confirmText}
-      </Button>
-    </DialogActions>
-  </Dialog>
-);
 
 // Component
 const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
@@ -509,7 +462,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
         onClose={handleCloseRemoveModal}
         onConfirm={handleConfirmRemove}
         title="Remove Person"
-        message={`Are you sure you want to remove ${personToRemove?.fullName} from the folder "${folderName}"? This action cannot be undone.`}
+        message={`Are you sure you want to remove ${personToRemove?.fullName} from the folder "${folderName}"? ${`\n\n`} This action cannot be undone.`}
         confirmText="Remove"
         confirmColor="error"
       />
@@ -520,7 +473,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
         onClose={handleCloseDeleteFolderModal}
         onConfirm={handleConfirmDeleteFolder}
         title="Delete Folder"
-        message={`Are you sure you want to delete the folder "${folderName}"? This action cannot be undone and will remove all associated data.`}
+        message={`Are you sure you want to delete the folder "${folderName}"?${`\n\n`} This action cannot be undone and will remove all associated data.`}
         confirmText="Delete"
         confirmColor="error"
       />
