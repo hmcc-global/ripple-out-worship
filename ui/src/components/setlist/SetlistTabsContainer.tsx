@@ -26,6 +26,7 @@ import {
   Menu,
   MenuItem,
   Snackbar,
+  TextField,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
@@ -103,6 +104,40 @@ const SetlistTabPanel: FC<TabPanelProps> = ({ children, value, index, ...other }
   );
 };
 
+const SearchTextField = ({
+  searchTerm,
+  setSearchTerm,
+}: {
+  searchTerm: string;
+  setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
+}) => {
+  return (
+    <TextField
+      variant="standard"
+      placeholder="Search"
+      InputProps={{
+        style: {
+          fontSize: '1rem',
+          color: '#CAC4D0',
+          background: '#4A4458',
+          borderRadius: '26px',
+          border: 0,
+          padding: '0.5rem 1rem',
+          marginRight: ' 0.5em',
+          marginTop: '1em',
+        },
+        disableUnderline: true,
+      }}
+      sx={{
+        width: '100%',
+      }}
+      value={searchTerm}
+      onChange={(e) => setSearchTerm(e.target.value)}
+      autoFocus
+    />
+  );
+};
+
 // Main Component
 const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
   // Hooks
@@ -118,6 +153,7 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
   const [allFolders, setAllFolders] = useState<SetlistFolder[]>([]);
   const [openFolders, setOpenFolders] = useState<string[]>([]);
   const [selectedSetlistId, setSelectedSetlistId] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
   // Data Fetching
   const getSetlistsAndFolders = useCallback(async () => {
@@ -455,12 +491,21 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
 
       {/* All Tab */}
       <Box sx={{ overflowY: 'auto', flex: 1 }}>
+        <SearchTextField searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
         <SetlistTabPanel value={tab} index={0}>
           <List>
             {(allSetlists && allSetlists.length > 0) || (allFolders && allFolders.length > 0) ? (
               <>
-                {allFolders.map(renderFolderItem)}
-                {allSetlists.map(renderSetlistItem)}
+                {allFolders
+                  .filter((folder) =>
+                    folder.groupName.toLowerCase().includes(searchTerm.toLowerCase())
+                  )
+                  .map(renderFolderItem)}
+                {allSetlists
+                  .filter((setlist) =>
+                    setlist.name.toLowerCase().includes(searchTerm.toLowerCase())
+                  )
+                  .map(renderSetlistItem)}
               </>
             ) : (
               renderEmptyState('No Setlists or Folders Found')
@@ -472,7 +517,11 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
         <SetlistTabPanel value={tab} index={1}>
           <List>
             {allFolders && allFolders.length > 0
-              ? allFolders.map(renderFolderItem)
+              ? allFolders
+                  .filter((folder) =>
+                    folder.groupName.toLowerCase().includes(searchTerm.toLowerCase())
+                  )
+                  .map(renderFolderItem)
               : renderEmptyState('No Folders Found')}
           </List>
         </SetlistTabPanel>
@@ -481,7 +530,11 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
         <SetlistTabPanel value={tab} index={2}>
           <List>
             {allSetlists && allSetlists.length > 0
-              ? allSetlists.map(renderSetlistItem)
+              ? allSetlists
+                  .filter((setlist) =>
+                    setlist.name.toLowerCase().includes(searchTerm.toLowerCase())
+                  )
+                  .map(renderSetlistItem)
               : renderEmptyState('No Personal Setlists Found')}
           </List>
         </SetlistTabPanel>
