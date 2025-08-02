@@ -11,8 +11,8 @@ import {
   IconButton,
   Dialog,
   DialogTitle,
-  InputBase,
   DialogContent,
+  InputBase,
   Alert,
   AlertTitle,
   Fade,
@@ -23,10 +23,11 @@ import {
 } from '@mui/material';
 import { Folder, GroupAdd, Delete, Close, Check, Add } from '@mui/icons-material';
 import axios, { AxiosResponse } from 'axios';
-import { SetlistFolder, SetlistFolderMember } from '../../types/setlist.types';
+import { SetlistFolder } from '../../types/setlist.types';
 import HeaderWithIcon from '../custom/HeaderWithIcon';
 import { GroupOwnership, Ownership } from '../../types/ownership.types';
 import { useOwnership } from '../../helpers/customHooks';
+import ConfirmationDialog from '../custom/ConfirmationDialog';
 
 // Types
 interface SetlistFolderDrawerProps {
@@ -42,6 +43,12 @@ interface SetlistFolderDrawerProps {
   mode: string;
 }
 
+interface SnackbarState {
+  open: boolean;
+  message: string;
+  severity: 'success' | 'error' | 'warning' | 'info';
+}
+
 // Component
 const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
   const {
@@ -55,6 +62,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
     folderCreated,
     mode,
   } = props;
+
   // Hooks
   const ownership = useOwnership();
   const theme = useTheme();
@@ -63,32 +71,41 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
   const isMobileAndSmallTablet = !isTablet && !isDesktop;
 
   // State
-  const [allFolders, setAllFolders] = useState<SetlistFolder[]>([]);
   const [allPeople, setAllPeople] = useState<Ownership[]>([]);
   const [addedPeople, setAddedPeople] = useState<string[]>([]);
-  const [openModal, setOpenModal] = useState<boolean>(false);
-  const [successSnackbarOpen, setSuccessSnackbarOpen] = useState<boolean>(false);
-  const [invalidFolder, setInvalidFolder] = useState<string>('');
+  const [openAddModal, setOpenAddModal] = useState<boolean>(false);
+  const [openRemoveModal, setOpenRemoveModal] = useState<boolean>(false);
+  const [openDeleteFolderModal, setOpenDeleteFolderModal] = useState<boolean>(false);
+  const [personToRemove, setPersonToRemove] = useState<Ownership | null>(null);
+  const [snackbar, setSnackbar] = useState<SnackbarState>({
+    open: false,
+    message: '',
+    severity: 'success',
+  });
   const [createdDateString, setCreatedDateString] = useState<string>('');
   const [searchString, setSearchString] = useState('');
   const [filteredPeople, setFilteredPeople] = useState<Ownership[]>([]);
 
+  // Helper function to show snackbar messages
+  const showSnackbar = useCallback(
+    (message: string, severity: 'success' | 'error' | 'warning' | 'info' = 'success') => {
+      setSnackbar({
+        open: true,
+        message,
+        severity,
+      });
+    },
+    []
+  );
+
   // To render the songs that are added to setlist
   const addedPeopleList = allPeople.filter((person) => addedPeople.includes(person.userId));
-  const handleAddPerson = (id: string) => {
-    let result = addedPeople.includes(id)
-      ? // eslint-disable-next-line eqeqeq
-        addedPeople.filter((add) => add != id)
-      : [...addedPeople, id];
-    setAddedPeople(result);
-  };
 
   const handleSaveMembers = useCallback(async () => {
     if (!folderId || !addedPeople.length) {
       return;
     }
     try {
-      //TODO: Think of removing works
       await Promise.all(
         addedPeople.map(async (userId) => {
           const currentUser = allPeople.find((person) => person.userId === userId);
@@ -104,21 +121,17 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
               groupIds: [...(currentUser?.groupIds || []), currentGroup],
             });
             if (status === 200) {
-              setInvalidFolder('');
               return data;
             }
           }
         })
       );
-
-      setInvalidFolder('');
-      setSuccessSnackbarOpen(true);
+      showSnackbar('Members successfully added to folder!');
     } catch (error: any) {
-      setInvalidFolder(error.response?.data || 'An error occurred');
-      setSuccessSnackbarOpen(false);
-      console.log(error);
+      showSnackbar('Failed to add members to folder', 'error');
+      console.error('Error saving members:', error);
     }
-  }, [addedPeople, allPeople, folderCreated, folderId, folderName]);
+  }, [addedPeople, allPeople, folderCreated, folderId, folderName, showSnackbar]);
 
   const handleSaveFolder = async () => {
     try {
@@ -136,7 +149,10 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
       }
 
       if (payload.status === 200) {
-        //TODO: Think of removing works
+        setFolderId(payload.data._id);
+        setFolderName(payload.data.groupName);
+        setFolderCreated(payload.data.createdAt);
+
         await Promise.all(
           addedPeople.map(async (userId) => {
             const currentUser = allPeople.find((person) => person.userId === userId);
@@ -145,30 +161,32 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
               name: payload.data.groupName,
               createdAt: payload.data.createdAt,
             };
-            // Check if the user is already part of the folder
             if (!currentUser?.groupIds?.some((group) => group.id === currentGroup.id)) {
               const { data, status } = await axios.put('/api/ownerships/update', {
                 ...currentUser,
                 groupIds: [...(currentUser?.groupIds || []), currentGroup],
               });
               if (status === 200) {
-                setInvalidFolder('');
                 return data;
               }
             }
-            setInvalidFolder('Some of the members are already in the folder');
             return null;
           })
         );
+
         cancelFolderDrawer();
-        setSuccessSnackbarOpen(true);
+
+        // Show specific message based on action
+        if (mode === 'create') {
+          showSnackbar(`Folder "${folderName}" created successfully!`);
+        } else {
+          showSnackbar(`Folder "${folderName}" updated successfully!`);
+        }
       }
-      setInvalidFolder('');
-      setSuccessSnackbarOpen(true);
     } catch (error: any) {
-      setInvalidFolder(error.response.data);
-      setSuccessSnackbarOpen(false);
-      console.log(error);
+      const action = folderId ? 'update' : 'create';
+      showSnackbar(`Failed to ${action} folder`, 'error');
+      console.error('Error saving folder:', error);
     }
   };
 
@@ -190,39 +208,38 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
 
   // API Calls
   const fetchFolderDetails = useCallback(async () => {
-    if (mode === 'create') return;
-
+    if (mode === 'create' || !folderId) return;
     try {
-      console.log(folderId);
       const { data } = await axios.get<SetlistFolder>(`/api/groups/get?id=${folderId}`);
-      console.log(data);
       if (data) {
         setFolderName(data.groupName);
         setFolderCreated(data.createdAt);
       }
-    } catch (err) {
+    } catch (err: any) {
+      showSnackbar('Failed to load folder details', 'error');
       console.error('Error fetching folder:', err);
     }
-  }, [mode, folderId, setFolderName, setFolderCreated]);
+  }, [mode, folderId, setFolderName, setFolderCreated, showSnackbar]);
 
   const getPeople = useCallback(async () => {
     try {
       const { data, status } = await axios.get<Ownership[]>('/api/ownerships/get');
       if (status === 200) {
         setAllPeople(data);
-        const existingMembers = data.filter((person) =>
-          person.groupIds.find((group) => group.id === folderId)
+        const existingMembers = data.filter(
+          (person) => person.groupIds?.some((group) => group.id === folderId)
         );
         setAddedPeople(existingMembers.map((person) => person.userId));
       }
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      showSnackbar('Failed to load users', 'error');
+      console.error('Error fetching users:', error);
     }
-  }, [folderId, setAllPeople, setAddedPeople]);
+  }, [folderId, showSnackbar]);
 
   const deleteGroup = useCallback(async () => {
     try {
-      const { data, status } = await axios.put(`/api/groups/delete`, {
+      const { status } = await axios.put(`/api/groups/delete`, {
         params: {
           id: folderId,
         },
@@ -232,31 +249,89 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
           ...ownership,
           groupIds: ownership.groupIds.filter((group) => group.id !== folderId),
         });
-        setSuccessSnackbarOpen(true);
+        showSnackbar(`Folder "${folderName}" deleted successfully!`);
         toggleFolderDrawer(false);
       }
-    } catch (e) {
-      console.log(e);
+    } catch (error: any) {
+      showSnackbar('Failed to delete folder', 'error');
+      console.error('Error deleting folder:', error);
     }
-  }, [folderId, ownership, toggleFolderDrawer]);
+  }, [folderId, ownership, toggleFolderDrawer, folderName, showSnackbar]);
 
-  const handleOpenModal = useCallback(() => setOpenModal(true), []);
+  const handleRemovePerson = useCallback(
+    async (id: string) => {
+      try {
+        const personToRemove = allPeople.find((person) => person.userId === id);
+        const { data, status } = await axios.get<Ownership>('/api/ownerships/get', {
+          params: {
+            userId: id,
+          },
+        });
+        if (status === 200) {
+          await axios.put('/api/ownerships/update', {
+            ...data,
+            groupIds: data.groupIds.filter((group) => group.id !== folderId),
+          });
+          setAddedPeople(addedPeople.filter((add) => add !== id));
+          showSnackbar(`${personToRemove?.fullName || 'Member'} removed from folder`);
+        }
+      } catch (error: any) {
+        showSnackbar('Failed to remove member from folder', 'error');
+        console.error('Error removing person:', error);
+      }
+    },
+    [addedPeople, folderId, allPeople, showSnackbar]
+  );
 
-  const handleCloseModal = useCallback(() => {
-    setOpenModal(false);
+  const handleAddPerson = useCallback(
+    (id: string) => {
+      addedPeople.includes(id)
+        ? setPersonToRemove(allPeople.find((person) => person.userId === id) || null)
+        : setAddedPeople([...addedPeople, id]);
+    },
+    [addedPeople, allPeople]
+  );
+
+  const handleOpenRemoveModal = useCallback((person: Ownership) => {
+    setPersonToRemove(person);
+    setOpenRemoveModal(true);
+  }, []);
+
+  const handleCloseRemoveModal = useCallback(() => {
+    setOpenRemoveModal(false);
+    setPersonToRemove(null);
+  }, []);
+
+  const handleConfirmRemove = useCallback(() => {
+    if (personToRemove) {
+      handleRemovePerson(personToRemove.userId);
+    }
+    handleCloseRemoveModal();
+  }, [personToRemove, handleCloseRemoveModal, handleRemovePerson]);
+
+  const handleOpenDeleteFolderModal = useCallback(() => {
+    setOpenDeleteFolderModal(true);
+  }, []);
+
+  const handleCloseDeleteFolderModal = useCallback(() => {
+    setOpenDeleteFolderModal(false);
+  }, []);
+
+  const handleConfirmDeleteFolder = useCallback(() => {
+    deleteGroup();
+    handleCloseDeleteFolderModal();
+  }, [deleteGroup, handleCloseDeleteFolderModal]);
+
+  const handleOpenAddModal = useCallback(() => setOpenAddModal(true), []);
+
+  const handleCloseAddModal = useCallback(() => {
+    setOpenAddModal(false);
     handleSaveMembers();
     setSearchString('');
   }, [handleSaveMembers]);
 
-  const handleRemovePerson = useCallback(
-    (id: string) => {
-      setAddedPeople(addedPeople.filter((add) => add !== id));
-    },
-    [addedPeople]
-  );
-
-  const handleCloseSuccessSnackbar = useCallback(() => {
-    setSuccessSnackbarOpen(false);
+  const handleCloseSnackbar = useCallback(() => {
+    setSnackbar((prev) => ({ ...prev, open: false }));
   }, []);
 
   // Effects
@@ -281,13 +356,16 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
     }
   }, [folderCreated, mode]);
 
-  // cancel button on drawer
+  // Cancel button on drawer
   const cancelFolderDrawer = () => {
     setFolderName('');
     setAddedPeople([]);
     setFolderId('');
     setFolderCreated('');
-    handleCloseModal();
+    setOpenAddModal(false);
+    setOpenRemoveModal(false);
+    setPersonToRemove(null);
+    setOpenDeleteFolderModal(false);
     toggleFolderDrawer(false);
   };
 
@@ -298,7 +376,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
       secondaryAction={
         <IconButton
           edge="end"
-          onClick={() => handleRemovePerson(person.userId)}
+          onClick={() => handleOpenRemoveModal(person)}
           sx={{
             padding: '8px 20px',
             borderRadius: '40px',
@@ -356,26 +434,111 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
   // Main Render
   return (
     <>
-      {/* Error Message */}
-      {invalidFolder && (
-        <Typography variant="body2" color="error">
-          {invalidFolder}
-        </Typography>
-      )}
-
-      {/* Success Snackbar */}
+      {/* Improved Snackbar with specific messages */}
       <Snackbar
-        open={successSnackbarOpen}
-        onClose={handleCloseSuccessSnackbar}
+        open={snackbar.open}
+        onClose={handleCloseSnackbar}
         autoHideDuration={6000}
         TransitionComponent={Fade}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
-        <Alert severity="success" onClose={handleCloseSuccessSnackbar}>
-          <AlertTitle>Success</AlertTitle>
-          Folder successfully saved/removed!
+        <Alert severity={snackbar.severity} onClose={handleCloseSnackbar}>
+          <AlertTitle>
+            {snackbar.severity === 'success'
+              ? 'Success'
+              : snackbar.severity === 'error'
+              ? 'Error'
+              : snackbar.severity === 'warning'
+              ? 'Warning'
+              : 'Info'}
+          </AlertTitle>
+          {snackbar.message}
         </Alert>
       </Snackbar>
+
+      {/* Remove Person Confirmation Modal */}
+      <ConfirmationDialog
+        open={openRemoveModal}
+        onClose={handleCloseRemoveModal}
+        onConfirm={handleConfirmRemove}
+        title="Remove Person"
+        message={`Are you sure you want to remove ${personToRemove?.fullName} from the folder "${folderName}"? ${`\n\n`} This action cannot be undone.`}
+        confirmText="Remove"
+        confirmColor="error"
+      />
+
+      {/* Delete Folder Confirmation Modal */}
+      <ConfirmationDialog
+        open={openDeleteFolderModal}
+        onClose={handleCloseDeleteFolderModal}
+        onConfirm={handleConfirmDeleteFolder}
+        title="Delete Folder"
+        message={`Are you sure you want to delete the folder "${folderName}"?${`\n\n`} This action cannot be undone and will remove all associated data.`}
+        confirmText="Delete"
+        confirmColor="error"
+      />
+
+      {/* Add People Modal */}
+      <Dialog
+        open={openAddModal}
+        onClose={handleCloseAddModal}
+        PaperProps={{
+          sx: { width: '30rem', height: '30rem', borderRadius: '1.75rem', padding: '0.5rem' },
+        }}
+      >
+        <DialogTitle
+          display="flex"
+          flexDirection="row"
+          alignItems="center"
+          justifyContent="space-between"
+        >
+          <HeaderWithIcon
+            Icon={GroupAdd}
+            headerText="Add People"
+            headerVariant="h3"
+            iconColor="secondary.main"
+          />
+          <IconButton
+            aria-label="close"
+            onClick={handleCloseAddModal}
+            sx={{ color: (theme) => theme.palette.grey[500] }}
+          >
+            <Close />
+          </IconButton>
+        </DialogTitle>
+        <InputBase
+          placeholder="Search by name"
+          sx={{
+            alignSelf: 'center',
+            width: '90%',
+            px: '1.25rem',
+            py: '0.75rem',
+            color: 'secondary.light',
+            backgroundColor: 'secondary.lighter',
+            borderRadius: '1.75rem',
+            fontWeight: 400,
+            fontSize: '1rem',
+          }}
+          value={searchString}
+          onChange={(e) => setSearchString(e.target.value)}
+          autoFocus
+        />
+        <DialogContent sx={{ pt: 0 }}>
+          <List>
+            {filteredPeople.length > 0 ? (
+              filteredPeople.map((person) => (
+                <AddPersonListItem key={person.userId} person={person} />
+              ))
+            ) : (
+              <ListItem>
+                <Typography variant="subtitle1" color="primary.lighter">
+                  No users found
+                </Typography>
+              </ListItem>
+            )}
+          </List>
+        </DialogContent>
+      </Dialog>
 
       {/* Folder Drawer */}
       <Drawer
@@ -419,7 +582,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
           {mode === 'edit' && (
             <Box sx={{ p: '1.125rem' }}>
               <Typography fontSize="0.75rem" fontStyle="italic" color="#CCC2DC">
-                {createdDateString || 'Created on INSERT DATE'}
+                {createdDateString || 'Created on unknown date'}
               </Typography>
             </Box>
           )}
@@ -466,7 +629,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
               </Typography>
               <Button
                 startIcon={<GroupAdd />}
-                onClick={handleOpenModal}
+                onClick={handleOpenAddModal}
                 sx={{
                   color: 'secondary.main',
                   padding: '8px 20px',
@@ -531,7 +694,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
           {mode === 'edit' && (
             <Box sx={{ position: 'absolute', bottom: '1.125rem', left: '1.125rem' }}>
               <Button
-                onClick={deleteGroup}
+                onClick={handleOpenDeleteFolderModal}
                 sx={{
                   color: '#EFB8C8',
                   borderRadius: '40px',
@@ -551,68 +714,6 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
           )}
         </Box>
       </Drawer>
-
-      {/* Add People Modal */}
-      <Dialog
-        open={openModal}
-        onClose={handleCloseModal}
-        PaperProps={{
-          sx: { width: '30rem', height: '30rem', borderRadius: '1.75rem', padding: '0.5rem' },
-        }}
-      >
-        <DialogTitle
-          display="flex"
-          flexDirection="row"
-          alignItems="center"
-          justifyContent="space-between"
-        >
-          <HeaderWithIcon
-            Icon={GroupAdd}
-            headerText="Add People"
-            headerVariant="h3"
-            iconColor="secondary.main"
-          />
-          <IconButton
-            aria-label="close"
-            onClick={handleCloseModal}
-            sx={{ color: (theme) => theme.palette.grey[500] }}
-          >
-            <Close />
-          </IconButton>
-        </DialogTitle>
-        <InputBase
-          placeholder="Search by name"
-          sx={{
-            alignSelf: 'center',
-            width: '90%',
-            px: '1.25rem',
-            py: '0.75rem',
-            color: 'secondary.light',
-            backgroundColor: 'secondary.lighter',
-            borderRadius: '1.75rem',
-            fontWeight: 400,
-            fontSize: '1rem',
-          }}
-          value={searchString}
-          onChange={(e) => setSearchString(e.target.value)}
-          autoFocus
-        />
-        <DialogContent sx={{ pt: 0 }}>
-          <List>
-            {filteredPeople.length > 0 ? (
-              filteredPeople.map((person) => (
-                <AddPersonListItem key={person.userId} person={person} />
-              ))
-            ) : (
-              <ListItem>
-                <Typography variant="subtitle1" color="primary.lighter">
-                  No users exist or failed retrieving users
-                </Typography>
-              </ListItem>
-            )}
-          </List>
-        </DialogContent>
-      </Dialog>
     </>
   );
 };

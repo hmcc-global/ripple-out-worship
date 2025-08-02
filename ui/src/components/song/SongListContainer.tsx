@@ -7,8 +7,9 @@ import {
   Modal,
   useMediaQuery,
   ButtonGroup,
+  Grid,
 } from '@mui/material';
-import { FC, ReactElement, useEffect, useState, useCallback } from 'react';
+import { FC, ReactElement, useEffect, useState, useCallback, useRef } from 'react';
 import { SongSchema, SongSearchFilter } from '../../types/song.types';
 import SongCard from './SongCard';
 import SongSearch from './SongSearch';
@@ -25,9 +26,8 @@ const SongListContainer: FC = (): ReactElement => {
   const { user } = useUser();
   const [songResults, setSongResults] = useState<SongSchema[]>([]);
   const [filterData, setFilterData] = useState<SongSearchFilter>();
-  const [search, setSearch] = useState('');
   const [open, setOpen] = useState(false);
-  const [showDetails, setShowDetails] = useState(true);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -40,31 +40,8 @@ const SongListContainer: FC = (): ReactElement => {
 
   const [loading, setLoading] = useState(true);
 
-  const handleScroll = () => {
-    const searchDisplayBox = document.getElementById('search-display');
-    if (searchDisplayBox) {
-      const { scrollTop, scrollHeight, clientHeight } = searchDisplayBox;
-      const isAtBottom = scrollTop + clientHeight >= scrollHeight - 5;
-      if (!loading && isAtBottom && page < totalPages) {
-        setPage((page) => page + 1);
-        searchDisplayBox.scrollTop = scrollTop - 30;
-      }
-    }
-  };
-
-  useEffect(() => {
-    const searchDisplayBox = document.getElementById('search-display');
-    if (searchDisplayBox) {
-      searchDisplayBox.addEventListener('scroll', handleScroll);
-    }
-    return () => {
-      if (searchDisplayBox) {
-        searchDisplayBox.removeEventListener('scroll', handleScroll);
-      }
-    };
-  }, [loading, page, totalPages]);
-
   const getSongResults = useCallback(async () => {
+    setLoading(true);
     if (filterData) {
       try {
         const payload = await axios.get('/api/songs/search', {
@@ -95,10 +72,39 @@ const SongListContainer: FC = (): ReactElement => {
     } else {
       setSongResults(allSongs);
     }
-  }, [filterData, page]);
+  }, [filterData, page, allSongs]);
+
+  const handleScroll = useCallback(() => {
+    const searchDisplayBox = document.getElementById('search-display');
+    if (searchDisplayBox) {
+      const { scrollTop, scrollHeight, clientHeight } = searchDisplayBox;
+      const isAtBottom = scrollTop + clientHeight >= scrollHeight - 5;
+      if (isAtBottom && timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      if (!loading && isAtBottom && page < totalPages) {
+        timeoutRef.current = setTimeout(() => {
+          setPage((prevPage) => prevPage + 1);
+        }, 300);
+        searchDisplayBox.scrollTop = scrollTop - 30;
+      }
+    }
+  }, [loading, page, totalPages, getSongResults]);
 
   useEffect(() => {
-    setLoading(true);
+    const searchDisplayBox = document.getElementById('search-display');
+    if (searchDisplayBox) {
+      searchDisplayBox.addEventListener('scroll', handleScroll);
+    }
+    return () => {
+      if (searchDisplayBox) {
+        searchDisplayBox.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, [loading, page, totalPages, handleScroll]);
+
+  // useffect for filter
+  useEffect(() => {
     setSongResults([]);
     setPage(1);
 
@@ -120,17 +126,16 @@ const SongListContainer: FC = (): ReactElement => {
   }, [filterData]);
 
   useEffect(() => {
-    if (page >= 2) {
-      getSongResults();
-    }
-  }, [page]);
-
-  useEffect(() => {
     if (location.search) {
       const searchQuery = new URLSearchParams(location.search).get('q');
-      setFilterData({ ...filterData, search: searchQuery });
+      setFilterData((prevState) => ({ ...prevState, search: searchQuery }));
     }
   }, [location.search]);
+
+  // useEffect for scrolling
+  useEffect(() => {
+    if (page > 1 && page <= totalPages) getSongResults();
+  }, [page, totalPages, getSongResults]);
 
   const modalSearchStyle = {
     width: '100vw',
@@ -138,8 +143,6 @@ const SongListContainer: FC = (): ReactElement => {
     bgcolor: 'background.paper',
     p: '32px 16px',
   };
-
-  const [viewOption, setViewOption] = useState<string>('cards');
 
   return (
     <>
@@ -236,51 +239,44 @@ const SongListContainer: FC = (): ReactElement => {
           }
         />
         <Box display={{ base: 'block', md: 'none' }}></Box>
-        <Stack
-          direction={{ base: 'column', md: 'row' }}
-          maxWidth="100%"
-          height="90vh"
-          width="100%"
-          gap={'1%'}
-        >
-          <Box display={isDesktop ? 'flex' : 'none'}>
-            <SongSearch
-              filterData={filterData}
-              setFilterData={setFilterData}
-              onClose={handleClose}
-              songs={allSongs}
-              setSearch={setSearch}
-              isDesktop={isDesktop}
-            />
-          </Box>
-          <Box display={isDesktop ? 'none' : 'flex'}>
-            <SongSearchMobile
-              filterData={filterData}
-              setFilterData={setFilterData}
-              onClose={handleClose}
-              songs={allSongs}
-              setSearch={setSearch}
-              isDesktop={isDesktop}
-            />
-          </Box>
+        <Grid container maxWidth="100%" height="90vh" width="100%" spacing={1}>
+          <Grid item xs={isDesktop ? 4 : 12}>
+            {isDesktop ? (
+              <SongSearch
+                filterData={filterData}
+                setFilterData={setFilterData}
+                onClose={handleClose}
+                songs={allSongs}
+                isDesktop={isDesktop}
+              />
+            ) : (
+              <SongSearchMobile
+                filterData={filterData}
+                setFilterData={setFilterData}
+                onClose={handleClose}
+                songs={allSongs}
+                isDesktop={isDesktop}
+              />
+            )}
+          </Grid>
 
           {/* Song cards search results */}
-          <Box display="flex" height="100%">
+          <Grid item xs={isDesktop ? 8 : 12} height="100%">
             <Container
               sx={{
                 py: '1em',
                 background: '#000',
                 borderRadius: '16px',
                 width: '100%',
+                height: '100%',
                 maxHeight: { xs: '90%', md: '100%' },
               }}
             >
               <Stack
                 direction="row"
                 alignItems="center"
-                justifyContent={'space-between'}
-                pb={'1em'}
-                height="3%"
+                justifyContent="space-between"
+                pb="1em"
                 spacing="space-between"
                 maxWidth="100%"
               >
@@ -307,7 +303,7 @@ const SongListContainer: FC = (): ReactElement => {
                   },
                 }}
               >
-                {loading && songResults.length == 0 ? (
+                {loading && songResults.length === 0 ? (
                   <Stack height="80%" justifyContent="center" alignItems="center" width={'400'}>
                     <CircularProgress />
                   </Stack>
@@ -316,7 +312,6 @@ const SongListContainer: FC = (): ReactElement => {
                     <SongCard
                       key={i}
                       {...song}
-                      showDetails={showDetails}
                       filterData={filterData}
                       isDesktop={isDesktop}
                       firstLine={getFirstLineLyrics(song.chordLyrics)}
@@ -332,8 +327,8 @@ const SongListContainer: FC = (): ReactElement => {
                 )}
               </Stack>
             </Container>
-          </Box>
-        </Stack>
+          </Grid>
+        </Grid>
       </Container>
 
       <Modal
@@ -348,7 +343,6 @@ const SongListContainer: FC = (): ReactElement => {
             setFilterData={setFilterData}
             onClose={handleClose}
             songs={allSongs}
-            setSearch={setSearch}
             isDesktop={false}
           />
         </Box>

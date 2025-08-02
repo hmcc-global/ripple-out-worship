@@ -46,7 +46,22 @@ const createSetlist: RequestHandler = async (req: Request, res: Response): Promi
 const getSetlist: RequestHandler = async (req: Request, res: Response): Promise<void> => {
   const { id: setlistId } = req.query;
 
-  if (setlistId) {
+  if (Array.isArray(setlistId)) {
+    try {
+      const data: SetlistDocument[] = await Setlist.find({
+        _id: { $in: setlistId },
+        isDeleted: false,
+      }).exec();
+
+      if (data && data.length > 0) {
+        sendResponse(res, 200, data);
+      } else {
+        sendResponse(res, 404, 'No setlists found with the provided IDs');
+      }
+    } catch (error: any) {
+      sendResponse(res, 500, error?.message);
+    }
+  } else if (setlistId) {
     try {
       const data: SetlistDocument = await Setlist.findOne({
         _id: setlistId,

@@ -5,22 +5,18 @@ import '@mui/material/styles';
 import { createBreakpoints } from '@mui/system';
 const breakpoints = createBreakpoints({});
 
-// const PRIMARY_MAIN = '#4B50B4';
 const PRIMARY_MAIN = '#4F378B';
 const PRIMARY_LIGHT = '#C9CDFF';
-// const PRIMARY_LIGHTER = '#DDE0FF';
 const PRIMARY_LIGHTER = '#E6E0E9';
-// const PRIMARY_LIGHTEST = '#EEEFFF';
 const PRIMARY_LIGHTEST = '#EADDFF';
 const PRIMARY_DARK = '#6750A4';
 const PRIMARY_DARKER = '#1D192B';
 const PRIMARY_DARKEST = '#141218';
 
 const SECONDARY_MAIN = '#D0BCFE';
-const SECONDARY_LIGHT = '#EADDFF'; // grey
-const SECONDARY_LIGHTER = '#4A4458'; // purple grey
-const SECONDARY_DARK = '#EADDFF'; // grey, same as SECONDARY_LIGHT
-// const SECONDARY_DARK = '#332D41'; // previous secondary dark, causes buttons to be colored similar to BG when hovered
+const SECONDARY_LIGHT = '#EADDFF';
+const SECONDARY_LIGHTER = '#4A4458';
+const SECONDARY_DARK = '#EADDFF';
 
 const WARNING_MAIN = '#EFB8C8';
 
@@ -102,6 +98,7 @@ declare module '@mui/material/styles/createPalette' {
     contrastText: string;
   }
 }
+
 interface ExtendedPaletteColorOptions extends SimplePaletteColorOptions {
   darker?: string;
   lighter?: string;
@@ -112,7 +109,9 @@ interface ExtendedPaletteColorOptions extends SimplePaletteColorOptions {
 interface ExtendedPaletteOptions extends PaletteOptions {
   primary: ExtendedPaletteColorOptions;
   secondary: ExtendedPaletteColorOptions;
+  error?: ExtendedPaletteColorOptions;
 }
+
 const palette: ExtendedPaletteOptions = {
   primary: {
     main: PRIMARY_MAIN,
@@ -129,6 +128,9 @@ const palette: ExtendedPaletteOptions = {
     lighter: SECONDARY_LIGHTER,
     dark: SECONDARY_DARK,
   },
+  error: {
+    main: WARNING_MAIN,
+  },
   background: {
     default: '#171717',
     paper: '#0F0D13',
@@ -140,13 +142,15 @@ const palette: ExtendedPaletteOptions = {
     primary: '#fff',
   },
 };
+
 const customTheme = createTheme({
   palette: palette,
   typography: {
     htmlFontSize: 16,
-    fontFamily: ['Work Sans', 'DM Sans'].join(','),
+    fontFamily: ['DM Sans', 'Work Sans'].join(','),
     h1: {
-      fontSize: '2rem', // Equivalent to 32px (16 * 2)
+      fontFamily: 'Work Sans',
+      fontSize: '2rem',
       fontWeight: 700,
       [breakpoints.up('lg')]: {
         fontSize: '1.875rem',
@@ -156,49 +160,59 @@ const customTheme = createTheme({
       },
     },
     h2: {
-      fontSize: '1.5rem', // Equivalent to 24px (16 * 1.5)
+      fontFamily: 'Work Sans',
+      fontSize: '1.5rem',
       fontWeight: 700,
     },
     h3: {
-      fontSize: '1.25rem', // Equivalent to 20px (16 * 1.25)
+      fontFamily: 'Work Sans',
+      fontSize: '1.25rem',
       fontWeight: 700,
     },
     h4: {
-      fontSize: '1.125rem', // Equivalent to 18px (16 * 1.125)
+      fontFamily: 'Work Sans',
+      fontSize: '1.125rem',
       fontWeight: 700,
     },
     h5: {
-      fontSize: '1rem', // Equivalent to 16px (16 * 1)
+      fontFamily: 'Work Sans',
+      fontSize: '1rem',
       fontWeight: 700,
     },
     subtitle1: {
-      fontSize: '1rem', // Equivalent to 16px (16 * 1)
+      fontFamily: 'DM Sans',
+      fontSize: '1rem',
       fontWeight: 600,
     },
     subtitle2: {
-      fontSize: '0.875rem', // Equivalent to 14px (16 * 0.875)
+      fontFamily: 'DM Sans',
+      fontSize: '0.875rem',
       fontWeight: 500,
     },
     body1: {
-      fontSize: '1rem', // Equivalent to 16px (16 * 1)
+      fontFamily: 'DM Sans',
+      fontSize: '1rem',
       fontWeight: 400,
       [breakpoints.down('sm')]: {
         fontSize: '0.875rem',
       },
     },
     body2: {
-      fontSize: '0.875rem', // Equivalent to 14px (16 * 0.875)
+      fontFamily: 'DM Sans',
+      fontSize: '0.875rem',
       fontWeight: 400,
       [breakpoints.down('sm')]: {
         fontSize: '0.8rem',
       },
     },
     caption: {
-      fontSize: '0.6875rem', // Equivalent to 11px (16 * 0.0.6875)
+      fontFamily: 'DM Sans',
+      fontSize: '0.6875rem',
       fontWeight: 400,
     },
     button: {
-      fontSize: '0.875rem', // Equivalent to 14px (16 * 0.875)
+      fontFamily: 'DM Sans',
+      fontSize: '0.875rem',
       fontWeight: 600,
       textTransform: 'none',
     },
@@ -341,7 +355,7 @@ const customTheme = createTheme({
       styleOverrides: {
         root: {
           '& .MuiPaper-root': {
-            backgroundColor: '#1D1B20',
+            backgroundColor: '#2B2930',
             color: PRIMARY_LIGHTER,
             border: '1px solid #938F99',
             borderRadius: '8px',
@@ -405,8 +419,8 @@ const customTheme = createTheme({
     MuiMenu: {
       styleOverrides: {
         paper: {
-          backgroundColor: PRIMARY_DARKEST, // Set the background color of the menu
-          color: PRIMARY_LIGHTER, // Set the text color of the menu
+          backgroundColor: PRIMARY_DARKEST,
+          color: PRIMARY_LIGHTER,
         },
       },
     },
@@ -414,7 +428,7 @@ const customTheme = createTheme({
       styleOverrides: {
         root: {
           '&:hover': {
-            backgroundColor: PRIMARY_DARK, // Set the hover background color of the menu items
+            backgroundColor: PRIMARY_DARK,
           },
         },
       },
@@ -422,14 +436,70 @@ const customTheme = createTheme({
     MuiDrawer: {
       styleOverrides: {
         paper: {
-          backgroundColor: '#2B2930', // Set the background color of the drawer
+          backgroundColor: '#2B2930',
         },
       },
     },
     MuiDialog: {
       styleOverrides: {
         paper: {
-          backgroundColor: '#2B2930', // Set the background color of the dialog
+          backgroundColor: '#2B2930',
+          color: PRIMARY_LIGHTER,
+          border: '1px solid #938F99',
+          borderRadius: '8px',
+          boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.3)',
+        },
+      },
+    },
+    MuiDialogTitle: {
+      styleOverrides: {
+        root: {
+          fontFamily: 'Work Sans',
+          fontSize: '1.25rem',
+          fontWeight: 700,
+          color: '#fff',
+          padding: '16px 24px',
+        },
+      },
+    },
+    MuiDialogContent: {
+      styleOverrides: {
+        root: {
+          fontFamily: 'DM Sans',
+          fontSize: '1rem',
+          fontWeight: 400,
+          color: PRIMARY_LIGHTER,
+          padding: '8px 24px',
+        },
+      },
+    },
+    MuiDialogContentText: {
+      styleOverrides: {
+        root: {
+          fontFamily: 'DM Sans',
+          fontSize: '1rem',
+          fontWeight: 400,
+          color: PRIMARY_LIGHTER,
+          whiteSpace: 'pre-line', // Ensures \n is rendered as a line break
+        },
+      },
+    },
+    MuiDialogActions: {
+      styleOverrides: {
+        root: {
+          padding: '8px 24px 16px',
+          '& .MuiButton-root': {
+            borderRadius: '30px',
+            fontSize: '0.875rem',
+            fontWeight: 600,
+            padding: '6px 16px',
+          },
+          '& .MuiButton-textPrimary': {
+            color: SECONDARY_MAIN,
+            '&:hover': {
+              backgroundColor: 'rgba(208, 188, 255, 0.15)',
+            },
+          },
         },
       },
     },
@@ -451,6 +521,20 @@ const customTheme = createTheme({
           textTransform: 'none',
           fontWeight: 600,
           borderRadius: '30px',
+        },
+        containedError: {
+          backgroundColor: WARNING_MAIN,
+          color: PRIMARY_DARKEST,
+          '&:hover': {
+            backgroundColor: 'rgba(239, 184, 200, 0.2)',
+            color: WARNING_MAIN,
+          },
+        },
+        outlined: {
+          border: '1px solid #938F99',
+          '&:hover': {
+            borderColor: SECONDARY_MAIN,
+          },
         },
       },
     },
