@@ -83,7 +83,7 @@ const PrivateRouteWrapper = ({ children, permissions }: PrivateRouteProps) => {
     return <Skeleton />;
   }
   // CASE 2: Routes that don't care about auth status (public routes)
-  if (isPublic) {
+  if (isPublic && isAuthenticated) {
     return <PageWithNavBar children={children} />;
   }
 
