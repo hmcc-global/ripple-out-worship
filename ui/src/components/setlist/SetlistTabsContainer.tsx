@@ -26,7 +26,6 @@ import {
   Menu,
   MenuItem,
   Snackbar,
-  CircularProgress,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
@@ -244,21 +243,22 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
   }, []);
 
   // Render Helper Functions
-  const renderNestedSetlistItem = (setlist: Setlist, folderId: string) => {
+  const renderNestedSetlistItem = (setlistId: string, folderId: string) => {
+    const setlist = allSetlists.find((s) => s._id === setlistId);
     if (!setlist) return null;
 
     return (
       <ListItemButton
         sx={{
           pl: 6,
-          ...(selectedSetlistId === setlist._id && selectedFolderId === folderId
+          ...(selectedSetlistId === setlistId && selectedFolderId === folderId
             ? SELECTED_ITEM_STYLE
             : { borderBottom: '1px solid #49454F' }),
         }}
-        key={setlist._id}
+        key={setlistId}
         onClick={() => {
           setSelectedFolderId(folderId);
-          handleSelectSetlist(setlist._id);
+          handleSelectSetlist(setlistId);
         }}
       >
         <ListItemIcon sx={{ minWidth: '40px', mr: '0.5rem' }}>
@@ -273,52 +273,21 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
     );
   };
 
-  const FolderContent = ({ folder }: { folder: SetlistFolder }) => {
-    const [folderSetlists, setFolderSetlists] = useState<Setlist[]>([]);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-
-    useEffect(() => {
-      const fetchSetlists = async () => {
-        if (folder.setlistIds?.length) {
-          try {
-            setIsLoading(true);
-            const setlistRes = await axios.get<Setlist[]>('/api/setlists/get', {
-              params: {
-                id: folder.setlistIds,
-              },
-            });
-            setFolderSetlists(setlistRes.data);
-          } catch (error) {
-            console.error('Error fetching setlists:', error);
-          } finally {
-            setIsLoading(false);
-          }
-        }
-      };
-
-      fetchSetlists();
-    }, [folder._id, folder.setlistIds]);
-
-    return (
-      <Collapse in={openFolders.includes(folder._id)} timeout="auto" unmountOnExit>
-        <List component="div" disablePadding>
-          {isLoading ? (
-            <ListItem sx={{ pl: 7 }}>
-              <CircularProgress size={20} />
-            </ListItem>
-          ) : folderSetlists.length > 0 ? (
-            folderSetlists.map((setlist) => renderNestedSetlistItem(setlist, folder._id))
-          ) : (
-            <ListItem sx={{ pl: 7 }}>
-              <Typography variant="subtitle2" color="secondary.light">
-                No setlists in this folder
-              </Typography>
-            </ListItem>
-          )}
-        </List>
-      </Collapse>
-    );
-  };
+  const renderFolderContent = (folder: SetlistFolder) => (
+    <Collapse in={openFolders.includes(folder._id)} timeout="auto" unmountOnExit>
+      <List component="div" disablePadding>
+        {folder.setlistIds?.length > 0 ? (
+          folder.setlistIds.map((setlistId) => renderNestedSetlistItem(setlistId, folder._id))
+        ) : (
+          <ListItem sx={{ pl: 7 }}>
+            <Typography variant="subtitle2" color="secondary.light">
+              No setlists in this folder
+            </Typography>
+          </ListItem>
+        )}
+      </List>
+    </Collapse>
+  );
 
   const renderFolderItem = (folder: SetlistFolder) => (
     <Fragment key={folder._id}>
@@ -351,7 +320,7 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
             <ExpandMore sx={LIST_ITEM_ICON_STYLE} />
           ))}
       </ListItemButton>
-      {<FolderContent folder={folder} />}
+      {renderFolderContent(folder)}
     </Fragment>
   );
 
