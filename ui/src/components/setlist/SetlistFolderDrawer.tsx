@@ -114,8 +114,9 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
             name: folderName,
             createdAt: folderCreated,
           };
+          // Check if the user is already part of the folder
           if (!currentUser?.groupIds?.some((group) => group.id === currentGroup.id)) {
-            const { data, status } = await axios.put(`/api/ownerships/${userId}`, {
+            const { data, status } = await axios.put('/api/ownerships/update', {
               ...currentUser,
               groupIds: [...(currentUser?.groupIds || []), currentGroup],
             });
