@@ -44,12 +44,57 @@ interface SetlistFolderDrawerProps {
   mode: string;
 }
 
-// Snackbar message types
 interface SnackbarState {
   open: boolean;
   message: string;
   severity: 'success' | 'error' | 'warning' | 'info';
 }
+
+interface ConfirmationDialogProps {
+  open: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  title: string;
+  message: string;
+  confirmText?: string;
+  cancelText?: string;
+  confirmColor?: 'primary' | 'error' | 'warning' | 'success';
+}
+
+// Reusable Confirmation Dialog Component
+const ConfirmationDialog = ({
+  open,
+  onClose,
+  onConfirm,
+  title,
+  message,
+  confirmText = 'Confirm',
+  cancelText = 'Cancel',
+  confirmColor = 'primary',
+}: ConfirmationDialogProps) => (
+  <Dialog
+    open={open}
+    onClose={onClose}
+    aria-labelledby="confirmation-dialog-title"
+    aria-describedby="confirmation-dialog-description"
+    PaperProps={{
+      sx: { width: '30rem', borderRadius: '1.75rem', padding: '0.5rem' },
+    }}
+  >
+    <DialogTitle id="confirmation-dialog-title">{title}</DialogTitle>
+    <DialogContent>
+      <DialogContentText id="confirmation-dialog-description">{message}</DialogContentText>
+    </DialogContent>
+    <DialogActions>
+      <Button onClick={onClose} color="primary">
+        {cancelText}
+      </Button>
+      <Button onClick={onConfirm} color={confirmColor} autoFocus>
+        {confirmText}
+      </Button>
+    </DialogActions>
+  </Dialog>
+);
 
 // Component
 const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
@@ -64,6 +109,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
     folderCreated,
     mode,
   } = props;
+
   // Hooks
   const ownership = useOwnership();
   const theme = useTheme();
@@ -76,6 +122,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
   const [addedPeople, setAddedPeople] = useState<string[]>([]);
   const [openAddModal, setOpenAddModal] = useState<boolean>(false);
   const [openRemoveModal, setOpenRemoveModal] = useState<boolean>(false);
+  const [openDeleteFolderModal, setOpenDeleteFolderModal] = useState<boolean>(false);
   const [personToRemove, setPersonToRemove] = useState<Ownership | null>(null);
   const [snackbar, setSnackbar] = useState<SnackbarState>({
     open: false,
@@ -239,9 +286,13 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
 
   const deleteGroup = useCallback(async () => {
     try {
-      const { status } = await axios.delete(`/api/folders/${folderId}`);
+      const { status } = await axios.put(`/api/groups/delete`, {
+        params: {
+          id: folderId,
+        },
+      });
       if (status === 200) {
-        await axios.put(`/api/ownerships/${ownership.userId}`, {
+        await axios.put('/api/ownerships/update', {
           ...ownership,
           groupIds: ownership.groupIds.filter((group) => group.id !== folderId),
         });
@@ -305,6 +356,19 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
     handleCloseRemoveModal();
   }, [personToRemove, handleCloseRemoveModal, handleRemovePerson]);
 
+  const handleOpenDeleteFolderModal = useCallback(() => {
+    setOpenDeleteFolderModal(true);
+  }, []);
+
+  const handleCloseDeleteFolderModal = useCallback(() => {
+    setOpenDeleteFolderModal(false);
+  }, []);
+
+  const handleConfirmDeleteFolder = useCallback(() => {
+    deleteGroup();
+    handleCloseDeleteFolderModal();
+  }, [deleteGroup, handleCloseDeleteFolderModal]);
+
   const handleOpenAddModal = useCallback(() => setOpenAddModal(true), []);
 
   const handleCloseAddModal = useCallback(() => {
@@ -348,6 +412,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
     setOpenAddModal(false);
     setOpenRemoveModal(false);
     setPersonToRemove(null);
+    setOpenDeleteFolderModal(false);
     toggleFolderDrawer(false);
   };
 
@@ -439,31 +504,26 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
       </Snackbar>
 
       {/* Remove Person Confirmation Modal */}
-      <Dialog
+      <ConfirmationDialog
         open={openRemoveModal}
         onClose={handleCloseRemoveModal}
-        aria-labelledby="remove-person-dialog-title"
-        aria-describedby="remove-person-dialog-description"
-        PaperProps={{
-          sx: { width: '30rem', borderRadius: '1.75rem', padding: '0.5rem' },
-        }}
-      >
-        <DialogTitle id="remove-person-dialog-title">Remove Person</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="remove-person-dialog-description">
-            Are you sure you want to remove {personToRemove?.fullName} from the folder "{folderName}
-            "? {`\n`} This action cannot be undone.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseRemoveModal} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleConfirmRemove} color="error" autoFocus>
-            Remove
-          </Button>
-        </DialogActions>
-      </Dialog>
+        onConfirm={handleConfirmRemove}
+        title="Remove Person"
+        message={`Are you sure you want to remove ${personToRemove?.fullName} from the folder "${folderName}"? This action cannot be undone.`}
+        confirmText="Remove"
+        confirmColor="error"
+      />
+
+      {/* Delete Folder Confirmation Modal */}
+      <ConfirmationDialog
+        open={openDeleteFolderModal}
+        onClose={handleCloseDeleteFolderModal}
+        onConfirm={handleConfirmDeleteFolder}
+        title="Delete Folder"
+        message={`Are you sure you want to delete the folder "${folderName}"? This action cannot be undone and will remove all associated data.`}
+        confirmText="Delete"
+        confirmColor="error"
+      />
 
       {/* Add People Modal */}
       <Dialog
@@ -681,7 +741,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
           {mode === 'edit' && (
             <Box sx={{ position: 'absolute', bottom: '1.125rem', left: '1.125rem' }}>
               <Button
-                onClick={deleteGroup}
+                onClick={handleOpenDeleteFolderModal}
                 sx={{
                   color: '#EFB8C8',
                   borderRadius: '40px',
