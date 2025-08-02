@@ -41,6 +41,7 @@ const SongListContainer: FC = (): ReactElement => {
   const [loading, setLoading] = useState(true);
 
   const getSongResults = useCallback(async () => {
+    setLoading(true);
     if (filterData) {
       try {
         const payload = await axios.get('/api/songs/search', {
@@ -82,12 +83,9 @@ const SongListContainer: FC = (): ReactElement => {
         clearTimeout(timeoutRef.current);
       }
       if (!loading && isAtBottom && page < totalPages) {
-        setLoading(true);
         timeoutRef.current = setTimeout(() => {
           setPage((prevPage) => prevPage + 1);
-          getSongResults();
         }, 300);
-        setLoading(false);
         searchDisplayBox.scrollTop = scrollTop - 30;
       }
     }
@@ -105,6 +103,7 @@ const SongListContainer: FC = (): ReactElement => {
     };
   }, [loading, page, totalPages, handleScroll]);
 
+  // useffect for filter
   useEffect(() => {
     setSongResults([]);
     setPage(1);
@@ -129,9 +128,14 @@ const SongListContainer: FC = (): ReactElement => {
   useEffect(() => {
     if (location.search) {
       const searchQuery = new URLSearchParams(location.search).get('q');
-      setFilterData({ ...filterData, search: searchQuery });
+      setFilterData((prevState) => ({ ...prevState, search: searchQuery }));
     }
-  }, [location.search, filterData]);
+  }, [location.search]);
+
+  // useEffect for scrolling
+  useEffect(() => {
+    if (page > 1 && page <= totalPages) getSongResults();
+  }, [page, totalPages, getSongResults]);
 
   const modalSearchStyle = {
     width: '100vw',
