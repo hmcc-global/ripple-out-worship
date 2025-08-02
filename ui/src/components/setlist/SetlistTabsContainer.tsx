@@ -336,7 +336,7 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
   const renderFolderContent = (folder: SetlistFolder) => (
     <Collapse in={openFolders.includes(folder._id)} timeout="auto" unmountOnExit>
       <List component="div" disablePadding>
-        {/* TODO-YY: Remove this "Set" logic after fixing duplicated setlist bug */}
+        {/* TODO: Workaround for duplicated setlist bug, see issue #119. Remove this "Set" logic after fixing the underlying bug. */}{' '}
         {folder.setlistIds?.length > 0 ? (
           Array.from(new Set(folder.setlistIds)).map((setlistId) =>
             renderNestedSetlistItem(setlistId, folder._id)
