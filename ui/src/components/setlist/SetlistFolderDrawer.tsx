@@ -112,7 +112,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
           const currentGroup: GroupOwnership = {
             id: folderId,
             name: folderName ?? '',
-            createdAt: folderCreated ?? Date.now.toString(),
+            createdAt: folderCreated ?? Date.now().toString(),
           };
           // Check if the user is already part of the folder
           if (!currentUser?.groupIds?.some((group) => group.id === currentGroup.id)) {
