@@ -239,8 +239,8 @@ const SongListContainer: FC = (): ReactElement => {
           }
         />
         <Box display={{ base: 'block', md: 'none' }}></Box>
-        <Grid container maxWidth="100%" height="90vh" width="100%" spacing={1}>
-          <Grid item xs={isDesktop ? 4 : 12}>
+        <Grid container maxWidth="100%" height="88vh" width="100%" spacing={1} marginTop={1}>
+          <Grid item xs={isDesktop ? 4 : 12} height="100%">
             {isDesktop ? (
               <SongSearch
                 filterData={filterData}

@@ -121,13 +121,20 @@ const SongSearch = (props: SongSearchProps) => {
   const [isDisplayResultOpen, setIsDisplayResultOpen] = useState<boolean>(true);
 
   return (
-    <Container sx={{ py: '1em', background: '#000', borderRadius: '16px' }}>
-      <Box sx={{ color: '#9E9E9E' }}>
+    <Container
+      sx={{
+        py: '1em',
+        background: '#000',
+        borderRadius: '16px',
+        height: '100%',
+      }}
+    >
+      <Box sx={{ color: '#9E9E9E' }} height="100%">
         {/* filter heading and reset button */}
         <Stack
           direction="row"
           alignItems="center"
-          pb={3}
+          height="5%"
           justifyContent="space-between"
           minWidth="100%"
         >
@@ -152,7 +159,7 @@ const SongSearch = (props: SongSearchProps) => {
           </Button>
         </Stack>
 
-        <Stack direction="column" gap={'1.25rem'}>
+        <Stack direction="column" spacing="1.25rem" height="95%" pb={4} sx={{ overflowY: 'auto' }}>
           <Box>
             <Typography variant="h4" color="#E6E0E9" pb={'0.5rem'}>
               Search Keywords
@@ -331,7 +338,7 @@ const SongSearch = (props: SongSearchProps) => {
             sx={{ border: 1, p: 1, borderRadius: '4px', borderColor: '#625B71' }}
             direction="row"
             alignItems="center"
-            gap={'0.5rem'}
+            spacing={'0.5rem'}
           >
             <Info sx={{ color: '#E8DEF8' }} />
             <Typography variant="body2">Song Title will be displayed by default</Typography>

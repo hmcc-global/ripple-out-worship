@@ -147,7 +147,7 @@ const SongSearch = (props: SongSearchProps) => {
                 backgroundColor: '#D0BCFF',
                 color: '#381E72',
                 padding: '10px',
-
+                width: '48px',
                 '&:hover': {
                   backgroundColor: 'darkpurple',
                 },
