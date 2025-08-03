@@ -19,13 +19,12 @@ import axios from 'axios';
 
 const SetlistViewContainerDesktop: FC = (): ReactElement => {
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
-  const [selectedSong, setSelectedSong] = useState<SongViewSchema>();
   const [setlist, setSetlist] = useState<Setlist>();
 
   const setlistId = window.location.pathname.split('/').reverse()[0];
   const openMenu = Boolean(menuAnchor);
   const songs = useMemo(() => (setlist && setlist.songs) || [], [setlist]);
-
+  const [selectedSong, setSelectedSong] = useState<SongViewSchema>(songs[0]);
   const handleSelectSong = (song: SongViewSchema) => {
     setSelectedSong(song);
   };
@@ -100,33 +99,37 @@ const SetlistViewContainerDesktop: FC = (): ReactElement => {
               {/* Song lyrics */}
               <Grid item xs={12} height="100%" overflow="auto" marginTop="8px">
                 <Stack height="100%">
-                  <SongsButtonsCard
-                    song={selectedSong}
-                    userView={true}
-                    userHeader={true}
-                    songsSelectionRow={
-                      <FormControl sx={{ mb: 2, minWidth: '300px' }}>
-                        <Select
-                          id="song-select"
-                          sx={{ borderRadius: '40px', px: 1, width: '300px' }}
-                          value={selectedSong?._id}
-                          onChange={(e) =>
-                            setSelectedSong(
-                              songs.find((song) => song._id === e.target.value) || songs[0]
-                            )
-                          }
-                        >
-                          {songs.map((song) => {
-                            return (
-                              <MenuItem key={song._id} value={song._id}>
-                                {song.title}
-                              </MenuItem>
-                            );
-                          })}
-                        </Select>
-                      </FormControl>
-                    }
-                  />
+                  {selectedSong ? (
+                    <SongsButtonsCard
+                      song={selectedSong}
+                      userView={true}
+                      userHeader={true}
+                      songsSelectionRow={
+                        <FormControl sx={{ mb: 2, minWidth: '300px' }}>
+                          <Select
+                            id="song-select"
+                            sx={{ borderRadius: '40px', px: 1, width: '300px' }}
+                            value={selectedSong?._id}
+                            onChange={(e) =>
+                              setSelectedSong(
+                                songs.find((song) => song._id === e.target.value) || songs[0]
+                              )
+                            }
+                          >
+                            {songs.map((song) => {
+                              return (
+                                <MenuItem key={song._id} value={song._id}>
+                                  {song.title}
+                                </MenuItem>
+                              );
+                            })}
+                          </Select>
+                        </FormControl>
+                      }
+                    />
+                  ) : (
+                    <Skeleton variant="text" height="100px" />
+                  )}
                 </Stack>
               </Grid>
             </Grid>
