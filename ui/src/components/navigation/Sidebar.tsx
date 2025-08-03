@@ -194,7 +194,8 @@ const SideBar: FC = (): ReactElement => {
                         borderRadius: '100px',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        padding: '5px',
+                        padding: '6px',
+                        px: '16px',
                       }}
                     >
                       {item.icon}
