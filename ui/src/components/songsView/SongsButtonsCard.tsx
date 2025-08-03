@@ -89,7 +89,7 @@ const SongsButtonsCard = ({
           pl: ['0px', '4px'],
         }}
       >
-        <Box display="flex" gap={2}>
+        <Box display="flex" gap={2} sx={{ overflowX: 'auto' }}>
           {songsSelectionRow}
           {/* Mobile view */}
           <Box

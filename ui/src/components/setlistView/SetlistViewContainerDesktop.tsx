@@ -105,10 +105,10 @@ const SetlistViewContainerDesktop: FC = (): ReactElement => {
                     userView={true}
                     userHeader={true}
                     songsSelectionRow={
-                      <FormControl sx={{ mb: 2 }}>
+                      <FormControl sx={{ mb: 2, minWidth: '300px' }}>
                         <Select
                           id="song-select"
-                          sx={{ borderRadius: '40px', px: 1, width: '400px' }}
+                          sx={{ borderRadius: '40px', px: 1, width: '300px' }}
                           value={selectedSong?._id}
                           onChange={(e) =>
                             setSelectedSong(
