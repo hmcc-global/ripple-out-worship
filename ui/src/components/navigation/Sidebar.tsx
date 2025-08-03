@@ -88,7 +88,6 @@ const SideBar: FC = (): ReactElement => {
     if (path === '/') setSelectedItem('Home');
     if (path.includes('song')) setSelectedItem('Songs');
     if (path.includes('setlist')) setSelectedItem('Setlists');
-    if (path.includes('resource')) setSelectedItem('Resources');
     if (path.includes('profile')) setSelectedItem('Profile');
   }, [location]);
 
@@ -97,7 +96,6 @@ const SideBar: FC = (): ReactElement => {
     { icon: <Language />, text: 'Home', path: '' },
     { icon: <MusicNoteIcon />, text: 'Songs', path: 'song' },
     { icon: <QueueMusicIcon />, text: 'Setlists', path: 'setlist' },
-    { icon: <TextSnippetIcon />, text: 'Resources', path: 'resource' },
     { icon: <Person />, text: 'Profile', path: 'profile' },
   ];
 
@@ -180,8 +178,6 @@ const SideBar: FC = (): ReactElement => {
                 <ListItem key={index} disablePadding>
                   <ListItemButton
                     selected={selectedItem === item.text}
-                    //TODO: remove when resources page is done
-                    disabled={item.text === 'Resources'}
                     onClick={() => handleClick(item.text, item.path)}
                     sx={{
                       flexDirection: 'column',

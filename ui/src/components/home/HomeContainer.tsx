@@ -50,6 +50,7 @@ const HomeContainer: FC = (): ReactElement => {
       <Box
         sx={{
           width: '100%',
+          height: '100%',
           flexGrow: 1,
           display: 'flex',
           justifyContent: 'center',
@@ -60,8 +61,8 @@ const HomeContainer: FC = (): ReactElement => {
           px: ['0em', '1em'],
         }}
       >
-        <Stack direction={'column'}>
-          <Stack direction={['column', 'row']} spacing={2} gap={['25px', '12px']}>
+        <Stack direction={'column'} height="100%">
+          <Stack direction={['column', 'row']} spacing={2} gap={['25px', '12px']} height="100%">
             <Box
               sx={{
                 pt: '2.5em',
@@ -73,23 +74,27 @@ const HomeContainer: FC = (): ReactElement => {
                   'linear-gradient(158deg, rgba(0, 0, 0, 0.00) 31.44%, rgba(148, 111, 255, 0.20) 80.34%), radial-gradient(111.68% 110.13% at 66.1% 8.28%, rgba(154, 118, 255, 0.20) 36.5%, rgba(0, 0, 0, 0.20) 64%), #1F1F1F',
                 ],
                 width: ['100%', '50%'],
+                height: ['unset', '100%'],
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
               }}
-              position="relative"
             >
-              <Typography variant="h1" sx={{ pb: 2, fontSize: ['24px', '40px'] }}>
-                Welcome to {isDesktop && <br />}
-                HMCC Worship
-              </Typography>
+              <Box>
+                <Typography variant="h1" sx={{ pb: 2, fontSize: ['24px', '40px'] }}>
+                  Welcome to {isDesktop && <br />}
+                  Ripple Out Worship
+                </Typography>
+                <Typography
+                  sx={{ fontSize: ['14px', '16px'], fontFamily: 'DM Sans, sans-serif' }}
+                  marginBottom={['2em', '0em']}
+                  fontWeight={400}
+                >
+                  Here is where you can find lyrics and chords for worship music! Go on and worship
+                  God!
+                </Typography>
+              </Box>
               <Typography
-                sx={{ fontSize: ['14px', '16px'], fontFamily: 'DM Sans, sans-serif' }}
-                marginBottom={['2em', '0em']}
-                fontWeight={400}
-              >
-                Here is where you can find lyrics and chords for worship music! Go on and worship
-                God!
-              </Typography>
-              <Typography
-                position={['static', 'absolute']}
                 sx={{ fontSize: ['12px', '16px'], fontFamily: 'DM Sans, sans-serif' }}
                 fontWeight={400}
                 bottom={35}
@@ -127,7 +132,7 @@ const HomeContainer: FC = (): ReactElement => {
             </Box>
             <Stack
               direction={'column'}
-              alignSelf={'center'}
+              alignSelf={['center', 'flex-start']}
               spacing={2}
               sx={{ width: ['90%', '50%'] }}
             >
@@ -143,27 +148,8 @@ const HomeContainer: FC = (): ReactElement => {
                 Icon={QueueMusicIcon}
                 route="/setlist"
               />
-              <HomeTab
-                title="Resources (Coming Soon)"
-                description="Find resources for worship here"
-                Icon={TextSnippetIcon}
-                route="/resource"
-              />
             </Stack>
           </Stack>
-
-          <Box sx={{ pt: 5, width: ['90%', '100%'], margin: 'auto' }}>
-            <Typography variant="h2">Recommended Songs</Typography>
-            <Stack direction={['column', 'row']} sx={{ py: 2 }} gap={3}>
-              {/* TODO: API to generate recommended or newly added songs */}
-              {/* TODO: set this to use display grid and repeat frame instead of fixing the width */}
-              <RecommendedSongCard songTitle="Living With A Fire" artistName="Jesus Culture" />
-              <RecommendedSongCard
-                songTitle="Yesterday, Today, and Forever"
-                artistName="Passion, Kristian Stanfill"
-              />
-            </Stack>
-          </Box>
         </Stack>
       </Box>
       <GlobalSearchModal
