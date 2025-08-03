@@ -29,9 +29,15 @@ type SongsButtonCardProps = {
   song: SongViewSchema | undefined;
   userView?: boolean;
   userHeader?: boolean;
+  songsSelectionRow?: React.ReactNode;
 };
 
-const SongsButtonsCard = ({ song, userView = false, userHeader = false }: SongsButtonCardProps) => {
+const SongsButtonsCard = ({
+  song,
+  userView = false,
+  userHeader = false,
+  songsSelectionRow,
+}: SongsButtonCardProps) => {
   const [chordStatus, setChordStatus] = useState(false);
   const [count, setCount] = useState(0);
   const [useFlat, setUseFlat] = useState(false);
@@ -83,21 +89,23 @@ const SongsButtonsCard = ({ song, userView = false, userHeader = false }: SongsB
           pl: ['0px', '4px'],
         }}
       >
-        {/* Mobile view */}
-        <Box
-          sx={{
-            display: isDesktop ? 'none' : 'block',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 2,
-            overflowX: 'auto',
-            whiteSpace: 'nowrap',
-            scrollbarWidth: 'none', // Firefox
-            '&::-webkit-scrollbar': { display: 'none' },
-          }}
-        >
-          <Stack direction="row" alignItems={'center'} spacing={1}>
-            {/* <Stack
+        <Box display="flex" gap={2} sx={{ overflowX: 'auto' }}>
+          {songsSelectionRow}
+          {/* Mobile view */}
+          <Box
+            sx={{
+              display: isDesktop ? 'none' : 'block',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 2,
+              overflowX: 'auto',
+              whiteSpace: 'nowrap',
+              scrollbarWidth: 'none', // Firefox
+              '&::-webkit-scrollbar': { display: 'none' },
+            }}
+          >
+            <Stack direction="row" alignItems={'center'} spacing={1}>
+              {/* <Stack
               display={{ xs: 'none', md: 'flex !important' }}
               direction="row"
               spacing={2}
@@ -142,133 +150,133 @@ const SongsButtonsCard = ({ song, userView = false, userHeader = false }: SongsB
                 </Stack>
               </Box>
             </Stack> */}
-            <Box
-              fontSize={{ sm: '14px', md: '26px' }}
-              sx={{
-                display: 'flex !important',
-                justifyContent: 'center',
-                background: '#322F35',
-                padding: '4px 10px',
-                borderRadius: '30px',
-              }}
-            >
-              <FormGroup style={{ justifyContent: 'center' }}>
-                <FormControlLabel
-                  labelPlacement="start"
-                  sx={{ color: '#E6E0E9' }}
-                  control={
-                    <Switch
-                      checked={chordStatus}
-                      onChange={handleChange(setChordStatus)}
-                      name="chords"
-                      sx={switchStyle}
-                    />
-                  }
-                  label="Chords"
-                />
-              </FormGroup>
-            </Box>
-            <Stack
-              direction="row"
-              gap={{ xs: 0.2, sm: 2 }}
-              alignItems={'center'}
-              sx={{
-                justifyContent: 'center',
-                background: '#322F35',
-                padding: '4px 10px',
-                borderRadius: '30px',
-                display: chordStatus ? 'flex' : 'none',
-              }}
-            >
               <Box
-                padding="6px 6px"
-                sx={{ width: '40px', height: '40px', display: 'flex', alignItems: 'center' }}
+                fontSize={{ sm: '14px', md: '26px' }}
+                sx={{
+                  display: 'flex !important',
+                  justifyContent: 'center',
+                  background: '#322F35',
+                  padding: '4px 10px',
+                  borderRadius: '30px',
+                }}
               >
-                <Typography color="#E6E0E9">Key</Typography>
+                <FormGroup style={{ justifyContent: 'center' }}>
+                  <FormControlLabel
+                    labelPlacement="start"
+                    sx={{ color: '#E6E0E9' }}
+                    control={
+                      <Switch
+                        checked={chordStatus}
+                        onChange={handleChange(setChordStatus)}
+                        name="chords"
+                        sx={switchStyle}
+                      />
+                    }
+                    label="Chords"
+                  />
+                </FormGroup>
               </Box>
-
-              {/* key - down arrow */}
-              <Box
-                bgcolor="primary.dark"
-                sx={{ borderRadius: '4px', width: ['24px', 'auto'], height: ['24px', 'auto'] }}
+              <Stack
+                direction="row"
+                gap={{ xs: 0.2, sm: 2 }}
+                alignItems={'center'}
+                sx={{
+                  justifyContent: 'center',
+                  background: '#322F35',
+                  padding: '4px 10px',
+                  borderRadius: '30px',
+                  display: chordStatus ? 'flex' : 'none',
+                }}
               >
-                <IconButton aria-label="down" onClick={handleDecrement} sx={{ padding: '0px' }}>
-                  <KeyboardArrowDownIcon sx={{ color: 'primary.lightest' }} />
-                </IconButton>
-              </Box>
+                <Box
+                  padding="6px 6px"
+                  sx={{ width: '40px', height: '40px', display: 'flex', alignItems: 'center' }}
+                >
+                  <Typography color="#E6E0E9">Key</Typography>
+                </Box>
 
-              <Chip
-                label={
-                  useFlat
-                    ? flatMusicKeysOptions[count]
+                {/* key - down arrow */}
+                <Box
+                  bgcolor="primary.dark"
+                  sx={{ borderRadius: '4px', width: ['24px', 'auto'], height: ['24px', 'auto'] }}
+                >
+                  <IconButton aria-label="down" onClick={handleDecrement} sx={{ padding: '0px' }}>
+                    <KeyboardArrowDownIcon sx={{ color: 'primary.lightest' }} />
+                  </IconButton>
+                </Box>
+
+                <Chip
+                  label={
+                    useFlat
                       ? flatMusicKeysOptions[count]
+                        ? flatMusicKeysOptions[count]
+                        : sharpMusicKeysOptions[count]
                       : sharpMusicKeysOptions[count]
-                    : sharpMusicKeysOptions[count]
-                }
-                sx={{ background: '#49454F' }}
-              />
+                  }
+                  sx={{ background: '#49454F' }}
+                />
 
-              {/* key - up arrow */}
+                {/* key - up arrow */}
+                <Box
+                  bgcolor="primary.dark"
+                  sx={{ borderRadius: '4px', width: ['24px', 'auto'], height: ['24px', 'auto'] }}
+                >
+                  <IconButton aria-label="up" onClick={handleIncrement} sx={{ padding: '0px' }}>
+                    <KeyboardArrowUpIcon sx={{ color: 'primary.lightest' }} />
+                  </IconButton>
+                </Box>
+              </Stack>
+
+              {/* flat toggle */}
               <Box
-                bgcolor="primary.dark"
-                sx={{ borderRadius: '4px', width: ['24px', 'auto'], height: ['24px', 'auto'] }}
+                fontSize={{ sm: '14px', md: '26px' }}
+                sx={{
+                  justifyContent: 'center',
+                  background: '#322F35',
+                  padding: '5px 10px',
+                  borderRadius: '30px',
+                  display: chordStatus ? 'flex' : 'none',
+                }}
               >
-                <IconButton aria-label="up" onClick={handleIncrement} sx={{ padding: '0px' }}>
-                  <KeyboardArrowUpIcon sx={{ color: 'primary.lightest' }} />
-                </IconButton>
+                <FormGroup style={{ justifyContent: 'center' }}>
+                  <FormControlLabel
+                    labelPlacement="start"
+                    sx={{ color: 'secondary.main' }}
+                    control={
+                      <Switch
+                        checked={useFlat}
+                        onChange={handleChange(setUseFlat)}
+                        sx={switchStyle}
+                        name="flat"
+                      />
+                    }
+                    label="Flat"
+                  />
+                </FormGroup>
               </Box>
             </Stack>
+            <Box display="flex" flexDirection="row" gap={1} mt={2}>
+              <Box display="flex" flexDirection="row" gap={1}>
+                {/*User Info button*/}
+                {userView ? null : (
+                  <Button
+                    variant="outlined"
+                    sx={{
+                      borderWidth: '1px',
+                      padding: '10px 16px',
+                      borderRadius: '40px',
+                      borderColor: '#332D41',
+                      color: 'secondary.main',
+                      textTransform: 'none',
+                    }}
+                    startIcon={<InfoIcon />}
+                    onClick={() => setShowMobileInfo(true)}
+                  >
+                    <Typography sx={{ fontSize: '14px' }}>About the Song</Typography>
+                  </Button>
+                )}
 
-            {/* flat toggle */}
-            <Box
-              fontSize={{ sm: '14px', md: '26px' }}
-              sx={{
-                justifyContent: 'center',
-                background: '#322F35',
-                padding: '5px 10px',
-                borderRadius: '30px',
-                display: chordStatus ? 'flex' : 'none',
-              }}
-            >
-              <FormGroup style={{ justifyContent: 'center' }}>
-                <FormControlLabel
-                  labelPlacement="start"
-                  sx={{ color: 'secondary.main' }}
-                  control={
-                    <Switch
-                      checked={useFlat}
-                      onChange={handleChange(setUseFlat)}
-                      sx={switchStyle}
-                      name="flat"
-                    />
-                  }
-                  label="Flat"
-                />
-              </FormGroup>
-            </Box>
-          </Stack>
-          <Box display="flex" flexDirection="row" gap={1} mt={2}>
-            <Box display="flex" flexDirection="row" gap={1}>
-              {/*User Info button*/}
-              {userView ? null : (
-                <Button
-                  variant="outlined"
-                  sx={{
-                    borderWidth: '1px',
-                    padding: '10px 16px',
-                    borderRadius: '40px',
-                    borderColor: '#332D41',
-                    color: 'secondary.main',
-                    textTransform: 'none',
-                  }}
-                  startIcon={<InfoIcon />}
-                  onClick={() => setShowMobileInfo(true)}
-                >
-                  <Typography sx={{ fontSize: '14px' }}>About the Song</Typography>
-                </Button>
-              )}
-
-              {/* add to setlist button
+                {/* add to setlist button
               {userView ? null : (
                 <Button
                   variant="outlined"
@@ -286,8 +294,8 @@ const SongsButtonsCard = ({ song, userView = false, userHeader = false }: SongsB
                 </Button>
               )} */}
 
-              {/* share button */}
-              {/* {userView ? null : (
+                {/* share button */}
+                {/* {userView ? null : (
                 <Button
                   variant="outlined"
                   sx={{
@@ -303,196 +311,196 @@ const SongsButtonsCard = ({ song, userView = false, userHeader = false }: SongsB
                   <Typography sx={{ fontSize: '14px' }}>Share</Typography>
                 </Button>
               )} */}
+              </Box>
             </Box>
           </Box>
-        </Box>
 
-        {/* Desktop view */}
-        <Stack
-          direction="row"
-          spacing={1}
-          sx={{ display: isDesktop ? 'block' : 'none' }}
-          justifyContent="space-between"
-        >
-          {/* split columns settings */}
-
-          <Box
-            sx={{
-              overflowX: 'auto',
-              whiteSpace: 'nowrap',
-              display: isDesktop ? 'flex' : 'none',
-              gap: 2,
-              alignItems: 'center',
-              paddingRight: 2,
-              scrollbarWidth: 'thin',
-              '&::-webkit-scrollbar': {
-                height: 6,
-              },
-              '&::-webkit-scrollbar-thumb': {
-                backgroundColor: '#999',
-                borderRadius: 4,
-              },
-            }}
+          {/* Desktop view */}
+          <Stack
+            direction="row"
+            spacing={1}
+            sx={{ display: isDesktop ? 'block' : 'none' }}
+            justifyContent="space-between"
           >
-            <Stack
-              direction="row"
-              spacing={2}
-              display={isDesktop ? 'flex !important' : 'none !important'}
-              alignItems={'center'}
+            {/* split columns settings */}
+
+            <Box
               sx={{
-                display: 'flex !important',
-                justifyContent: 'center',
-                background: '#322F35',
-                padding: ['4px 10px', '8px 16px', '12px 20px'],
-                borderRadius: '30px',
+                overflowX: 'auto',
+                whiteSpace: 'nowrap',
+                display: isDesktop ? 'flex' : 'none',
+                gap: 2,
+                alignItems: 'center',
+                paddingRight: 2,
+                scrollbarWidth: 'thin',
+                '&::-webkit-scrollbar': {
+                  height: 6,
+                },
+                '&::-webkit-scrollbar-thumb': {
+                  backgroundColor: '#999',
+                  borderRadius: 4,
+                },
               }}
             >
-              <Box>
-                <Typography color="#E6E0E9">Split</Typography>
-              </Box>
-              <Box
-                bgcolor={'primary.main'}
-                height="30px"
-                width="30px"
-                borderRadius="4px"
-                onClick={handleSplit}
+              <Stack
+                direction="row"
+                spacing={2}
+                display={isDesktop ? 'flex !important' : 'none !important'}
+                alignItems={'center'}
+                sx={{
+                  display: 'flex !important',
+                  justifyContent: 'center',
+                  background: '#322F35',
+                  padding: ['4px 10px', '8px 16px', '12px 20px'],
+                  borderRadius: '30px',
+                }}
               >
-                <Stack
-                  direction="row"
-                  height="100%"
-                  width="100%"
-                  display="flex"
-                  justifyContent="center"
-                  alignItems="center"
-                  spacing={0.2}
+                <Box>
+                  <Typography color="#E6E0E9">Split</Typography>
+                </Box>
+                <Box
+                  bgcolor={'primary.main'}
+                  height="30px"
+                  width="30px"
+                  borderRadius="4px"
+                  onClick={handleSplit}
                 >
-                  {Array.from({ length: split }, (e, i) => {
-                    return (
-                      <Box
-                        key={i}
-                        bgcolor="primary.lightest"
-                        height="15px"
-                        width="6px"
-                        borderRadius="2px"
+                  <Stack
+                    direction="row"
+                    height="100%"
+                    width="100%"
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    spacing={0.2}
+                  >
+                    {Array.from({ length: split }, (e, i) => {
+                      return (
+                        <Box
+                          key={i}
+                          bgcolor="primary.lightest"
+                          height="15px"
+                          width="6px"
+                          borderRadius="2px"
+                        />
+                      );
+                    })}
+                  </Stack>
+                </Box>
+              </Stack>
+
+              {/* chords toggle */}
+              <Box
+                fontSize={{ sm: '14px', md: '26px' }}
+                sx={{
+                  display: 'flex !important',
+                  justifyContent: 'center',
+                  background: '#322F35',
+                  padding: ['4px 10px', '6px 12px', '8px 16px'],
+                  borderRadius: '30px',
+                }}
+              >
+                <FormGroup style={{ justifyContent: 'center' }}>
+                  <FormControlLabel
+                    labelPlacement="start"
+                    sx={{ color: '#E6E0E9' }}
+                    control={
+                      <Switch
+                        checked={chordStatus}
+                        onChange={handleChange(setChordStatus)}
+                        name="chords"
+                        sx={switchStyle}
                       />
-                    );
-                  })}
-                </Stack>
+                    }
+                    label="Chords"
+                  />
+                </FormGroup>
               </Box>
-            </Stack>
 
-            {/* chords toggle */}
-            <Box
-              fontSize={{ sm: '14px', md: '26px' }}
-              sx={{
-                display: 'flex !important',
-                justifyContent: 'center',
-                background: '#322F35',
-                padding: ['4px 10px', '6px 12px', '8px 16px'],
-                borderRadius: '30px',
-              }}
-            >
-              <FormGroup style={{ justifyContent: 'center' }}>
-                <FormControlLabel
-                  labelPlacement="start"
-                  sx={{ color: '#E6E0E9' }}
-                  control={
-                    <Switch
-                      checked={chordStatus}
-                      onChange={handleChange(setChordStatus)}
-                      name="chords"
-                      sx={switchStyle}
-                    />
-                  }
-                  label="Chords"
-                />
-              </FormGroup>
-            </Box>
-
-            {/* key settings */}
-            <Stack
-              direction="row"
-              gap={{ xs: 0.2, sm: 2 }}
-              alignItems={'center'}
-              sx={{
-                justifyContent: 'center',
-                background: '#322F35',
-                padding: ['4px 10px', '6px 12px', '8px 16px'],
-                borderRadius: '30px',
-                display: chordStatus ? 'flex' : 'none',
-              }}
-            >
-              <Box
-                padding="6px 6px"
-                sx={{ width: '40px', height: '40px', display: 'flex', alignItems: 'center' }}
+              {/* key settings */}
+              <Stack
+                direction="row"
+                gap={{ xs: 0.2, sm: 2 }}
+                alignItems={'center'}
+                sx={{
+                  justifyContent: 'center',
+                  background: '#322F35',
+                  padding: ['4px 10px', '6px 12px', '8px 16px'],
+                  borderRadius: '30px',
+                  display: chordStatus ? 'flex' : 'none',
+                }}
               >
-                <Typography color="#E6E0E9">Key</Typography>
-              </Box>
+                <Box
+                  padding="6px 6px"
+                  sx={{ width: '40px', height: '40px', display: 'flex', alignItems: 'center' }}
+                >
+                  <Typography color="#E6E0E9">Key</Typography>
+                </Box>
 
-              {/* key - down arrow */}
-              <Box
-                bgcolor="primary.dark"
-                sx={{ borderRadius: '4px', width: ['24px', 'auto'], height: ['24px', 'auto'] }}
-              >
-                <IconButton aria-label="down" onClick={handleDecrement} sx={{ padding: '0px' }}>
-                  <KeyboardArrowDownIcon sx={{ color: 'primary.lightest' }} />
-                </IconButton>
-              </Box>
+                {/* key - down arrow */}
+                <Box
+                  bgcolor="primary.dark"
+                  sx={{ borderRadius: '4px', width: ['24px', 'auto'], height: ['24px', 'auto'] }}
+                >
+                  <IconButton aria-label="down" onClick={handleDecrement} sx={{ padding: '0px' }}>
+                    <KeyboardArrowDownIcon sx={{ color: 'primary.lightest' }} />
+                  </IconButton>
+                </Box>
 
-              <Chip
-                label={
-                  useFlat
-                    ? flatMusicKeysOptions[count]
+                <Chip
+                  label={
+                    useFlat
                       ? flatMusicKeysOptions[count]
+                        ? flatMusicKeysOptions[count]
+                        : sharpMusicKeysOptions[count]
                       : sharpMusicKeysOptions[count]
-                    : sharpMusicKeysOptions[count]
-                }
-                sx={{ background: '#49454F' }}
-              />
-
-              {/* key - up arrow */}
-              <Box
-                bgcolor="primary.dark"
-                sx={{ borderRadius: '4px', width: ['24px', 'auto'], height: ['24px', 'auto'] }}
-              >
-                <IconButton aria-label="up" onClick={handleIncrement} sx={{ padding: '0px' }}>
-                  <KeyboardArrowUpIcon sx={{ color: 'primary.lightest' }} />
-                </IconButton>
-              </Box>
-            </Stack>
-
-            {/* flat toggle */}
-            <Box
-              fontSize={{ sm: '16px', md: '26px' }}
-              sx={{
-                padding: ['4px 10px', '6px 12px', '10px 18px'],
-                display: chordStatus ? 'flex' : 'none',
-                justifyContent: 'center',
-                background: '#322F35',
-                borderRadius: '30px',
-              }}
-            >
-              <FormGroup style={{ justifyContent: 'center' }}>
-                <FormControlLabel
-                  labelPlacement="start"
-                  sx={{ color: 'secondary.main' }}
-                  control={
-                    <Switch
-                      checked={useFlat}
-                      onChange={handleChange(setUseFlat)}
-                      sx={switchStyle}
-                      name="flat"
-                    />
                   }
-                  label="Flat"
+                  sx={{ background: '#49454F' }}
                 />
-              </FormGroup>
-            </Box>
-          </Box>
 
-          {/* <Box display="flex" flexDirection="row" gap={1}> */}
-          {/* add to setlist button */}
-          {/* {userView ? null : (
+                {/* key - up arrow */}
+                <Box
+                  bgcolor="primary.dark"
+                  sx={{ borderRadius: '4px', width: ['24px', 'auto'], height: ['24px', 'auto'] }}
+                >
+                  <IconButton aria-label="up" onClick={handleIncrement} sx={{ padding: '0px' }}>
+                    <KeyboardArrowUpIcon sx={{ color: 'primary.lightest' }} />
+                  </IconButton>
+                </Box>
+              </Stack>
+
+              {/* flat toggle */}
+              <Box
+                fontSize={{ sm: '16px', md: '26px' }}
+                sx={{
+                  padding: ['4px 10px', '6px 12px', '10px 18px'],
+                  display: chordStatus ? 'flex' : 'none',
+                  justifyContent: 'center',
+                  background: '#322F35',
+                  borderRadius: '30px',
+                }}
+              >
+                <FormGroup style={{ justifyContent: 'center' }}>
+                  <FormControlLabel
+                    labelPlacement="start"
+                    sx={{ color: 'secondary.main' }}
+                    control={
+                      <Switch
+                        checked={useFlat}
+                        onChange={handleChange(setUseFlat)}
+                        sx={switchStyle}
+                        name="flat"
+                      />
+                    }
+                    label="Flat"
+                  />
+                </FormGroup>
+              </Box>
+            </Box>
+
+            {/* <Box display="flex" flexDirection="row" gap={1}> */}
+            {/* add to setlist button */}
+            {/* {userView ? null : (
               <Button
                 variant="outlined"
                 sx={{
@@ -509,8 +517,8 @@ const SongsButtonsCard = ({ song, userView = false, userHeader = false }: SongsB
               </Button>
             )} */}
 
-          {/* share button */}
-          {/* {userView ? null : (
+            {/* share button */}
+            {/* {userView ? null : (
               <Box
                 alignItems="center"
                 justifyContent="center"
@@ -523,7 +531,8 @@ const SongsButtonsCard = ({ song, userView = false, userHeader = false }: SongsB
               </Box>
             )}
           </Box> */}
-        </Stack>
+          </Stack>
+        </Box>
       </Box>
 
       {/* render header */}
@@ -545,10 +554,11 @@ const SongsButtonsCard = ({ song, userView = false, userHeader = false }: SongsB
           maxWidth: '100%',
           height: '100%',
           display: 'flex',
-          overflow: 'hidden',
+          overflow: 'auto',
           padding: ['10px', '14px'],
           backgroundColor: '#141218',
           borderRadius: '12px',
+          mb: '15vh',
         }}
       >
         <SongsLyrics

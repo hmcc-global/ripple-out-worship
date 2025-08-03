@@ -56,22 +56,20 @@ const SetlistViewContainerMobile = ({ preview }: { preview?: boolean }): ReactEl
 
   useEffect(() => {
     const fetchSetlists = async () => {
-   
-        try {
-          const { data } = await axios.get<Setlist>('/api/setlists/get', {
-            params: {
-              id: setlistId,
-            },
-          });
-          setSetlist(data);
-        } catch (error) {
-          console.error('Error fetching setlists:', error);
-        }
-      
+      try {
+        const { data } = await axios.get<Setlist>('/api/setlists/get', {
+          params: {
+            id: setlistId,
+          },
+        });
+        setSetlist(data);
+      } catch (error) {
+        console.error('Error fetching setlists:', error);
+      }
     };
 
     fetchSetlists();
-  }, [ setlistId]);
+  }, [setlistId]);
 
   useEffect(() => {
     if (songs) {
@@ -143,19 +141,10 @@ const SetlistViewContainerMobile = ({ preview }: { preview?: boolean }): ReactEl
             {/* Setlist body */}
             {/* Song choice */}
             <Stack flexDirection="row" gap={2} alignItems="center">
-              <IconButton
-                style={{
-                  border: `1px solid ${theme.palette.secondary.main}`,
-                  height: '48px',
-                  width: '48px',
-                }}
-                onClick={toggleDrawer(true)}
-              >
-                <TuneIcon style={{ color: theme.palette.secondary.main }} />
-              </IconButton>
               <FormControl fullWidth>
                 <Select
                   id="song-select"
+                  sx={{ borderRadius: '40px', px: 1 }}
                   value={selectedSong?._id}
                   onChange={(e) =>
                     setSelectedSong(songs.find((song) => song._id === e.target.value) || songs[0])
@@ -169,7 +158,17 @@ const SetlistViewContainerMobile = ({ preview }: { preview?: boolean }): ReactEl
                     );
                   })}
                 </Select>
-              </FormControl>
+              </FormControl>{' '}
+              <IconButton
+                style={{
+                  border: `1px solid ${theme.palette.secondary.main}`,
+                  height: '48px',
+                  width: '48px',
+                }}
+                onClick={toggleDrawer(true)}
+              >
+                <TuneIcon style={{ color: theme.palette.secondary.main }} />
+              </IconButton>
             </Stack>
             {/* Song lyrics */}
             <Box height="100%" overflow="auto" marginTop="8px">
@@ -200,7 +199,7 @@ const SetlistViewContainerMobile = ({ preview }: { preview?: boolean }): ReactEl
               </Stack>
             </Box>
             {preview ? null : (
-              <SetlistViewFooter style={{ width: '100vw', margin: '0 0 -16px -16px' }}>
+              <SetlistViewFooter style={{ width: '100vw', margin: '8px 0 -16px -16px' }}>
                 <Typography>Created by HMCC T3CH</Typography>
               </SetlistViewFooter>
             )}

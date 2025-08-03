@@ -48,17 +48,17 @@ const SetlistViewMenuDesktop = () => {
   return (
     <>
       <List style={{ display: 'flex', gap: '24px', paddingBottom: '0px' }}>
-        <Button style={ButtonStyle} variant="outlined" onClick={handleShare}>
-          <ListItemIcon style={{ minWidth: 'unset' }}>
-            <ShareIcon style={{ color: theme.palette.primary.light }} fontSize="small" />
-          </ListItemIcon>
-          <Typography color={theme.palette.secondary.main}>Copy Link</Typography>
-        </Button>
         <Button style={ButtonStyle} variant="outlined" onClick={handleEdit}>
           <ListItemIcon style={{ minWidth: 'unset' }}>
             <EditIcon style={{ color: theme.palette.primary.light }} fontSize="small" />
           </ListItemIcon>
           <Typography color={theme.palette.secondary.main}>Edit</Typography>
+        </Button>
+        <Button style={ButtonStyle} variant="outlined" onClick={handleShare}>
+          <ListItemIcon style={{ minWidth: 'unset' }}>
+            <ShareIcon style={{ color: theme.palette.primary.light }} fontSize="small" />
+          </ListItemIcon>
+          <Typography color={theme.palette.secondary.main}>Copy Link</Typography>
         </Button>
       </List>
       <Snackbar
