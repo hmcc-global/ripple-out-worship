@@ -96,29 +96,37 @@ const SetlistViewContainerDesktop: FC = (): ReactElement => {
                   <Typography variant="h3">{setlist.name}</Typography>
                   <SetlistViewMenuDesktop />
                 </HeaderSetlistView>
-                <FormControl sx={{ pl: 3 }}>
-                  <Select
-                    id="song-select"
-                    sx={{ borderRadius: '40px', px: 1, width: '400px' }}
-                    value={selectedSong?._id}
-                    onChange={(e) =>
-                      setSelectedSong(songs.find((song) => song._id === e.target.value) || songs[0])
-                    }
-                  >
-                    {songs.map((song) => {
-                      return (
-                        <MenuItem key={song._id} value={song._id}>
-                          {song.title}
-                        </MenuItem>
-                      );
-                    })}
-                  </Select>
-                </FormControl>
               </Grid>
               {/* Song lyrics */}
               <Grid item xs={12} height="100%" overflow="auto" marginTop="8px">
                 <Stack height="100%">
-                  <SongsButtonsCard song={selectedSong} userView={true} userHeader={true} />
+                  <SongsButtonsCard
+                    song={selectedSong}
+                    userView={true}
+                    userHeader={true}
+                    songsSelectionRow={
+                      <FormControl sx={{ mb: 2 }}>
+                        <Select
+                          id="song-select"
+                          sx={{ borderRadius: '40px', px: 1, width: '400px' }}
+                          value={selectedSong?._id}
+                          onChange={(e) =>
+                            setSelectedSong(
+                              songs.find((song) => song._id === e.target.value) || songs[0]
+                            )
+                          }
+                        >
+                          {songs.map((song) => {
+                            return (
+                              <MenuItem key={song._id} value={song._id}>
+                                {song.title}
+                              </MenuItem>
+                            );
+                          })}
+                        </Select>
+                      </FormControl>
+                    }
+                  />
                 </Stack>
               </Grid>
             </Grid>
