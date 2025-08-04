@@ -40,7 +40,7 @@ interface SetlistFolderDrawerProps {
   folderId?: string;
   folderName?: string;
   folderCreated?: string;
-  mode: string;
+  mode: 'edit' | 'create';
 }
 
 interface SnackbarState {
@@ -73,6 +73,8 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
   // State
   const [allPeople, setAllPeople] = useState<Ownership[]>([]);
   const [addedPeople, setAddedPeople] = useState<string[]>([]);
+  const [createdDateString, setCreatedDateString] = useState<string>('');
+  // Modal States
   const [openAddModal, setOpenAddModal] = useState<boolean>(false);
   const [openRemoveModal, setOpenRemoveModal] = useState<boolean>(false);
   const [openDeleteFolderModal, setOpenDeleteFolderModal] = useState<boolean>(false);
@@ -82,9 +84,21 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
     message: '',
     severity: 'success',
   });
-  const [createdDateString, setCreatedDateString] = useState<string>('');
+  // Add People Function
   const [searchString, setSearchString] = useState('');
   const [filteredPeople, setFilteredPeople] = useState<Ownership[]>([]);
+
+  // Initialize addedPeople with current user when in create mode
+  useEffect(() => {
+    if (mode === 'create' && ownership?.userId) {
+      setAddedPeople([ownership.userId]);
+    }
+  }, [mode, ownership]);
+
+  // Automatically re-calculate added people list when addedPeople list changes
+  const addedPeopleList = useMemo(() => {
+    return allPeople.filter((person) => addedPeople.includes(person.userId));
+  }, [allPeople, addedPeople]);
 
   // Helper function to show snackbar messages
   const showSnackbar = useCallback(
@@ -98,9 +112,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
     []
   );
 
-  // To render the songs that are added to setlist
-  const addedPeopleList = allPeople.filter((person) => addedPeople.includes(person.userId));
-
+  // Save Functions
   const handleSaveMembers = useCallback(async () => {
     if (!folderId || !addedPeople.length) {
       return;
@@ -226,16 +238,18 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
       const { data, status } = await axios.get<Ownership[]>('/api/ownerships/get');
       if (status === 200) {
         setAllPeople(data);
-        const existingMembers = data.filter(
-          (person) => person.groupIds?.some((group) => group.id === folderId)
-        );
-        setAddedPeople(existingMembers.map((person) => person.userId));
+        if (mode !== 'create') {
+          const existingMembers = data.filter(
+            (person) => person.groupIds?.some((group) => group.id === folderId)
+          );
+          setAddedPeople(existingMembers.map((person) => person.userId));
+        }
       }
     } catch (error: any) {
       showSnackbar('Failed to load users', 'error');
       console.error('Error fetching users:', error);
     }
-  }, [folderId, showSnackbar]);
+  }, [folderId, mode, showSnackbar]);
 
   const deleteGroup = useCallback(async () => {
     try {
