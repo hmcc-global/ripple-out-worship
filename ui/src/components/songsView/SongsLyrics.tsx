@@ -214,7 +214,7 @@ const SongsLyrics = ({ chordStatus, changeKey, song, split, useFlat }: SongsLyri
   }, [parseLyrics, song, groupLyricsToParagraphs]);
   return (
     <>
-      <Grid container width={'100%'} spacing={2} marginTop={1} marginBottom={1}>
+      <Grid container width={'100%'} spacing={2} marginTop={1} marginBottom={0}>
         {finalLyrics &&
           finalLyrics.map((chunk, i) => {
             return (

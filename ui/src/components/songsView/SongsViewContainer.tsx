@@ -128,7 +128,6 @@ const SongsViewContainer: FC = (): ReactElement => {
                 sx={{
                   [`@media (max-width:${specificSongsDesktopWidth})`]: {
                     width: '100%',
-                    marginBottom: '20px',
                   },
                   [`@media (min-width:${specificSongsDesktopWidth})`]: {
                     width: '70%',
@@ -142,7 +141,6 @@ const SongsViewContainer: FC = (): ReactElement => {
                 sx={{
                   [`@media (max-width:${specificSongsDesktopWidth})`]: {
                     width: '50%',
-                    marginBottom: '20px',
                   },
                   [`@media (min-width:${specificSongsDesktopWidth})`]: {
                     width: '30%',

@@ -112,7 +112,7 @@ const SongsButtonsCard = ({
           >
             <Stack direction="row" alignItems={'center'} spacing={1}>
               <Stack
-                display={{ xs: 'none', md: 'flex' }}
+                display="flex"
                 direction="row"
                 spacing={2}
                 sx={{
@@ -564,7 +564,7 @@ const SongsButtonsCard = ({
           padding: ['10px', '14px'],
           backgroundColor: '#141218',
           borderRadius: '12px',
-          mb: '15vh',
+          mb: '5vh',
         }}
       >
         <SongsLyrics
