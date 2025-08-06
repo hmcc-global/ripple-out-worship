@@ -123,7 +123,7 @@ const SongsViewContainer: FC = (): ReactElement => {
             >
               <Box
                 sx={{
-                  '@media (max-width:1340px)': { width: '100%', marginBottom: '20px' },
+                  '@media (max-width:1340px)': { width: '100%', marginBottom: '5px' },
                   '@media (min-width:1340px)': { width: '70%', marginBottom: '20px' },
                 }}
               >
