@@ -9,10 +9,11 @@ import SongsButtonCard from './SongsButtonsCard';
 import SongsInfoCard from './SongsInfoCard';
 import { useUser } from '../../helpers/customHooks';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { mobileNavbarHeight } from '../../constants';
 
 const SongsViewContainer: FC = (): ReactElement => {
   const navigate = useNavigate();
-  const isMobile = useMediaQuery('(max-width: 768px)');
+  const isMobile = useMediaQuery('(max-width:920px)');
 
   // Get user information
   const { user } = useUser();
@@ -48,15 +49,17 @@ const SongsViewContainer: FC = (): ReactElement => {
             cursor: 'pointer',
             mt: 2,
             ml: 1,
+            padding: 0,
           }}
           onClick={() => navigate('/song')}
         >
           <ArrowLeftIcon sx={{ mr: 0.5 }} fontSize="small" />
           <Typography
             sx={{
-              fontSize: '0.75rem',
+              fontSize: '12px',
               color: '#D1D1D1',
               fontWeight: '500',
+              fontFamily: 'DM Sans, sans-serif',
             }}
           >
             Back to Songs
@@ -65,14 +68,20 @@ const SongsViewContainer: FC = (): ReactElement => {
       )}
       <Container
         maxWidth={false}
-        sx={{ paddingTop: ['1.5em', '3em'], width: '100%', paddingLeft: '0', paddingRight: '0' }}
+        sx={{
+          paddingTop: { xs: '1em', md: '3em' },
+          width: '100%',
+          paddingLeft: '0',
+          paddingRight: '0',
+          pb: isMobile ? `${mobileNavbarHeight}px` : 0,
+        }}
       >
         <Box
           sx={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            marginBottom: ['0.1em', '2em'],
+            marginBottom: ['0.1em', '0.3em'],
           }}
         >
           {/* song title and artist */}
@@ -103,14 +112,32 @@ const SongsViewContainer: FC = (): ReactElement => {
             </Box>
           )}
           {!isMobile && (
-            <>
-              <Box sx={{ marginBottom: ['10px', '15vh'], width: '70%' }}>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                '@media (max-width:1340px)': {
+                  flexDirection: 'column',
+                },
+              }}
+            >
+              <Box
+                sx={{
+                  '@media (max-width:1340px)': { width: '100%', marginBottom: '20px' },
+                  '@media (min-width:1340px)': { width: '70%', marginBottom: '20px' },
+                }}
+              >
                 <SongsButtonCard song={song} />
               </Box>
-              <Box sx={{ width: '30%' }}>
+              <Box
+                sx={{
+                  '@media (max-width:1340px)': { width: '50%', marginBottom: '20px' },
+                  '@media (min-width:1340px)': { width: '30%' },
+                }}
+              >
                 <SongsInfoCard song={song} />
               </Box>
-            </>
+            </Box>
           )}
         </Stack>
       </Container>

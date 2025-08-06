@@ -12,7 +12,8 @@ interface SongsLyricsProps {
 }
 
 const SongsLyrics = ({ chordStatus, changeKey, song, split, useFlat }: SongsLyricsProps) => {
-  const isDesktop = useMediaQuery('(min-width:768px)');
+  // For this: We would like to split the lyrics in mobile landscape mode, where the minimum we assume is 550px
+  const isDesktop = useMediaQuery('(min-width:600px)');
   const noSplit = isDesktop ? split : 1;
   const [finalLyrics, setFinalLyrics] = useState<ReactNode[]>();
 
@@ -140,7 +141,13 @@ const SongsLyrics = ({ chordStatus, changeKey, song, split, useFlat }: SongsLyri
                             }}
                           />
                         ) : null}
-                        <Typography style={{ whiteSpace: 'pre-wrap', color: '#CCC2DC' }}>
+                        <Typography
+                          style={{
+                            whiteSpace: 'pre-wrap',
+                            color: '#CCC2DC',
+                            wordBreak: 'break-word',
+                          }}
+                        >
                           {textLyrics}
                         </Typography>
                       </Box>
