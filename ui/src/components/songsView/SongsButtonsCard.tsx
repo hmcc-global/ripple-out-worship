@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { SongViewSchema } from '../../types/song.types';
 import {
   Container,
@@ -20,13 +19,12 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import SongsLyrics from './SongsLyrics';
 import { flatMusicKeysOptions, sharpMusicKeysOptions } from '../../constants';
-import PlaylistAdd from '@mui/icons-material/PlaylistAdd';
-import { Share } from '@mui/icons-material';
 import InfoIcon from '@mui/icons-material/Info';
 import SongsInfoCardMobile from './SongsInfoCardMobile';
 import Snackbar from '@mui/material/Snackbar';
 import ScreenRotationIcon from '@mui/icons-material/ScreenRotation';
 import CloseIcon from '@mui/icons-material/Close';
+import { specificSongsMobileWidth, specificSongsDesktopWidth } from '../../constants';
 
 type SongsButtonCardProps = {
   song: SongViewSchema | undefined;
@@ -48,8 +46,8 @@ const SongsButtonsCard = ({
   const theme = useTheme();
   const [showMobileInfo, setShowMobileInfo] = useState(false);
   const [showSplitSnackbar, setShowSplitSnackbar] = useState(false);
-  const isSmallScreen = useMediaQuery('(max-width:600px)');
-  const isDesktop = useMediaQuery('(min-width:920px)');
+  const isSmallScreen = useMediaQuery(`(max-width:${specificSongsMobileWidth})`);
+  const isDesktop = useMediaQuery(`(min-width:${specificSongsDesktopWidth})`);
   const switchStyle = {
     '& .Mui-checked': { color: theme.palette.secondary.main },
     '& .Mui-checked + .MuiSwitch-track': { backgroundColor: '#8175A0' },
@@ -582,7 +580,7 @@ const SongsButtonsCard = ({
       )}
       <Snackbar
         open={showSplitSnackbar}
-        autoHideDuration={200}
+        autoHideDuration={3000}
         onClose={() => setShowSplitSnackbar(false)}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         ContentProps={{ sx: { background: 'transparent', boxShadow: 'none' } }}

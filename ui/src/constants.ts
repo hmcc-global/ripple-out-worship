@@ -120,3 +120,7 @@ export const ChordColors: Record<string, string> = {
 
 export const drawerWidth = '100px';
 export const mobileNavbarHeight = '80px';
+
+export const specificSongsMobileWidth = '600px';
+export const specificSongsTabletWidth = '900px';
+export const specificSongsDesktopWidth = '1340px';

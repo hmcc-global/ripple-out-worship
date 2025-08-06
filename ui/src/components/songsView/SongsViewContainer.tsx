@@ -1,4 +1,4 @@
-import { Container, Box, Grid, Stack, Typography, Button } from '@mui/material';
+import { Container, Box, Stack, Typography, Button } from '@mui/material';
 import { FC, ReactElement, useState, useEffect, useCallback } from 'react';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import { useNavigate } from 'react-router-dom';
@@ -9,11 +9,15 @@ import SongsButtonCard from './SongsButtonsCard';
 import SongsInfoCard from './SongsInfoCard';
 import { useUser } from '../../helpers/customHooks';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { mobileNavbarHeight } from '../../constants';
+import {
+  specificSongsTabletWidth,
+  specificSongsDesktopWidth,
+  mobileNavbarHeight,
+} from '../../constants';
 
 const SongsViewContainer: FC = (): ReactElement => {
   const navigate = useNavigate();
-  const isMobile = useMediaQuery('(max-width:920px)');
+  const isMobile = useMediaQuery(`(max-width:${specificSongsTabletWidth})`);
 
   // Get user information
   const { user } = useUser();
@@ -58,7 +62,7 @@ const SongsViewContainer: FC = (): ReactElement => {
             sx={{
               fontSize: '12px',
               color: '#D1D1D1',
-              fontWeight: '500',
+              fontWeight: 500,
               fontFamily: 'DM Sans, sans-serif',
             }}
           >
@@ -71,8 +75,8 @@ const SongsViewContainer: FC = (): ReactElement => {
         sx={{
           paddingTop: { xs: '1em', md: '3em' },
           width: '100%',
-          paddingLeft: '0',
-          paddingRight: '0',
+          paddingLeft: 0,
+          paddingRight: 0,
           pb: isMobile ? `${mobileNavbarHeight}px` : 0,
         }}
       >
@@ -84,7 +88,6 @@ const SongsViewContainer: FC = (): ReactElement => {
             marginBottom: ['0.1em', '0.3em'],
           }}
         >
-          {/* song title and artist */}
           <Box sx={{ width: '100' }}>
             <SongsTitleCard song={song} />
           </Box>
@@ -116,23 +119,34 @@ const SongsViewContainer: FC = (): ReactElement => {
               sx={{
                 display: 'flex',
                 flexDirection: 'row',
-                '@media (max-width:1340px)': {
+                [`@media (max-width:${specificSongsDesktopWidth})`]: {
                   flexDirection: 'column',
                 },
               }}
             >
               <Box
                 sx={{
-                  '@media (max-width:1340px)': { width: '100%', marginBottom: '5px' },
-                  '@media (min-width:1340px)': { width: '70%', marginBottom: '20px' },
+                  [`@media (max-width:${specificSongsDesktopWidth})`]: {
+                    width: '100%',
+                    marginBottom: '20px',
+                  },
+                  [`@media (min-width:${specificSongsDesktopWidth})`]: {
+                    width: '70%',
+                    marginBottom: '20px',
+                  },
                 }}
               >
                 <SongsButtonCard song={song} />
               </Box>
               <Box
                 sx={{
-                  '@media (max-width:1340px)': { width: '50%', marginBottom: '20px' },
-                  '@media (min-width:1340px)': { width: '30%' },
+                  [`@media (max-width:${specificSongsDesktopWidth})`]: {
+                    width: '50%',
+                    marginBottom: '20px',
+                  },
+                  [`@media (min-width:${specificSongsDesktopWidth})`]: {
+                    width: '30%',
+                  },
                 }}
               >
                 <SongsInfoCard song={song} />
