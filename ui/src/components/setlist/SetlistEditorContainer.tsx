@@ -421,79 +421,130 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
   // Form submission
   const handleSaveSetlist: SubmitHandler<SetlistEditorFields> = async (data) => {
     try {
-      let payload: AxiosResponse<Setlist>;
-      const setlistFolderIds = folderOptions
+      const isEditSetlist = action === 'edit';
+
+      // Get updated folder IDs
+      const updatedSetlistFolderIds: string[] = folderOptions
         .filter((folder) => folderList.includes(folder.groupName))
         .map((folder) => folder._id);
-      if (action === 'edit') {
-        payload = await axios.put(`/api/setlists/update`, {
-          id: setlistId,
-          name: data.name,
-          date: date ? date.toDate() : new Date(''),
-          songs: addedSongList,
-          groupIds: setlistFolderIds,
-        });
-      } else {
-        payload = await axios.post('/api/setlists/create', {
-          name: data.name,
-          date: date ? date.toDate() : new Date(''),
-          songs: addedSongList,
-          groupIds: setlistFolderIds,
-          createdBy: ownership.userId,
-        });
+
+      // Create/update setlist
+      const payload = await (isEditSetlist
+        ? axios.put('/api/setlists/update', {
+            id: setlistId,
+            name: data.name,
+            date: date ? date.toDate() : null,
+            songs: addedSongList,
+            groupIds: updatedSetlistFolderIds,
+          })
+        : axios.post('/api/setlists/create', {
+            name: data.name,
+            date: date ? date.toDate() : null,
+            songs: addedSongList,
+            groupIds: updatedSetlistFolderIds,
+            createdBy: ownership.userId,
+          }));
+
+      if (payload.status !== 200) {
+        throw new Error('Failed to save setlist');
       }
 
-      // folderList.forEach((folder) => {
-      //   const folderToUpdate = folderOptions.find((f) => f.groupName === folder);
+      const savedSetlistId = payload.data._id;
 
-      //   if (folderToUpdate) {
-      //     const payload = axios.post('/api/group/update', {
-      //       _id: folderToUpdate._id,
-      //       setlistIds: [...folderToUpdate.setlistIds, setlistId],
-      //     });
-      //   } else {
+      // Prepare all update promises
+      const promises: Promise<any>[] = [];
 
-      //   }
+      // Add ownership update if needed
+      const isOwnedSetlist = ownership.setlistIds.some(
+        (setlist) => setlist.id === payload.data._id
+      );
 
-      // })
-      if (payload.status === 200) {
-        // Updates the ownership and folder
-        Promise.all(
-          setlistFolderIds.map((folderId) => {
-            const currentFolder = folderOptions.find((folder) => folder._id === folderId);
-            // Only updates the folder the user have access to
-            if (currentFolder) {
-              axios.put('/api/groups/update', {
-                id: folderId,
-                setlistIds: [...(currentFolder?.setlistIds || []), payload.data._id],
-              });
-            }
-          })
-        );
-
-        if (!ownership.setlistIds.some((setlist) => setlist.id === payload.data._id)) {
-          await axios.put('/api/ownerships/update', {
+      if (!isOwnedSetlist) {
+        promises.push(
+          axios.put('/api/ownerships/update', {
             ...ownership,
             setlistIds: [
               ...ownership.setlistIds,
-              { id: payload.data._id, name: payload.data.name, createdAt: payload.data.createdAt },
+              {
+                id: payload.data._id,
+                name: payload.data.name,
+                createdAt: payload.data.createdAt,
+              },
             ],
-          });
-        }
-        setInvalidSetlist('');
-        setSuccessSnackbarOpen(true);
-        navigate(`/setlist`);
+          })
+        );
       }
 
-      setInvalidSetlist('Error saving setlist');
-      setSuccessSnackbarOpen(false);
+      // Add folder update promises
+      if (isEditSetlist && setlist) {
+        const originalFolderIds = setlist.groupIds || [];
+        const foldersToAdd = updatedSetlistFolderIds.filter(
+          (id) => !originalFolderIds.includes(id)
+        );
+        const foldersToRemove = originalFolderIds.filter(
+          (id) => !updatedSetlistFolderIds.includes(id)
+        );
+
+        // Helper function to update folder
+        const updateFolder = (folderId: string, shouldAdd: boolean) => {
+          const folder = folderOptions.find((f) => f._id === folderId);
+          if (!folder) return Promise.resolve();
+
+          const currentSetlistIds = folder.setlistIds || [];
+          const newSetlistIds = shouldAdd
+            ? [...currentSetlistIds, savedSetlistId]
+            : currentSetlistIds.filter((id) => id !== savedSetlistId);
+
+          return axios.put('/api/groups/update', {
+            id: folderId,
+            setlistIds: newSetlistIds,
+          });
+        };
+
+        // Add folder update promises
+        promises.push(
+          ...foldersToAdd.map((folderId) => updateFolder(folderId, true)),
+          ...foldersToRemove.map((folderId) => updateFolder(folderId, false))
+        );
+      } else if (!isEditSetlist) {
+        // For new setlists, just add to all selected folders
+        const folderUpdatePromises = updatedSetlistFolderIds
+          .map((folderId) => {
+            const folder = folderOptions.find((f) => f._id === folderId);
+            return folder
+              ? axios.put('/api/groups/update', {
+                  id: folderId,
+                  setlistIds: [...(folder.setlistIds || []), savedSetlistId],
+                })
+              : Promise.resolve();
+          })
+          .filter(Boolean);
+
+        promises.push(...folderUpdatePromises);
+      }
+
+      // Execute all updates
+      if (promises.length > 0) {
+        const results = await Promise.all(promises);
+        const allSuccessful = results.every((res) => res?.status === 200);
+
+        if (!allSuccessful) {
+          console.warn('Some updates failed, but setlist was saved');
+        }
+      }
+
+      // Success - clear errors and redirect
+      setInvalidSetlist('');
+      setSuccessSnackbarOpen(true);
+      navigate('/setlist');
     } catch (error: any) {
-      setInvalidSetlist(error.response.data);
+      console.error('Error saving setlist:', error);
+      setInvalidSetlist(error.response?.data || 'Error saving setlist');
       setSuccessSnackbarOpen(false);
-      console.log(error);
     }
   };
 
+  // Navigate to the previous page on cancel
   const handleCancel = () => {
     navigate(-1);
   };
