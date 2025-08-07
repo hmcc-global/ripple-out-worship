@@ -152,6 +152,26 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
   const [selectedSetlistId, setSelectedSetlistId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
 
+  // Snackbar
+  interface SnackbarState {
+    open: boolean;
+    message: string;
+  }
+  const SNACKBAR_AUTO_HIDE_DURATION = 5000;
+  const [snackbar, setSnackbar] = useState<SnackbarState>({
+    open: false,
+    message: '',
+  });
+
+  const handleCloseSnackbar = useCallback((_: any, reason?: string) => {
+    if (reason === 'clickaway') return;
+    setSnackbar((prev) => ({ ...prev, open: false }));
+  }, []);
+
+  const handleSnackbarOpen = useCallback((message: string) => {
+    setSnackbar({ open: true, message });
+  }, []);
+
   // Data Fetching
   const getSetlistsAndFolders = useCallback(async () => {
     try {
@@ -194,7 +214,7 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
       handleSnackbarOpen(`Error fetching data: ${message}`);
       console.error('Error in getSetlistsAndFolders:', error);
     }
-  }, [ownership, setAllSetlists, setOwnedFolders]);
+  }, [handleSnackbarOpen, ownership.groupIds, ownership.setlistIds]);
 
   useEffect(() => {
     getSetlistsAndFolders();
@@ -237,26 +257,6 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
       anchorEl: null,
       currentSetlistId: null,
     });
-  };
-
-  // Snackbar
-  interface SnackbarState {
-    open: boolean;
-    message: string;
-  }
-  const SNACKBAR_AUTO_HIDE_DURATION = 5000;
-  const [snackbar, setSnackbar] = useState<SnackbarState>({
-    open: false,
-    message: '',
-  });
-
-  const handleCloseSnackbar = useCallback((_: any, reason?: string) => {
-    if (reason === 'clickaway') return;
-    setSnackbar((prev) => ({ ...prev, open: false }));
-  }, []);
-
-  const handleSnackbarOpen = (message: string) => {
-    setSnackbar({ open: true, message });
   };
 
   // State Refresh Callbacks
@@ -463,6 +463,9 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
   const [folderCreated, setFolderCreated] = useState<string>('');
   const toggleFolderDrawer = (newOpen: boolean) => {
     setOpenDrawer(newOpen);
+    if (!newOpen) {
+      handleDataRefresh('folders');
+    }
   };
 
   // Main Render
