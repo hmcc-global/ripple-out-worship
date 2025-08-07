@@ -293,9 +293,7 @@ const FolderListItem: FC<{
       </IconButton>
     }
   >
-    <Stack direction="column">
-      <Typography variant="subtitle1">{folder.groupName}</Typography>
-    </Stack>
+      <Typography sx={{paddingRight: '32px'}} variant="subtitle1">{folder.groupName}</Typography>
   </ListItem>
 );
 
