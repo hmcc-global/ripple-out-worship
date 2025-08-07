@@ -93,7 +93,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
     if (mode === 'create' && ownership?.userId) {
       setAddedPeople([ownership.userId]);
     }
-  }, [mode, ownership]);
+  }, [mode, ownership, openDrawer]);
 
   // Automatically re-calculate added people list when addedPeople list changes
   const addedPeopleList = useMemo(() => {
