@@ -77,7 +77,7 @@ const SongsViewContainer: FC = (): ReactElement => {
           width: '100%',
           paddingLeft: 0,
           paddingRight: 0,
-          pb: isMobile ? `${mobileNavbarHeight}px` : 0,
+          pb: isMobile ? mobileNavbarHeight : 0,
         }}
       >
         <Box

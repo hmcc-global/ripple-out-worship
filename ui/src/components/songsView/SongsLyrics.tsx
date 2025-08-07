@@ -2,6 +2,7 @@ import { Box, Chip, Grid, Stack, Typography, useMediaQuery } from '@mui/material
 import { SongViewSchema } from '../../types/song.types';
 import { flatMusicKeysOptions, sharpMusicKeysOptions, ChordColors } from '../../constants';
 import { ReactNode, useCallback, useEffect, useState } from 'react';
+import { specificSongsMobileWidth } from '../../constants';
 
 interface SongsLyricsProps {
   chordStatus: boolean;
@@ -12,8 +13,7 @@ interface SongsLyricsProps {
 }
 
 const SongsLyrics = ({ chordStatus, changeKey, song, split, useFlat }: SongsLyricsProps) => {
-  // For this: We would like to split the lyrics in mobile landscape mode, where the minimum we assume is 550px
-  const isDesktop = useMediaQuery('(min-width:600px)');
+  const isDesktop = useMediaQuery(`(min-width:${specificSongsMobileWidth})`);
   const noSplit = isDesktop ? split : 1;
   const [finalLyrics, setFinalLyrics] = useState<ReactNode[]>();
 
