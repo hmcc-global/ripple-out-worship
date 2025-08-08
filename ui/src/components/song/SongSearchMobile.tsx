@@ -187,7 +187,7 @@ const SongSearch = (props: SongSearchProps) => {
                   </Box>
                   <TextField
                     variant="standard"
-                    placeholder="type Song Title, Keywords, etc"
+                    placeholder="Type Song Title, Keywords, etc"
                     InputProps={{
                       style: {
                         fontSize: '1rem',
@@ -197,7 +197,6 @@ const SongSearch = (props: SongSearchProps) => {
                         border: 0,
                         padding: '0.5rem 1rem',
                         marginRight: ' 0.5em',
-                        height: '10vh',
                         width: '90%',
                         margin: 'auto',
                       },
@@ -255,7 +254,7 @@ const SongSearch = (props: SongSearchProps) => {
                         alignItems={'center'}
                         pb="0.5rem"
                       >
-                        <Typography variant="h4" color="#E6E0E9">
+                        <Typography variant="h4" color="white">
                           Tempo
                         </Typography>
                         <IconButton
@@ -306,7 +305,7 @@ const SongSearch = (props: SongSearchProps) => {
                         pb="0.5rem"
                         pt="0.5rem"
                       >
-                        <Typography variant="h4" color="#E6E0E9">
+                        <Typography variant="h4" color="white">
                           Themes
                         </Typography>
                         <IconButton
@@ -356,7 +355,7 @@ const SongSearch = (props: SongSearchProps) => {
                           pb="0.5rem"
                           pt="0.5rem"
                         >
-                          <Typography variant="h4" color="#E6E0E9">
+                          <Typography variant="h4" color="white">
                             Display Results Details
                           </Typography>
                           <IconButton

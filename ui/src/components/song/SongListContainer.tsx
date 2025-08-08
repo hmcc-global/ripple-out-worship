@@ -32,7 +32,7 @@ const SongListContainer: FC = (): ReactElement => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const isDesktop = useMediaQuery('(min-width: 768px)');
+  const isDesktop = useMediaQuery('(min-width: 769px)');
   const navigate = useNavigate();
   const location = useLocation();
   const handleClose = () => setOpen(false);
@@ -276,9 +276,9 @@ const SongListContainer: FC = (): ReactElement => {
                 direction="row"
                 alignItems="center"
                 justifyContent="space-between"
-                pb="1em"
                 spacing="space-between"
                 maxWidth="100%"
+                height="4%"
               >
                 <Typography variant="h3" color="#FFFFFF">
                   Search Results

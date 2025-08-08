@@ -134,7 +134,7 @@ const SongSearch = (props: SongSearchProps) => {
         <Stack
           direction="row"
           alignItems="center"
-          height="5%"
+          height="4%"
           justifyContent="space-between"
           minWidth="100%"
         >
@@ -161,7 +161,7 @@ const SongSearch = (props: SongSearchProps) => {
 
         <Stack direction="column" spacing="1.25rem" height="95%" pb={4} sx={{ overflowY: 'auto' }}>
           <Box>
-            <Typography variant="h4" color="#E6E0E9" pb={'0.5rem'}>
+            <Typography variant="h4" color="white" pb={'0.5rem'}>
               Search Keywords
             </Typography>
             <TextField
@@ -194,7 +194,7 @@ const SongSearch = (props: SongSearchProps) => {
               alignItems={'center'}
               pb="0.5rem"
             >
-              <Typography variant="h4" color="#E6E0E9">
+              <Typography variant="h4" color="white">
                 Tempo
               </Typography>
               <IconButton
@@ -240,7 +240,7 @@ const SongSearch = (props: SongSearchProps) => {
               alignItems={'center'}
               pb="0.5rem"
             >
-              <Typography variant="h4" color="#E6E0E9">
+              <Typography variant="h4" color="white">
                 Themes
               </Typography>
               <IconButton
@@ -287,7 +287,7 @@ const SongSearch = (props: SongSearchProps) => {
               alignItems={'center'}
               pb="0.5rem"
             >
-              <Typography variant="h4" color="#E6E0E9">
+              <Typography variant="h4" color="white">
                 Display Results Details
               </Typography>
               <IconButton
