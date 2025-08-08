@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { SongViewSchema } from '../../types/song.types';
 import {
   Container,
@@ -20,10 +19,12 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import SongsLyrics from './SongsLyrics';
 import { flatMusicKeysOptions, sharpMusicKeysOptions } from '../../constants';
-import PlaylistAdd from '@mui/icons-material/PlaylistAdd';
-import { Share } from '@mui/icons-material';
 import InfoIcon from '@mui/icons-material/Info';
 import SongsInfoCardMobile from './SongsInfoCardMobile';
+import Snackbar from '@mui/material/Snackbar';
+import ScreenRotationIcon from '@mui/icons-material/ScreenRotation';
+import CloseIcon from '@mui/icons-material/Close';
+import { specificSongsMobileWidth, specificSongsDesktopWidth } from '../../constants';
 
 type SongsButtonCardProps = {
   song: SongViewSchema | undefined;
@@ -44,8 +45,9 @@ const SongsButtonsCard = ({
   const [split, setSplit] = useState(1);
   const theme = useTheme();
   const [showMobileInfo, setShowMobileInfo] = useState(false);
-
-  const isDesktop = useMediaQuery('(min-width:768px)');
+  const [showSplitSnackbar, setShowSplitSnackbar] = useState(false);
+  const isSmallScreen = useMediaQuery(`(max-width:${specificSongsMobileWidth})`);
+  const isDesktop = useMediaQuery(`(min-width:${specificSongsDesktopWidth})`);
   const switchStyle = {
     '& .Mui-checked': { color: theme.palette.secondary.main },
     '& .Mui-checked + .MuiSwitch-track': { backgroundColor: '#8175A0' },
@@ -67,6 +69,10 @@ const SongsButtonsCard = ({
   };
 
   const handleSplit = () => {
+    if (isSmallScreen) {
+      setShowSplitSnackbar(true);
+      return;
+    }
     if (split < 3) setSplit(split + 1);
     else setSplit(1);
   };
@@ -100,56 +106,56 @@ const SongsButtonsCard = ({
               gap: 2,
               overflowX: 'auto',
               whiteSpace: 'nowrap',
-              scrollbarWidth: 'none', // Firefox
+              scrollbarWidth: 'none',
               '&::-webkit-scrollbar': { display: 'none' },
             }}
           >
             <Stack direction="row" alignItems={'center'} spacing={1}>
-              {/* <Stack
-              display={{ xs: 'none', md: 'flex !important' }}
-              direction="row"
-              spacing={2}
-              sx={{
-                justifyContent: 'center',
-                background: '#322F35',
-                padding: ['8px 14px', '12px 20px'],
-                borderRadius: '30px',
-              }}
-              alignItems={'center'}
-            >
-              <Box>
-                <Typography color="#E6E0E9">Split</Typography>
-              </Box>
-              <Box
-                bgcolor={'primary.main'}
-                height="30px"
-                width="30px"
-                borderRadius="4px"
-                onClick={handleSplit}
+              <Stack
+                display="flex"
+                direction="row"
+                spacing={2}
+                sx={{
+                  justifyContent: 'center',
+                  background: '#322F35',
+                  padding: '8px 16px',
+                  borderRadius: '30px',
+                }}
+                alignItems={'center'}
               >
-                <Stack
-                  direction="row"
-                  height="100%"
-                  width="100%"
-                  display="flex"
-                  justifyContent="center"
-                  alignItems="center"
-                  spacing={0.2}
+                <Box>
+                  <Typography color="#E6E0E9">Split</Typography>
+                </Box>
+                <Box
+                  bgcolor={'primary.main'}
+                  height="30px"
+                  width="30px"
+                  borderRadius="4px"
+                  onClick={handleSplit}
                 >
-                  {Array.from({ length: split }, (e, i) => {
-                    return (
-                      <Box
-                        key={i}
-                        bgcolor="primary.lightest"
-                        height="15px"
-                        width="6px"
-                        borderRadius="2px"
-                      />
-                    );
-                  })}
-                </Stack>
-              </Box>
-            </Stack> */}
+                  <Stack
+                    direction="row"
+                    height="100%"
+                    width="100%"
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    spacing={0.2}
+                  >
+                    {Array.from({ length: split }, (e, i) => {
+                      return (
+                        <Box
+                          key={i}
+                          bgcolor="primary.lightest"
+                          height="15px"
+                          width="6px"
+                          borderRadius="2px"
+                        />
+                      );
+                    })}
+                  </Stack>
+                </Box>
+              </Stack>
               <Box
                 fontSize={{ sm: '14px', md: '26px' }}
                 sx={{
@@ -558,7 +564,7 @@ const SongsButtonsCard = ({
           padding: ['10px', '14px'],
           backgroundColor: '#141218',
           borderRadius: '12px',
-          mb: '15vh',
+          mb: '5vh',
         }}
       >
         <SongsLyrics
@@ -572,6 +578,45 @@ const SongsButtonsCard = ({
       {showMobileInfo && (
         <SongsInfoCardMobile song={song} onClose={() => setShowMobileInfo(false)} />
       )}
+      <Snackbar
+        open={showSplitSnackbar}
+        autoHideDuration={3000}
+        onClose={() => setShowSplitSnackbar(false)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        ContentProps={{ sx: { background: 'transparent', boxShadow: 'none' } }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            px: 3,
+            py: 1,
+            backgroundColor: '#D0BCFF',
+            color: '#4F378B',
+            borderRadius: 2,
+            boxShadow: 3,
+            fontWeight: 500,
+            fontSize: 16,
+            minWidth: 260,
+            position: 'relative',
+          }}
+        >
+          <ScreenRotationIcon sx={{ color: '#4F378B', fontSize: 22, mr: 1 }} />
+          <Box sx={{ px: 0.5 }}>Rotate phone to landscape to split</Box>
+          <IconButton
+            size="small"
+            onClick={() => setShowSplitSnackbar(false)}
+            sx={{
+              color: '#4F378B',
+              ml: 2, // margin-left for spacing
+            }}
+            aria-label="close"
+          >
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        </Box>
+      </Snackbar>
     </Container>
   );
 };

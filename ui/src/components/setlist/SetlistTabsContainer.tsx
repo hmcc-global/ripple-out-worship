@@ -1,11 +1,8 @@
 import {
   Close,
-  Delete,
-  Edit,
   ExpandLess,
   ExpandMore,
   Folder,
-  LinkRounded,
   MoreVertRounded,
   QueueMusic,
 } from '@mui/icons-material';
@@ -23,8 +20,6 @@ import {
   Typography,
   useMediaQuery,
   IconButton,
-  Menu,
-  MenuItem,
   Snackbar,
   TextField,
 } from '@mui/material';
@@ -34,14 +29,15 @@ import axios from 'axios';
 import { FC, useState, useEffect, useCallback, Fragment } from 'react';
 import { Setlist, SetlistFolder } from '../../types/setlist.types';
 import SetlistFolderDrawer from './SetlistFolderDrawer';
+import SetlistActionsMenu from './SetlistActionsMenu';
 import { useOwnership } from '../../helpers/customHooks';
 
 // Constants and Utility Functions
 const SELECTED_ITEM_STYLE = {
-  backgroundColor: '#4F378B',
+  backgroundColor: 'primary.darker',
   color: '#E6E0E9',
   '&:hover': {
-    backgroundColor: '#4F378B',
+    backgroundColor: 'primary.darker',
     opacity: '0.9',
   },
   '& .MuiListItemIcon-root': {
@@ -150,7 +146,8 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
   // State
   const [tab, setTab] = useState(0);
   const [allSetlists, setAllSetlists] = useState<Setlist[]>([]);
-  const [allFolders, setAllFolders] = useState<SetlistFolder[]>([]);
+  const [ownedSetlists, setOwnedSetlists] = useState<Setlist[]>([]);
+  const [ownedFolders, setOwnedFolders] = useState<SetlistFolder[]>([]);
   const [openFolders, setOpenFolders] = useState<string[]>([]);
   const [selectedSetlistId, setSelectedSetlistId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -158,25 +155,46 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
   // Data Fetching
   const getSetlistsAndFolders = useCallback(async () => {
     try {
-      const setlistRes = await axios.get<Setlist[]>('/api/setlists/get');
-      if (setlistRes.status === 200) {
-        const filteredSetlists = setlistRes.data.filter((setlist) =>
-          ownership.setlistIds.some((setlistOwnership) => setlistOwnership.id === setlist._id)
-        );
-        setAllSetlists(filteredSetlists);
+      // Fetch data concurrently
+      const [folderRes, setlistRes] = await Promise.all([
+        axios.get<SetlistFolder[]>('/api/groups/get'),
+        axios.get<Setlist[]>('/api/setlists/get'),
+      ]);
+
+      if (folderRes.status !== 200 || !folderRes.data) {
+        throw new Error('Failed to fetch folders');
+      }
+      if (setlistRes.status !== 200 || !setlistRes.data) {
+        throw new Error('Failed to fetch setlists');
       }
 
-      const folderRes = await axios.get<SetlistFolder[]>('/api/groups/get');
-      if (folderRes.status === 200) {
-        const filteredFolders = folderRes.data.filter((folder) =>
-          ownership.groupIds.some((folderOwnership) => folderOwnership.id === folder._id)
-        );
-        setAllFolders(filteredFolders);
-      }
+      // Filter owned folders
+      const filteredFolders = folderRes.data.filter(
+        (folder) => ownership.groupIds?.some(({ id }) => id === folder._id)
+      );
+      setOwnedFolders(filteredFolders);
+      // Collect all setlist IDs from the owned folders
+      const foldersSetlistIds = Array.from(
+        new Set(filteredFolders.flatMap((folder) => folder.setlistIds ?? []))
+      );
+
+      // Filter owned setlists
+      const ownedSetlists = setlistRes.data.filter(
+        (setlist) => ownership.setlistIds?.some(({ id }) => id === setlist._id)
+      );
+      setOwnedSetlists(ownedSetlists);
+      console.log(ownedSetlists);
+      // Get folder setlists and combine with owned setlists
+      const folderSetlists = setlistRes.data.filter((setlist) =>
+        foldersSetlistIds.includes(setlist._id)
+      );
+      setAllSetlists([...ownedSetlists, ...folderSetlists]);
     } catch (error) {
-      console.log(error);
+      const message = error instanceof Error ? error.message : 'An unexpected error occurred';
+      handleSnackbarOpen(`Error fetching data: ${message}`);
+      console.error('Error in getSetlistsAndFolders:', error);
     }
-  }, [ownership, setAllSetlists, setAllFolders]);
+  }, [ownership, setAllSetlists, setOwnedFolders]);
 
   useEffect(() => {
     getSetlistsAndFolders();
@@ -221,47 +239,6 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
     });
   };
 
-  const MenuActionItem = ({
-    icon: Icon,
-    text,
-    onClick,
-  }: {
-    icon: React.ElementType;
-    text: string;
-    onClick: () => void;
-  }) => (
-    <MenuItem onClick={onClick}>
-      <ListItemIcon sx={{ color: 'secondary.main' }}>
-        <Icon />
-      </ListItemIcon>
-      <ListItemText sx={{ color: 'primary.lighter', fontSize: '0.75rem !important' }}>
-        {text}
-      </ListItemText>
-    </MenuItem>
-  );
-
-  // Setlist Menu Actions (placeholders)
-  const handleEditSetlist = (setlistId: string) => {
-    navigate(`/setlist/edit/${setlistId}`);
-    handleMenuClose();
-  };
-  // TODO-YY: Implement action functions
-  const handleCopyLink = async (publicLink: string) => {
-    await navigator.clipboard.writeText(publicLink);
-    setSnackbar({ open: true, message: 'Link copied to clipboard' });
-    handleMenuClose();
-  };
-
-  const handleAddToFolder = (setlistId: string) => {
-    console.log(`Add to folder ${setlistId}`);
-    handleMenuClose();
-  };
-
-  const handleDeleteSetlist = (setlistId: string) => {
-    console.log(`Delete setlist ${setlistId}`);
-    handleMenuClose();
-  };
-
   // Snackbar
   interface SnackbarState {
     open: boolean;
@@ -277,6 +254,53 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
     if (reason === 'clickaway') return;
     setSnackbar((prev) => ({ ...prev, open: false }));
   }, []);
+
+  const handleSnackbarOpen = (message: string) => {
+    setSnackbar({ open: true, message });
+  };
+
+  // State Refresh Callbacks
+  // Add refresh callback
+  const handleDataRefresh = useCallback(
+    async (type?: 'folders' | 'setlists' | 'all') => {
+      try {
+        if (type === 'folders' || type === 'all' || !type) {
+          // Refresh folders data
+          const folderRes = await axios.get<SetlistFolder[]>('/api/groups/get');
+          if (folderRes.status === 200 && folderRes.data) {
+            const filteredFolders = folderRes.data.filter(
+              (folder) => ownership.groupIds?.some(({ id }) => id === folder._id)
+            );
+            setOwnedFolders(filteredFolders);
+          }
+        }
+
+        if (type === 'setlists' || type === 'all' || !type) {
+          // Refresh setlists data
+          const setlistRes = await axios.get<Setlist[]>('/api/setlists/get');
+          if (setlistRes.status === 200 && setlistRes.data) {
+            const ownedSetlists = setlistRes.data.filter(
+              (setlist) => ownership.setlistIds?.some(({ id }) => id === setlist._id)
+            );
+            setOwnedSetlists(ownedSetlists);
+
+            // Update all setlists
+            const foldersSetlistIds = Array.from(
+              new Set(ownedFolders.flatMap((folder) => folder.setlistIds ?? []))
+            );
+            const folderSetlists = setlistRes.data.filter((setlist) =>
+              foldersSetlistIds.includes(setlist._id)
+            );
+            setAllSetlists([...ownedSetlists, ...folderSetlists]);
+          }
+        }
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Failed to refresh data';
+        handleSnackbarOpen(`Error refreshing data: ${message}`);
+      }
+    },
+    [ownership, ownedFolders, handleSnackbarOpen]
+  );
 
   // Render Helper Functions
   const renderNestedSetlistItem = (setlistId: string, folderId: string) => {
@@ -312,8 +336,11 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
   const renderFolderContent = (folder: SetlistFolder) => (
     <Collapse in={openFolders.includes(folder._id)} timeout="auto" unmountOnExit>
       <List component="div" disablePadding>
+        {/* TODO: Workaround for duplicated setlist bug, see issue #119. Remove this "Set" logic after fixing the underlying bug. */}{' '}
         {folder.setlistIds?.length > 0 ? (
-          folder.setlistIds.map((setlistId) => renderNestedSetlistItem(setlistId, folder._id))
+          Array.from(new Set(folder.setlistIds)).map((setlistId) =>
+            renderNestedSetlistItem(setlistId, folder._id)
+          )
         ) : (
           <ListItem sx={{ pl: 7 }}>
             <Typography variant="subtitle2" color="secondary.light">
@@ -339,22 +366,24 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
           // secondary={'Shared with ' + folder.userIds?.length.toString() + ' people'}
           sx={LIST_ITEM_TEXT_STYLE}
         />
-        <IconButton>
-          <MoreVertRounded
-            sx={{ color: '#4A4458', fontSize: '1.75rem' }}
-            onClick={(event: any) => {
-              event.stopPropagation();
-              setSelectedFolderId(folder._id);
-              toggleFolderDrawer(true);
-            }}
-          />
+        <IconButton
+          onClick={(event: any) => {
+            event.stopPropagation();
+            setSelectedFolderId(folder._id);
+            toggleFolderDrawer(true);
+          }}
+        >
+          <MoreVertRounded sx={{ color: '#4A4458', fontSize: '1.75rem' }} />
         </IconButton>
-        {(isTablet || isDesktop) &&
-          (openFolders.includes(folder._id) ? (
-            <ExpandLess sx={LIST_ITEM_ICON_STYLE} />
-          ) : (
-            <ExpandMore sx={LIST_ITEM_ICON_STYLE} />
-          ))}
+        {(isTablet || isDesktop) && (
+          <IconButton>
+            {openFolders.includes(folder._id) ? (
+              <ExpandLess sx={LIST_ITEM_ICON_STYLE} />
+            ) : (
+              <ExpandMore sx={LIST_ITEM_ICON_STYLE} />
+            )}
+          </IconButton>
+        )}
       </ListItemButton>
       {renderFolderContent(folder)}
     </Fragment>
@@ -402,46 +431,19 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
             />
           </IconButton>
         </ListItemButton>
-        <Menu
-          id={`setlist-menu-${setlist._id}`}
+        <SetlistActionsMenu
           anchorEl={menuState.anchorEl}
           open={menuState.anchorEl !== null && menuState.currentSetlistId === setlist._id}
           onClose={handleMenuClose}
-          MenuListProps={{
-            'aria-labelledby': `setlist-menu-button-${setlist._id}`,
+          setlist={setlist}
+          handleSnackbarOpen={handleSnackbarOpen}
+          onSetlistDeleted={(setlistId) => {
+            // Remove from local state immediately
+            setOwnedSetlists((prev) => prev.filter((s) => s._id !== setlistId));
+            setAllSetlists((prev) => prev.filter((s) => s._id !== setlistId));
           }}
-          PaperProps={{
-            sx: {
-              backgroundColor: 'primary.darker',
-              color: '#E6E0E9',
-              border: '1px solid #938F99',
-              borderRadius: '8px',
-              boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.3)',
-            },
-          }}
-        >
-          <MenuActionItem
-            icon={Edit}
-            text="Edit Setlist"
-            onClick={() => handleEditSetlist(setlist._id)}
-          />
-          <MenuActionItem
-            icon={LinkRounded}
-            text="Copy Link"
-            onClick={() => handleCopyLink(setlist.publicLink)}
-          />
-          <MenuActionItem
-            icon={Folder}
-            text="Add to Folder"
-            onClick={() => handleAddToFolder(setlist._id)}
-          />
-          <Divider sx={{ bgcolor: '#49454F' }} />
-          <MenuActionItem
-            icon={Delete}
-            text="Delete Setlist"
-            onClick={() => handleDeleteSetlist(setlist._id)}
-          />
-        </Menu>
+          onFolderAssignmentChanged={handleDataRefresh}
+        />
       </ListItem>
     </Fragment>
   );
@@ -494,18 +496,11 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
         <SearchTextField searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
         <SetlistTabPanel value={tab} index={0}>
           <List>
-            {(allSetlists && allSetlists.length > 0) || (allFolders && allFolders.length > 0) ? (
+            {(ownedSetlists && ownedSetlists.length > 0) ||
+            (ownedFolders && ownedFolders.length > 0) ? (
               <>
-                {allFolders
-                  .filter((folder) =>
-                    folder.groupName.toLowerCase().includes(searchTerm.toLowerCase())
-                  )
-                  .map(renderFolderItem)}
-                {allSetlists
-                  .filter((setlist) =>
-                    setlist.name.toLowerCase().includes(searchTerm.toLowerCase())
-                  )
-                  .map(renderSetlistItem)}
+                {ownedFolders.map(renderFolderItem)}
+                {ownedSetlists.map(renderSetlistItem)}
               </>
             ) : (
               renderEmptyState('No Setlists or Folders Found')
@@ -516,12 +511,8 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
         {/* Folders Tab */}
         <SetlistTabPanel value={tab} index={1}>
           <List>
-            {allFolders && allFolders.length > 0
-              ? allFolders
-                  .filter((folder) =>
-                    folder.groupName.toLowerCase().includes(searchTerm.toLowerCase())
-                  )
-                  .map(renderFolderItem)
+            {ownedFolders && ownedFolders.length > 0
+              ? ownedFolders.map(renderFolderItem)
               : renderEmptyState('No Folders Found')}
           </List>
         </SetlistTabPanel>
@@ -529,12 +520,8 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
         {/* Setlists Tab */}
         <SetlistTabPanel value={tab} index={2}>
           <List>
-            {allSetlists && allSetlists.length > 0
-              ? allSetlists
-                  .filter((setlist) =>
-                    setlist.name.toLowerCase().includes(searchTerm.toLowerCase())
-                  )
-                  .map(renderSetlistItem)
+            {ownedSetlists && ownedSetlists.length > 0
+              ? ownedSetlists.map(renderSetlistItem)
               : renderEmptyState('No Personal Setlists Found')}
           </List>
         </SetlistTabPanel>

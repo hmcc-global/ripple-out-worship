@@ -13,28 +13,16 @@ import MobileBackButton from '../../navigation/MobileBackButton';
 const ActionButton = styled(Button)(({ theme }) => ({
   borderRadius: '6.25rem',
   color: theme.palette.secondary.main,
-  borderColor: theme.palette.secondary.main,
+  // borderColor: theme.palette.secondary.main,
   minWidth: 'auto',
   fontWeight: 400,
+  flex: 1,
+  padding: '0.5rem 1rem',
+  fontSize: '0.875rem',
   [theme.breakpoints.down('sm')]: {
     flex: 'none',
     padding: '0.5rem 1.5rem',
     fontSize: '0.75rem',
-  },
-  [theme.breakpoints.between('sm', 'xl')]: {
-    flex: 1,
-    padding: '0.5rem 1rem',
-    fontSize: '0.75rem',
-  },
-  [theme.breakpoints.between('xl', 1920)]: {
-    flex: 'none',
-    padding: '0.75rem 2rem',
-    fontSize: '0.875rem',
-  },
-  [theme.breakpoints.up(1800)]: {
-    flex: 1,
-    padding: '0.75rem 2rem',
-    fontSize: '0.875rem',
   },
 }));
 
@@ -79,7 +67,7 @@ const SUBTITLE_COLOR = '#CAC4D0';
 
 // Utility functions
 const formatDate = (dateString: string): string => {
-  return new Date(dateString).toISOString().split('T')[0];
+  return dateString === '' ? dateString : new Date(dateString).toISOString().split('T')[0];
 };
 
 const SetlistAdminViewContainer: FC = (): ReactElement | null => {
@@ -119,7 +107,6 @@ const SetlistAdminViewContainer: FC = (): ReactElement | null => {
   }, [id]);
 
   // Event handlers
-  // TODO-YY: FIX THIS COPY LINK - PUBLIC LINK IS NOT CORRECT
   const handleCopyLink = useCallback(async () => {
     if (!setlist?.publicLink) {
       setSnackbar({ open: true, message: 'No public link available' });
@@ -128,7 +115,7 @@ const SetlistAdminViewContainer: FC = (): ReactElement | null => {
 
     try {
       await navigator.clipboard.writeText(setlist.publicLink);
-      setSnackbar({ open: true, message: 'Link copied to clipboard' });
+      setSnackbar({ open: true, message: 'Setlist Public Link copied to clipboard' });
     } catch (err) {
       console.error('Failed to copy link:', err);
       setSnackbar({ open: true, message: 'Failed to copy link' });
@@ -166,19 +153,19 @@ const SetlistAdminViewContainer: FC = (): ReactElement | null => {
           {!isTablet && !isDesktop && <MobileBackButton />}
           <Typography variant="h2">{setlist.name}</Typography>
           <Typography variant="subtitle2" sx={{ color: SUBTITLE_COLOR, fontWeight: 400 }}>
-            Created on {formatDate(setlist.date.toString())}
+            Created on {formatDate(setlist.date?.toString() ?? '')}
           </Typography>
         </HeaderContainer>
 
         <ButtonContainer>
           <ActionButton startIcon={<Edit />} variant="outlined" onClick={handleEditClick}>
-            {isTablet || isDesktop ? 'Edit Setlist' : 'Edit'}
+            {'Edit'}
           </ActionButton>
           <ActionButton startIcon={<Link />} variant="outlined" onClick={handleCopyLink}>
-            {isTablet || isDesktop ? 'Copy Link' : 'Link'}
+            {'Link'}
           </ActionButton>
           <ActionButton startIcon={<Launch />} variant="outlined" onClick={handlePublicViewClick}>
-            {isTablet || isDesktop ? 'View on Browser' : 'Public View'}
+            {'Public View'}
           </ActionButton>
         </ButtonContainer>
 
