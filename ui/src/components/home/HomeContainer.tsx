@@ -14,6 +14,7 @@ import { useOwnership, useSongs } from '../../helpers/customHooks';
 import { SongSchema } from '../../types/song.types';
 import { Setlist } from '../../types/setlist.types';
 import axios from 'axios';
+import { MAXIMUM_DESKTOP_HEIGHT } from '../../constants';
 
 const HomeContainer: FC = (): ReactElement => {
   const theme = useTheme();
@@ -51,6 +52,7 @@ const HomeContainer: FC = (): ReactElement => {
         sx={{
           width: '100%',
           height: '100%',
+          maxHeight: ['100%', MAXIMUM_DESKTOP_HEIGHT],
           flexGrow: 1,
           display: 'flex',
           justifyContent: 'center',
@@ -97,7 +99,6 @@ const HomeContainer: FC = (): ReactElement => {
               <Typography
                 sx={{ fontSize: ['12px', '16px'], fontFamily: 'DM Sans, sans-serif' }}
                 fontWeight={400}
-                bottom={35}
               >
                 Harvest Mission Community Church
               </Typography>
