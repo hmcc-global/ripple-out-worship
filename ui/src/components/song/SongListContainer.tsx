@@ -21,6 +21,7 @@ import { getFirstLineLyrics } from '../../helpers/song';
 import axios from 'axios';
 import { useSongs, useUser } from '../../helpers/customHooks';
 import CircularProgress from '@mui/material/CircularProgress';
+import { mobileNavbarHeight } from '../../constants';
 
 const SongListContainer: FC = (): ReactElement => {
   const { user } = useUser();
@@ -151,7 +152,8 @@ const SongListContainer: FC = (): ReactElement => {
         sx={{
           py: '1rem',
           px: '1.5rem',
-          maxHeight: { xs: '90vh', md: '100vh' },
+          maxHeight: { xs: '92vh', md: '100vh' },
+          height: { xs: '92vh', md: '100vh' },
           minWidth: '100%',
           overflow: 'hidden',
         }}
@@ -239,8 +241,15 @@ const SongListContainer: FC = (): ReactElement => {
           }
         />
         <Box display={{ base: 'block', md: 'none' }}></Box>
-        <Grid container maxWidth="100%" height="88vh" width="100%" spacing={1} marginTop={1}>
-          <Grid item xs={isDesktop ? 4 : 12} height="100%">
+        <Grid
+          container
+          maxWidth="100%"
+          height={isDesktop ? '88vh' : `calc(100% - ${mobileNavbarHeight})`}
+          width="100%"
+          spacing={1}
+          marginTop={1}
+        >
+          <Grid item xs={isDesktop ? 4 : 12} height={isDesktop ? '100%' : 'auto'}>
             {isDesktop ? (
               <SongSearch
                 filterData={filterData}
@@ -261,7 +270,7 @@ const SongListContainer: FC = (): ReactElement => {
           </Grid>
 
           {/* Song cards search results */}
-          <Grid item xs={isDesktop ? 8 : 12} height="100%">
+          <Grid item xs={isDesktop ? 8 : 12} height={isDesktop ? '100%' : '100%'}>
             <Container
               sx={{
                 py: '1em',
@@ -278,7 +287,8 @@ const SongListContainer: FC = (): ReactElement => {
                 justifyContent="space-between"
                 spacing="space-between"
                 maxWidth="100%"
-                height="4%"
+                height={isDesktop ? '4%' : 'auto'}
+                pb={isDesktop ? 0 : '1em'}
               >
                 <Typography variant="h3" color="#FFFFFF">
                   Search Results
