@@ -500,7 +500,7 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
     if (page > 1) getSongResults();
   }, [page, getSongResults]);
 
-  // useffect for filter
+  // useEffect for filter
   useEffect(() => {
     setSongResults([]);
     setPage(1);
