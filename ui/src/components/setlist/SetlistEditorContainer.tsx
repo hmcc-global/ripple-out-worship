@@ -37,7 +37,7 @@ import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
 import axios, { AxiosResponse } from 'axios';
-import { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -317,6 +317,7 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
   const isTablet = useMediaQuery(theme.breakpoints.between('md', 'xl'));
   const isDesktop = useMediaQuery(theme.breakpoints.up('xl'));
   const isMobileOrSmallTablet = !isTablet && !isDesktop;
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const allSongs = useSongs() as SongSchema[];
   // const allFolders = useFolders() as SetlistFolder[];
@@ -353,15 +354,78 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
   const [folderList, setFolderList] = useState<string[]>([]);
   const [folderOptions, setFolderOptions] = useState<SetlistFolder[]>([]);
 
-  // Search state
-  const [searchString, setSearchString] = useState('');
-  const filterKeyword = useMemo(() => searchString.trim().toLowerCase(), [searchString]);
-
   // UI state
   const [successSnackbarOpen, setSuccessSnackbarOpen] = useState(false);
   const [invalidSetlist, setInvalidSetlist] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState('');
   const [drawerOpen, setDrawerOpen] = useState(false);
+
+  // Songs pagination
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(true);
+
+  // get dynamic songs data
+  const getSongResults = useCallback(async () => {
+    setLoading(true);
+    try {
+      //TODO: find a way so it only call once
+      const payload = await axios.get('/api/songs/search', {
+        params: {
+          keyword: filterData?.search || '',
+          themes: filterData?.themes || [],
+          tempo: filterData?.tempo || [],
+          page: page,
+          limit: 20,
+        },
+      });
+      setSongResults((prevSongs) => {
+        const uniqueSongs = [...prevSongs, ...payload.data.data];
+        const songMap = new Map();
+
+        // Use Map to deduplicate by ID
+        uniqueSongs.forEach((song) => {
+          const id = song._id || song.id;
+          songMap.set(id, song);
+        });
+
+        // Convert back to array
+        return Array.from(songMap.values());
+      });
+      setTotalPages(payload.data.totalPages);
+      setLoading(false);
+    } catch (error: any) {
+      if (error?.response) {
+        setLoading(false);
+        if (error.response.status === 404) {
+          console.log('No songs found');
+          setSongResults([]);
+        } else if (error.response.status === 500 || error.response.status === 401) {
+          // Handle 500 or 401 errors as needed
+        }
+      } else {
+        console.log('An unexpected error occurred:', error);
+      }
+    }
+  }, [filterData, page]);
+
+  // handle get songs or end scroll
+  const handleScroll = useCallback(() => {
+    const searchDisplayBox = document.getElementById('search-display');
+    if (searchDisplayBox) {
+      const { scrollTop, scrollHeight, clientHeight } = searchDisplayBox;
+      const isAtBottom = scrollTop + clientHeight >= scrollHeight - 5;
+      if (isAtBottom && timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      if (!loading && isAtBottom && page < totalPages) {
+        timeoutRef.current = setTimeout(() => {
+          setPage((prevPage) => prevPage + 1);
+        }, 300);
+        searchDisplayBox.scrollTop = scrollTop - 30;
+      }
+    }
+  }, [loading, page, totalPages]);
 
   // Folder Options for User
   const getFolderOptions = useCallback(async () => {
@@ -397,9 +461,10 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
   }, [setlistId]);
 
   useEffect(() => {
+    getSongResults();
     getSetlist();
     getFolderOptions();
-  }, [getSetlist, getFolderOptions]);
+  }, [getSetlist, getFolderOptions, getSongResults]);
 
   useEffect(() => {
     if (setlist && Object.keys(setlist).length > 0) {
@@ -417,6 +482,45 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
       );
     }
   }, [setlist, folderOptions, reset]);
+
+  // useEffect for scrolling
+  useEffect(() => {
+    const searchDisplayBox = document.getElementById('search-display');
+    if (searchDisplayBox) {
+      searchDisplayBox.addEventListener('scroll', handleScroll);
+    }
+    return () => {
+      if (searchDisplayBox) {
+        searchDisplayBox.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, [loading, page, totalPages, handleScroll]);
+
+  useEffect(() => {
+    if (page > 1) getSongResults();
+  }, [page, getSongResults]);
+
+  // useEffect for filter
+  useEffect(() => {
+    setSongResults([]);
+    setPage(1);
+
+    const shouldQuery =
+      filterData &&
+      (filterData.search?.trim() ||
+        (filterData.themes && filterData.themes.length > 0) ||
+        filterData.tempo);
+    if (shouldQuery) {
+      const timer = setTimeout(() => {
+        getSongResults();
+      }, 1000);
+
+      return () => {
+        clearTimeout(timer);
+      };
+    }
+    return;
+  }, [filterData]);
 
   // Form submission
   const handleSaveSetlist: SubmitHandler<SetlistEditorFields> = async (data) => {
@@ -589,28 +693,6 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
 
   const addedSongIds = addedSongList.map((song) => song._id);
 
-  // Filter songs based on searchString
-  const memoizedFilteredSongs = useMemo(() => {
-    if (allSongs.length === 0) return [];
-
-    if (filterKeyword.length < 2) return allSongs;
-
-    const filteredSongs = allSongs.filter((song) => {
-      const songTitle = song.title.toLowerCase();
-
-      if (songTitle.includes(filterKeyword)) {
-        return true;
-      }
-
-      return false;
-    });
-    return filteredSongs;
-  }, [filterKeyword, allSongs]);
-
-  useEffect(() => {
-    setSongResults(memoizedFilteredSongs);
-  }, [filterKeyword, memoizedFilteredSongs]);
-
   // TODO-YY: Song Filtering
   const [isFilterDrawerToggled, setIsFilterDrawerToggled] = useState<boolean>(false);
 
@@ -681,8 +763,8 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
                 </MobileSongList>
               ) : (
                 <SongSearchSection
-                  searchString={searchString}
-                  onSearchChange={setSearchString}
+                  filterData={filterData}
+                  setFilterData={setFilterData}
                   songResults={songResults}
                   isMobileOrSmallTablet={isMobileOrSmallTablet}
                   isTablet={isTablet}
@@ -711,8 +793,8 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
               <DrawerContent>
                 <DrawerBody>
                   <SongSearchSection
-                    searchString={searchString}
-                    onSearchChange={setSearchString}
+                    filterData={filterData}
+                    setFilterData={setFilterData}
                     songResults={songResults}
                     isMobileOrSmallTablet={isMobileOrSmallTablet}
                     isTablet={isTablet}
@@ -893,8 +975,8 @@ const SetlistDetailsSection: FC<{
 
 // Song Search Section Component
 const SongSearchSection: FC<{
-  searchString: string;
-  onSearchChange: (value: string) => void;
+  filterData: SongSearchFilter | undefined;
+  setFilterData: (value: SongSearchFilter) => void;
   songResults: SongSchema[];
   isMobileOrSmallTablet: boolean;
   isTablet: boolean;
@@ -904,8 +986,8 @@ const SongSearchSection: FC<{
   isFilterDrawerToggled: boolean;
   handleToggleFilterDrawer: () => void;
 }> = ({
-  searchString,
-  onSearchChange,
+  filterData,
+  setFilterData,
   songResults,
   isMobileOrSmallTablet,
   isTablet,
@@ -929,13 +1011,15 @@ const SongSearchSection: FC<{
 
       <SongSearchStack>
         <SearchInputComponent
-          searchString={searchString}
-          onSearchChange={onSearchChange}
+          searchString={filterData?.search || ''}
+          onSearchChange={(value) => {
+            setFilterData({ ...filterData, search: value });
+          }}
           isFilterDrawerToggled={isFilterDrawerToggled}
           handleToggleFilterDrawer={handleToggleFilterDrawer}
         />
 
-        <SongResultsContainer>
+        <SongResultsContainer id="search-display">
           {songResults.length > 0 ? (
             songResults.map((song) => (
               <SongCardComponent
@@ -947,7 +1031,7 @@ const SongSearchSection: FC<{
               />
             ))
           ) : (
-            <Typography>No songs found for "{searchString}"</Typography>
+            <Typography>No songs found for "{filterData?.search}"</Typography>
           )}
         </SongResultsContainer>
       </SongSearchStack>
