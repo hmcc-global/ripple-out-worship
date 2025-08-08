@@ -2,6 +2,7 @@ import { Box, Chip, Grid, Stack, Typography, useMediaQuery } from '@mui/material
 import { SongViewSchema } from '../../types/song.types';
 import { flatMusicKeysOptions, sharpMusicKeysOptions, ChordColors } from '../../constants';
 import { ReactNode, useCallback, useEffect, useState } from 'react';
+import { specificSongsMobileWidth } from '../../constants';
 
 interface SongsLyricsProps {
   chordStatus: boolean;
@@ -12,7 +13,7 @@ interface SongsLyricsProps {
 }
 
 const SongsLyrics = ({ chordStatus, changeKey, song, split, useFlat }: SongsLyricsProps) => {
-  const isDesktop = useMediaQuery('(min-width:768px)');
+  const isDesktop = useMediaQuery(`(min-width:${specificSongsMobileWidth})`);
   const noSplit = isDesktop ? split : 1;
   const [finalLyrics, setFinalLyrics] = useState<ReactNode[]>();
 
@@ -140,7 +141,13 @@ const SongsLyrics = ({ chordStatus, changeKey, song, split, useFlat }: SongsLyri
                             }}
                           />
                         ) : null}
-                        <Typography style={{ whiteSpace: 'pre-wrap', color: '#CCC2DC' }}>
+                        <Typography
+                          style={{
+                            whiteSpace: 'pre-wrap',
+                            color: '#CCC2DC',
+                            wordBreak: 'break-word',
+                          }}
+                        >
                           {textLyrics}
                         </Typography>
                       </Box>
@@ -207,7 +214,7 @@ const SongsLyrics = ({ chordStatus, changeKey, song, split, useFlat }: SongsLyri
   }, [parseLyrics, song, groupLyricsToParagraphs]);
   return (
     <>
-      <Grid container width={'100%'} spacing={2} marginTop={1} marginBottom={1}>
+      <Grid container width={'100%'} spacing={2} marginTop={1} marginBottom={0}>
         {finalLyrics &&
           finalLyrics.map((chunk, i) => {
             return (
