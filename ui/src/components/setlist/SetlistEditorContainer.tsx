@@ -354,10 +354,6 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
   const [folderList, setFolderList] = useState<string[]>([]);
   const [folderOptions, setFolderOptions] = useState<SetlistFolder[]>([]);
 
-  // Search state
-  const [searchString, setSearchString] = useState('');
-  const filterKeyword = useMemo(() => searchString.trim().toLowerCase(), [searchString]);
-
   // UI state
   const [successSnackbarOpen, setSuccessSnackbarOpen] = useState(false);
   const [invalidSetlist, setInvalidSetlist] = useState<string>('');
@@ -369,7 +365,7 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
 
-  // get dynamiuc songs data
+  // get dynamic songs data
   const getSongResults = useCallback(async () => {
     setLoading(true);
     try {
@@ -503,6 +499,28 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
   useEffect(() => {
     if (page > 1) getSongResults();
   }, [page, getSongResults]);
+
+  // useffect for filter
+  useEffect(() => {
+    setSongResults([]);
+    setPage(1);
+
+    const shouldQuery =
+      filterData &&
+      (filterData.search?.trim() ||
+        (filterData.themes && filterData.themes.length > 0) ||
+        filterData.tempo);
+    if (shouldQuery) {
+      const timer = setTimeout(() => {
+        getSongResults();
+      }, 1000);
+
+      return () => {
+        clearTimeout(timer);
+      };
+    }
+    return;
+  }, [filterData]);
 
   // Form submission
   const handleSaveSetlist: SubmitHandler<SetlistEditorFields> = async (data) => {
@@ -745,8 +763,8 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
                 </MobileSongList>
               ) : (
                 <SongSearchSection
-                  searchString={searchString}
-                  onSearchChange={setSearchString}
+                  filterData={filterData}
+                  setFilterData={setFilterData}
                   songResults={songResults}
                   isMobileOrSmallTablet={isMobileOrSmallTablet}
                   isTablet={isTablet}
@@ -775,8 +793,8 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
               <DrawerContent>
                 <DrawerBody>
                   <SongSearchSection
-                    searchString={searchString}
-                    onSearchChange={setSearchString}
+                    filterData={filterData}
+                    setFilterData={setFilterData}
                     songResults={songResults}
                     isMobileOrSmallTablet={isMobileOrSmallTablet}
                     isTablet={isTablet}
@@ -957,8 +975,8 @@ const SetlistDetailsSection: FC<{
 
 // Song Search Section Component
 const SongSearchSection: FC<{
-  searchString: string;
-  onSearchChange: (value: string) => void;
+  filterData: SongSearchFilter | undefined;
+  setFilterData: (value: SongSearchFilter) => void;
   songResults: SongSchema[];
   isMobileOrSmallTablet: boolean;
   isTablet: boolean;
@@ -968,8 +986,8 @@ const SongSearchSection: FC<{
   isFilterDrawerToggled: boolean;
   handleToggleFilterDrawer: () => void;
 }> = ({
-  searchString,
-  onSearchChange,
+  filterData,
+  setFilterData,
   songResults,
   isMobileOrSmallTablet,
   isTablet,
@@ -993,8 +1011,10 @@ const SongSearchSection: FC<{
 
       <SongSearchStack>
         <SearchInputComponent
-          searchString={searchString}
-          onSearchChange={onSearchChange}
+          searchString={filterData?.search || ''}
+          onSearchChange={(value) => {
+            setFilterData({ ...filterData, search: value });
+          }}
           isFilterDrawerToggled={isFilterDrawerToggled}
           handleToggleFilterDrawer={handleToggleFilterDrawer}
         />
@@ -1011,7 +1031,7 @@ const SongSearchSection: FC<{
               />
             ))
           ) : (
-            <Typography>No songs found for "{searchString}"</Typography>
+            <Typography>No songs found for "{filterData?.search}"</Typography>
           )}
         </SongResultsContainer>
       </SongSearchStack>
