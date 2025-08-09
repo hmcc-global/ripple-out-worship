@@ -1,6 +1,6 @@
 # Project Overview
 
-This project is a web application that allows users to create and manage songs and setlist for worhsip music. It is built using React and Node.js, and uses MongoDB for data storage.
+This project is a web application that allows users to create and manage songs and setlist for worship music. It is built using React and Node.js, and uses MongoDB for data storage.
 
 ## Folder Structure
 
