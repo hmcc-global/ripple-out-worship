@@ -56,7 +56,7 @@ const MainLoginContainer: React.FC = () => {
           <Typography variant="h1" sx={{ pb: 2, textAlign: ['center', 'center', 'left'] }}>
             Welcome to
             <br />
-            Ripple Worship
+            Ripple Out Worship
           </Typography>
           <Typography variant="body1" textAlign={['center', 'center', 'left']}>
             Harvest Mission Community Church
