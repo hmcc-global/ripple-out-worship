@@ -145,6 +145,7 @@ const SongsViewContainer: FC = (): ReactElement => {
                   },
                   [`@media (min-width:${specificSongsDesktopWidth})`]: {
                     width: '30%',
+                    marginTop: '15px',
                   },
                 }}
               >
