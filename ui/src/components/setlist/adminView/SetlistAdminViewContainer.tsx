@@ -19,7 +19,7 @@ const ActionButton = styled(Button)(({ theme }) => ({
   flex: 1,
   padding: '0.5rem 1rem',
   fontSize: '0.875rem',
-  [theme.breakpoints.down('sm')]: {
+  [theme.breakpoints.down('md')]: {
     flex: 'none',
     padding: '0.5rem 1.5rem',
     fontSize: '0.75rem',
@@ -47,10 +47,10 @@ const MainContainer = styled(Box)(({ theme }) => ({
   flexDirection: 'column',
   gap: '1rem',
   width: '100%',
-  [theme.breakpoints.down('md')]: {
+  [theme.breakpoints.down('sm')]: {
     padding: '1rem',
   },
-  [theme.breakpoints.up('md')]: {
+  [theme.breakpoints.up('sm')]: {
     padding: '0',
   },
 }));
@@ -72,8 +72,8 @@ const formatDate = (dateString: string): string => {
 
 const SetlistAdminViewContainer: FC = (): ReactElement | null => {
   const theme = useTheme();
-  const isTablet = useMediaQuery(theme.breakpoints.between('md', 'xl'));
-  const isDesktop = useMediaQuery(theme.breakpoints.up('xl'));
+  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'lg'));
+  const isDesktop = useMediaQuery(theme.breakpoints.up('lg'));
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 

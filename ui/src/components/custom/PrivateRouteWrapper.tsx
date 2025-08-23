@@ -28,7 +28,7 @@ const PageWithNavBar = ({ children }: { children: ReactElement }) => {
           <Box
             overflow="auto"
             sx={{
-              height: { xs: `calc(100% - ${mobileNavbarHeight})`, md: '100%' },
+              height: { xs: `calc(100% - ${mobileNavbarHeight})`, sm: '100%' },
               width: { xs: '100%', md: `calc(100% - ${drawerWidth})` },
             }}
           >

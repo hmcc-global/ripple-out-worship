@@ -140,8 +140,9 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
   const ownership = useOwnership();
   const navigate = useNavigate();
   const theme = useTheme();
-  const isTablet = useMediaQuery(theme.breakpoints.between('md', 'xl'));
-  const isDesktop = useMediaQuery(theme.breakpoints.up('xl'));
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'lg'));
+  const isDesktop = useMediaQuery(theme.breakpoints.up('lg'));
 
   // State
   const [tab, setTab] = useState(0);
@@ -475,7 +476,11 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
       flex={1}
       flexDirection={'column'}
       maxHeight={
-        isDesktop || isTablet ? 'calc(92vh - 2.25rem)' : 'calc(100vh - 7vh - 2.25rem - 80px)'
+        isDesktop
+          ? 'calc(100vh - 8vh - 2.25rem)'
+          : isMobile
+          ? 'calc(100vh - 6vh - 2.25rem - 80px)'
+          : 'calc(100vh - 6vh - 2.25rem)'
       } // Page Header = 7/8vh, Mobile NavBar = 80px, Vertical Padding = ~2.25rem
       sx={{ overflow: 'hidden' }}
     >

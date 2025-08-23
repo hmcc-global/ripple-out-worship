@@ -15,7 +15,7 @@ const PageHeader = (props: PageHeaderProps) => {
         justifyContent: 'space-between',
         alignItems: 'center',
         width: '100%',
-        height: { xs: '6vh', xl: '8vh' },
+        height: { xs: '6vh', lg: '8vh' },
       }}
     >
       <Box

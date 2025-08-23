@@ -315,8 +315,8 @@ const DrawerBody = styled(Box)({
 const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
   const navigate = useNavigate();
   const theme = useTheme();
-  const isTablet = useMediaQuery(theme.breakpoints.between('md', 'xl'));
-  const isDesktop = useMediaQuery(theme.breakpoints.up('xl'));
+  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'lg'));
+  const isDesktop = useMediaQuery(theme.breakpoints.up('lg'));
   const isMobileOrSmallTablet = !isTablet && !isDesktop;
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 

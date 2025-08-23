@@ -8,6 +8,7 @@ import {
   useMediaQuery,
   ButtonGroup,
   Grid,
+  useTheme,
 } from '@mui/material';
 import { FC, ReactElement, useEffect, useState, useCallback, useRef } from 'react';
 import { SongSchema, SongSearchFilter } from '../../types/song.types';
@@ -26,6 +27,7 @@ import { mobileNavbarHeight } from '../../constants';
 const SongListContainer: FC = (): ReactElement => {
   const ownership = useOwnership();
   const isAdmin = ownership.accessType === 'admin';
+  const theme = useTheme();
   const [songResults, setSongResults] = useState<SongSchema[]>([]);
   const [filterData, setFilterData] = useState<SongSearchFilter>();
   const [open, setOpen] = useState(false);
@@ -34,7 +36,9 @@ const SongListContainer: FC = (): ReactElement => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const isDesktop = useMediaQuery('(min-width: 769px)');
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.between('sm','lg'));
+  const isDesktop = useMediaQuery(theme.breakpoints.up('lg'));
   const navigate = useNavigate();
   const location = useLocation();
   const handleClose = () => setOpen(false);
@@ -152,12 +156,13 @@ const SongListContainer: FC = (): ReactElement => {
         fixed
         sx={{
           py: '1rem',
-          px: '1.5rem',
-          maxHeight: { xs: '92vh', md: '100vh' },
-          height: { xs: '92vh', md: '100vh' },
+          px: '1rem',
+          maxHeight: { xs: 'calc(100vh - 80px)', sm: '100vh' },
+          height: '100%',
           minWidth: '100%',
           overflow: 'hidden',
         }}
+        disableGutters
       >
         {isAdmin && (
           <Button
@@ -245,19 +250,19 @@ const SongListContainer: FC = (): ReactElement => {
         <Grid
           container
           maxWidth="100%"
-          height={isDesktop ? '88vh' : `calc(100% - ${mobileNavbarHeight})`}
+          height={!isMobile ? 'calc(100vh - 8vh - 1rem)' : `calc(100% - ${mobileNavbarHeight})`}
           width="100%"
           spacing={1}
           marginTop={1}
         >
-          <Grid item xs={isDesktop ? 4 : 12} height={isDesktop ? '100%' : 'auto'}>
-            {isDesktop ? (
+          <Grid item xs={isDesktop ? 4 : isTablet ? 5 : 12} height={!isMobile ? '100%' : 'auto'} p={0}>
+            {!isMobile ? (
               <SongSearch
                 filterData={filterData}
                 setFilterData={setFilterData}
                 onClose={handleClose}
                 songs={allSongs}
-                isDesktop={isDesktop}
+                isDesktop={!isMobile}
               />
             ) : (
               <SongSearchMobile
@@ -265,22 +270,23 @@ const SongListContainer: FC = (): ReactElement => {
                 setFilterData={setFilterData}
                 onClose={handleClose}
                 songs={allSongs}
-                isDesktop={isDesktop}
+                isDesktop={!isMobile}
               />
             )}
           </Grid>
 
           {/* Song cards search results */}
-          <Grid item xs={isDesktop ? 8 : 12} height={isDesktop ? '100%' : '100%'}>
+          <Grid item xs={isDesktop ? 8 : isTablet ? 7 : 12} height={!isMobile ? '100%' : '100%'}>
             <Container
               sx={{
-                py: '1em',
+                p: '1rem',
                 background: '#000',
                 borderRadius: '16px',
                 width: '100%',
                 height: '100%',
-                maxHeight: { xs: '90%', md: '100%' },
+                maxHeight: { xs: '90%', sm: '100%' },
               }}
+              disableGutters
             >
               <Stack
                 direction="row"
@@ -288,8 +294,8 @@ const SongListContainer: FC = (): ReactElement => {
                 justifyContent="space-between"
                 spacing="space-between"
                 maxWidth="100%"
-                height={isDesktop ? '4%' : 'auto'}
-                pb={isDesktop ? 0 : '1em'}
+                height={!isMobile ? '4%' : 'auto'}
+                pb={!isMobile ? 0 : '1em'}
               >
                 <Typography variant="h3" color="#FFFFFF">
                   Search Results
@@ -324,7 +330,7 @@ const SongListContainer: FC = (): ReactElement => {
                       key={i}
                       {...song}
                       filterData={filterData}
-                      isDesktop={isDesktop}
+                      isDesktop={!isMobile}
                       firstLine={getFirstLineLyrics(song.chordLyrics)}
                     />
                   ))

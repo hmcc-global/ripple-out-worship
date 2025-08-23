@@ -76,8 +76,8 @@ const STYLES = {
 // Custom Hooks
 const useBreakpoints = () => {
   const theme = useTheme();
-  const isTablet = useMediaQuery(theme.breakpoints.between('md', 'xl'));
-  const isDesktop = useMediaQuery(theme.breakpoints.up('xl'));
+  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'lg'));
+  const isDesktop = useMediaQuery(theme.breakpoints.up('lg'));
   const isMobile = !isTablet && !isDesktop;
 
   return { isMobile, isTablet, isDesktop };

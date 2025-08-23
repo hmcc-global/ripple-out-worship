@@ -2,7 +2,7 @@ import { Add, ExpandMore, QueueMusic } from '@mui/icons-material';
 import { Box, Button, Container, Stack, Typography, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { FC, ReactElement, useState, MouseEvent } from 'react';
-import SetlistViewContainer from './adminView/SetlistAdminViewContainer';
+import SetlistAdminViewContainer from './adminView/SetlistAdminViewContainer';
 import SetlistTabsContainer from './SetlistTabsContainer';
 import PageHeader from '../navigation/PageHeader';
 import SetlistPreview from './adminView/SetlistPreview';
@@ -10,8 +10,9 @@ import SetlistActionMenu from './SetlistPageActionMenu';
 
 const SetlistListContainer: FC = (): ReactElement => {
   const theme = useTheme();
-  const isTablet = useMediaQuery(theme.breakpoints.between('md', 'xl'));
-  const isDesktop = useMediaQuery(theme.breakpoints.up('xl'));
+  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'lg'));
+  const isDesktop = useMediaQuery(theme.breakpoints.up('lg'));
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   // handle create setlist/folder button
   const [createAnchorEl, setCreateAnchorEl] = useState<null | HTMLElement>(null);
@@ -25,12 +26,14 @@ const SetlistListContainer: FC = (): ReactElement => {
       <Container
         sx={{
           py: isTablet || isDesktop ? '1rem' : '0.75rem',
-          px: isTablet || isDesktop ? '1.25rem' : '0.75rem',
+          px: isTablet || isDesktop ? '1rem' : '0.75rem',
           width: '100%',
-          maxWidth: '100vw !important',
+          maxWidth: isMobile ? '100vw !important' : 'calc(100vw - 100px) !important',
           height: '100%',
+          maxHeight: isMobile ? 'calc(100vh - 80px) !important' : '100vh !important',
           margin: 'auto',
         }}
+        disableGutters
       >
         {/* Toolbar at the top */}
         <PageHeader
@@ -80,7 +83,7 @@ const SetlistListContainer: FC = (): ReactElement => {
             {/* Setlist View (detail) Container */}
             <Box display="flex" flexDirection={'row'} width="72.5%" gap={'0'} paddingX={'1rem'}>
               <Box flex="0 0 50%">
-                <SetlistViewContainer />
+                <SetlistAdminViewContainer />
               </Box>
               <Box flex="0 0 50%">
                 <SetlistPreview />
@@ -93,8 +96,8 @@ const SetlistListContainer: FC = (): ReactElement => {
             <SetlistTabsContainer />
 
             {/* Setlist View (detail) Container */}
-            <Box width="60%">
-              <SetlistViewContainer />
+            <Box width="55%">
+              <SetlistAdminViewContainer />
             </Box>
           </Stack>
         ) : (
