@@ -123,11 +123,12 @@ const SongSearch = (props: SongSearchProps) => {
   return (
     <Container
       sx={{
-        py: '1em',
+        p: '1rem',
         background: '#000',
         borderRadius: '16px',
         height: '100%',
       }}
+      disableGutters
     >
       <Box sx={{ color: '#9E9E9E' }} height="100%">
         {/* filter heading and reset button */}
@@ -142,7 +143,7 @@ const SongSearch = (props: SongSearchProps) => {
             Icon={Tune}
             headerText="Filter"
             headerVariant="h3"
-            headerColor="#CAC4D0"
+            headerColor="#FFFFFF"
           />
           <Button
             sx={{
@@ -161,7 +162,7 @@ const SongSearch = (props: SongSearchProps) => {
 
         <Stack direction="column" spacing="1.25rem" height="95%" pb={4} sx={{ overflowY: 'auto' }}>
           <Box>
-            <Typography variant="h4" color="white" pb={'0.5rem'}>
+            <Typography variant="body1" fontWeight={700} color="#E6E0E9" pb={'0.5rem'}>
               Search Keywords
             </Typography>
             <TextField
@@ -194,7 +195,7 @@ const SongSearch = (props: SongSearchProps) => {
               alignItems={'center'}
               pb="0.5rem"
             >
-              <Typography variant="h4" color="white">
+              <Typography variant="body1" fontWeight={700} color="#E6E0E9">
                 Tempo
               </Typography>
               <IconButton
@@ -240,7 +241,7 @@ const SongSearch = (props: SongSearchProps) => {
               alignItems={'center'}
               pb="0.5rem"
             >
-              <Typography variant="h4" color="white">
+              <Typography variant="body1" fontWeight={700} color="#E6E0E9">
                 Themes
               </Typography>
               <IconButton
@@ -287,7 +288,7 @@ const SongSearch = (props: SongSearchProps) => {
               alignItems={'center'}
               pb="0.5rem"
             >
-              <Typography variant="h4" color="white">
+              <Typography variant="body1" fontWeight={700} color="#E6E0E9">
                 Display Results Details
               </Typography>
               <IconButton

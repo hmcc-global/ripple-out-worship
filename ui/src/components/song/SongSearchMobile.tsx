@@ -179,7 +179,7 @@ const SongSearch = (props: SongSearchProps) => {
                       Icon={SearchIcon}
                       headerText="Search"
                       headerVariant="h3"
-                      headerColor="#CAC4D0"
+                      headerColor="#FFFFFF"
                     />
                     <IconButton onClick={handleSearchToggle}>
                       <CloseIcon sx={{ color: 'white' }} />
@@ -223,7 +223,7 @@ const SongSearch = (props: SongSearchProps) => {
                       Icon={Tune}
                       headerText="Filter"
                       headerVariant="h3"
-                      headerColor="#CAC4D0"
+                      headerColor="#FFFFFF"
                     />
                     <Button
                       sx={{
