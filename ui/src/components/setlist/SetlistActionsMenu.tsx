@@ -1,10 +1,7 @@
 import { Add, Check, Close, Delete, Edit, Folder, LinkRounded } from '@mui/icons-material';
 import {
   Divider,
-  ListItemIcon,
-  ListItemText,
   Menu,
-  MenuItem,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -13,7 +10,6 @@ import {
   Button,
   ListItem,
   IconButton,
-  Stack,
   Typography,
   List,
   InputBase,
@@ -24,6 +20,7 @@ import { customAxios as axios } from '../custom/customAxios';
 import { Setlist, SetlistFolder } from '../../types/setlist.types';
 import HeaderWithIcon from '../custom/HeaderWithIcon';
 import { useOwnership } from '../../helpers/customHooks';
+import SetlistMenuActionItem from './SetlistMenuActionItem';
 
 // Types
 interface SetlistActionsMenuProps {
@@ -34,15 +31,6 @@ interface SetlistActionsMenuProps {
   handleSnackbarOpen: (message: string) => void;
   onSetlistDeleted?: (setlistId: string) => void;
   onFolderAssignmentChanged?: (type?: 'folders' | 'setlists' | 'all') => Promise<void>;
-}
-
-interface MenuActionItemProps {
-  icon: React.ElementType;
-  text: string;
-  onClick: () => void;
-  iconColor?: string;
-  color?: string;
-  hoverBgColor?: string;
 }
 
 // Constants
@@ -246,23 +234,6 @@ const useFolderManagement = (
   };
 };
 
-// Sub-components
-const MenuActionItem: FC<MenuActionItemProps> = ({
-  icon: Icon,
-  text,
-  onClick,
-  iconColor = 'secondary.main',
-  color = 'primary.lighter',
-  hoverBgColor = 'primary.main',
-}) => (
-  <MenuItem onClick={onClick} sx={{ '&:hover': { bgcolor: hoverBgColor } }}>
-    <ListItemIcon sx={{ color: iconColor }}>
-      <Icon />
-    </ListItemIcon>
-    <ListItemText sx={{ color, fontSize: '0.75rem !important' }}>{text}</ListItemText>
-  </MenuItem>
-);
-
 const FolderListItem: FC<{
   folder: SetlistFolder;
   isSelected: boolean;
@@ -293,7 +264,9 @@ const FolderListItem: FC<{
       </IconButton>
     }
   >
-      <Typography sx={{paddingRight: '32px'}} variant="subtitle1">{folder.groupName}</Typography>
+    <Typography sx={{ paddingRight: '32px' }} variant="subtitle1">
+      {folder.groupName}
+    </Typography>
   </ListItem>
 );
 
@@ -487,13 +460,17 @@ const SetlistActionsMenu: FC<SetlistActionsMenuProps> = ({
         MenuListProps={{ 'aria-labelledby': `setlist-menu-button-${setlist._id}` }}
         PaperProps={{ sx: MENU_STYLES.paper }}
       >
-        <MenuActionItem icon={Edit} text="Edit Setlist" onClick={handleEditClick} />
-        <MenuActionItem icon={LinkRounded} text="Copy Link" onClick={handleCopyLinkClick} />
-        <MenuActionItem icon={Folder} text="Folder Actions" onClick={handleFolderActionsClick} />
+        <SetlistMenuActionItem icon={Edit} text="Edit Setlist" onClick={handleEditClick} />
+        <SetlistMenuActionItem icon={LinkRounded} text="Copy Link" onClick={handleCopyLinkClick} />
+        <SetlistMenuActionItem
+          icon={Folder}
+          text="Folder Actions"
+          onClick={handleFolderActionsClick}
+        />
 
         <Divider sx={{ bgcolor: '#49454F' }} />
 
-        <MenuActionItem
+        <SetlistMenuActionItem
           icon={Delete}
           text="Delete Setlist"
           onClick={handleDeleteClick}
