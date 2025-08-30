@@ -7,14 +7,10 @@ import { customAxios as axios } from '../custom/customAxios';
 import { AxiosResponse } from 'axios';
 import SongsTitleCard from './SongsTitleCard';
 import SongsButtonCard from './SongsButtonsCard';
-import SongsInfoCard from './SongsInfoCard';
 import { useUser } from '../../helpers/customHooks';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import {
-  specificSongsTabletWidth,
-  specificSongsDesktopWidth,
-  mobileNavbarHeight,
-} from '../../constants';
+import { specificSongsTabletWidth } from '../../constants';
+import EditIcon from '@mui/icons-material/Edit';
 
 const SongsViewContainer: FC = (): ReactElement => {
   const navigate = useNavigate();
@@ -86,6 +82,7 @@ const SongsViewContainer: FC = (): ReactElement => {
             justifyContent: 'space-between',
             alignItems: 'center',
             marginBottom: ['0.1em', '0.3em'],
+            paddingRight: '1.5rem',
           }}
         >
           <Box sx={{ width: '100' }}>
@@ -95,6 +92,7 @@ const SongsViewContainer: FC = (): ReactElement => {
             <Button
               variant="outlined"
               onClick={() => navigate(`/song/edit/${id}`)}
+              startIcon={<EditIcon />}
               sx={{
                 borderWidth: '2px',
                 padding: '10px 25px',
@@ -109,49 +107,9 @@ const SongsViewContainer: FC = (): ReactElement => {
           )}
         </Box>
         <Stack direction={['row']}>
-          {isMobile && (
-            <Box sx={{ marginBottom: ['10px', '15vh'], width: '100%' }}>
-              <SongsButtonCard song={song} />
-            </Box>
-          )}
-          {!isMobile && (
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'row',
-                [`@media (max-width:${specificSongsDesktopWidth})`]: {
-                  flexDirection: 'column',
-                },
-              }}
-            >
-              <Box
-                sx={{
-                  [`@media (max-width:${specificSongsDesktopWidth})`]: {
-                    width: '100%',
-                  },
-                  [`@media (min-width:${specificSongsDesktopWidth})`]: {
-                    width: '70%',
-                    marginBottom: '20px',
-                  },
-                }}
-              >
-                <SongsButtonCard song={song} />
-              </Box>
-              <Box
-                sx={{
-                  [`@media (max-width:${specificSongsDesktopWidth})`]: {
-                    width: '50%',
-                  },
-                  [`@media (min-width:${specificSongsDesktopWidth})`]: {
-                    width: '30%',
-                    marginTop: '15px',
-                  },
-                }}
-              >
-                <SongsInfoCard song={song} />
-              </Box>
-            </Box>
-          )}
+          <Box sx={{ marginBottom: ['10px', '3vh'], width: '100%' }}>
+            <SongsButtonCard song={song} />
+          </Box>
         </Stack>
       </Container>
     </>
