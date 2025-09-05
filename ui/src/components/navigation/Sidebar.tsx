@@ -22,7 +22,7 @@ import { SongSchema } from '../../types/song.types';
 import { Setlist } from '../../types/setlist.types';
 import { SearchButtonBox } from './NavigationPaper';
 import { drawerWidth, mobileNavbarHeight } from '../../constants';
-import axios from 'axios';
+import { customAxios as axios } from '../custom/customAxios';
 
 const SideBar: FC = (): ReactElement => {
   const navigate = useNavigate();

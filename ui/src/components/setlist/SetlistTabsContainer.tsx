@@ -25,7 +25,7 @@ import {
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { customAxios as axios } from '../custom/customAxios';
 import { FC, useState, useEffect, useCallback, Fragment } from 'react';
 import { Setlist, SetlistFolder } from '../../types/setlist.types';
 import SetlistFolderDrawer from './SetlistFolderDrawer';

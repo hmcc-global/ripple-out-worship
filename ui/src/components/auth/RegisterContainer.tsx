@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import axios from 'axios';
+import { customAxios as axios } from '../custom/customAxios';
 import {
   Alert,
   Box,

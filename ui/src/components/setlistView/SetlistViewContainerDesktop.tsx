@@ -15,7 +15,7 @@ import { FC, ReactElement, useEffect, useMemo, useState } from 'react';
 import SongsButtonsCard from '../songsView/SongsButtonsCard';
 import { HeaderSetlistView, SetlistViewFooter } from './SetlistViewPaper';
 import SetlistViewMenuDesktop from './SetlistViewMenuDesktop';
-import axios from 'axios';
+import { customAxios as axios } from '../custom/customAxios';
 
 const SetlistViewContainerDesktop: FC = (): ReactElement => {
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);

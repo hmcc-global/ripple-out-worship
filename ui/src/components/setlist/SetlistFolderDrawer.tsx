@@ -22,7 +22,8 @@ import {
   useTheme,
 } from '@mui/material';
 import { Folder, GroupAdd, Delete, Close, Check, Add } from '@mui/icons-material';
-import axios, { AxiosResponse } from 'axios';
+import { customAxios as axios } from '../custom/customAxios';
+import { AxiosResponse } from 'axios';
 import { SetlistFolder } from '../../types/setlist.types';
 import HeaderWithIcon from '../custom/HeaderWithIcon';
 import { GroupOwnership, Ownership } from '../../types/ownership.types';

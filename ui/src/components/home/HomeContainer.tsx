@@ -13,7 +13,7 @@ import GlobalSearchModal from '../navigation/GlobalSearchModal';
 import { useOwnership, useSongs } from '../../helpers/customHooks';
 import { SongSchema } from '../../types/song.types';
 import { Setlist } from '../../types/setlist.types';
-import axios from 'axios';
+import { customAxios as axios } from '../custom/customAxios';
 import { MAXIMUM_DESKTOP_HEIGHT } from '../../constants';
 
 const HomeContainer: FC = (): ReactElement => {

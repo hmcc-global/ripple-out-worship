@@ -1,6 +1,6 @@
 import { Setlist } from '#/types/setlist.types';
 import { Box, Typography, Button, styled, Snackbar, IconButton } from '@mui/material';
-import axios from 'axios';
+import { customAxios as axios } from '../../custom/customAxios';
 import { FC, ReactElement, useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Edit, Link, Launch, Close } from '@mui/icons-material';
