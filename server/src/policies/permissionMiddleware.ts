@@ -1,7 +1,14 @@
 import { Request, Response, NextFunction, RequestHandler } from 'express';
-import { AuthenticatedRequest } from './AuthenticatedRequest';
 import { AccessType, ROUTE_PERMISSIONS } from './permissions.config';
 import verifyToken from '../utils/verify-jwt';
+
+export interface AuthenticatedRequest extends Request {
+  user?: {
+    id: string;
+    emailAddress: string;
+    accessType: string;
+  };
+}
 
 /**
  * Creates a permission middleware based on the route's permission configuration
@@ -38,7 +45,7 @@ export const createPermissionMiddleware = (
  * Authentication middleware - checks for valid JWT token, i.e. isLoggedIn
  */
 const requireAuth: RequestHandler = (
-  req: Request | AuthenticatedRequest,
+  req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
 ) => {
@@ -67,8 +74,7 @@ const requireAuth: RequestHandler = (
         error: 'Invalid token'
       });
     }
-    
-    (req as AuthenticatedRequest).user = decoded;
+    req.user = decoded;
     next();
     return;
   } catch (error) {
