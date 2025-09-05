@@ -4,13 +4,13 @@ import {
   updateOwnership,
   deleteOwnership,
 } from '../controllers/ownership.controllers';
-import { Router } from 'express';
+import { createPermissionRouter } from '../policies';
 
-const ownershipRouter = Router();
+const router = createPermissionRouter('/ownerships');
 
-ownershipRouter.post('/create', createOwnership);
-ownershipRouter.get('/get', getOwnership);
-ownershipRouter.put('/update', updateOwnership);
-ownershipRouter.put('/delete', deleteOwnership);
+router.post('/create', createOwnership);
+router.get('/get', getOwnership);
+router.put('/update', updateOwnership);
+router.put('/delete', deleteOwnership);
 
-export default ownershipRouter;
+export default router.getRouter();

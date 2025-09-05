@@ -3,12 +3,13 @@ import {
   createSongOption,
   getSongOptionList,
 } from '../controllers/song-option.controllers';
-import { Router } from 'express';
+import { createPermissionRouter } from '../policies';
 
-const songOptionRouter = Router();
+// Currently not in use. Was planned to manage the song filters options i.e. themes, tempo etc.
+const router = createPermissionRouter('/song-options');
 
-songOptionRouter.post('/create', createSongOption);
-songOptionRouter.post('/get', getSongOption);
-songOptionRouter.get('/list', getSongOptionList);
+router.post('/create', createSongOption);
+router.get('/get', getSongOption);
+router.get('/list', getSongOptionList);
 
-export default songOptionRouter;
+export default router.getRouter();

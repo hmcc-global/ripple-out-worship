@@ -1,4 +1,8 @@
-import { default as isLoggedIn } from './isLoggedIn';
-import { default as isAdmin } from './isAdmin';
+import { createPermissionMiddleware } from './permissionMiddleware';
+import { PermissionRouter, createPermissionRouter } from './PermissionRouter';
 
-export { isLoggedIn, isAdmin };
+export { 
+  createPermissionMiddleware, 
+  PermissionRouter,
+  createPermissionRouter
+};
