@@ -1,6 +1,6 @@
 import { FC, ReactElement, useCallback, useEffect, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import axios from 'axios';
+import { customAxios as axios } from '../custom/customAxios';
 import { SongEditorFields, SongEditorProps, SongSchema } from '../../types/song.types';
 import {
   musicKeysOptions,

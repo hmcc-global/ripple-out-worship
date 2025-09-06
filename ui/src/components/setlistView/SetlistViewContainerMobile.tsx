@@ -22,7 +22,7 @@ import SongsLyrics from '../songsView/SongsLyrics';
 import { flatMusicKeysOptions, sharpMusicKeysOptions } from '../../constants';
 import TuneIcon from '@mui/icons-material/Tune';
 import SetlistViewMobileDrawer from './SetlistViewMobileDrawer';
-import axios from 'axios';
+import { customAxios as axios } from '../custom/customAxios';
 
 const SetlistViewContainerMobile = ({ preview }: { preview?: boolean }): ReactElement | null => {
   const setlistId = window.location.pathname.split('/').reverse()[0];

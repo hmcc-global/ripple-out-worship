@@ -13,7 +13,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
+import { customAxios as axios } from '../custom/customAxios';
 import { useState, useEffect, useCallback, Fragment } from 'react';
 import { Setlist, SetlistFolder } from '../../types/setlist.types';
 import MobileBackButton from '../navigation/MobileBackButton';

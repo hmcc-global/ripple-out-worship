@@ -1,5 +1,5 @@
 import { fetchSongs } from '../../reducers';
-import axios from 'axios';
+import { customAxios as axios } from '../../components/custom/customAxios';
 import { AnyAction, Dispatch } from 'redux';
 
 const getSongsGlobal = async (dispatch: Dispatch<AnyAction>) => {
