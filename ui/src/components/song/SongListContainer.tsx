@@ -18,7 +18,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Add, MusicNote } from '@mui/icons-material';
 import PageHeader from '../navigation/PageHeader';
 import { getFirstLineLyrics } from '../../helpers/song';
-import axios from 'axios';
+import { customAxios as axios } from '../custom/customAxios';
 import { useSongs, useUser } from '../../helpers/customHooks';
 import CircularProgress from '@mui/material/CircularProgress';
 import { mobileNavbarHeight } from '../../constants';

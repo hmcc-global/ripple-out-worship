@@ -1,4 +1,4 @@
-import axios from 'axios';
+import { customAxios as axios } from '../components/custom/customAxios';
 import { Setlist, SetlistFolder } from '../types/setlist.types';
 import { SongSchema, SongViewSchema } from '../types/song.types';
 import { useEffect, useState } from 'react';

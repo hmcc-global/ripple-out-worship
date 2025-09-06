@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { signin } from '../../reducers/userSlice';
-import axios from 'axios';
+import { customAxios as axios } from '../custom/customAxios';
 import {
   Box,
   Button,

@@ -20,7 +20,7 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
-import axios from 'axios';
+import { customAxios as axios } from '../custom/customAxios';
 import { Setlist, SetlistFolder } from '../../types/setlist.types';
 import HeaderWithIcon from '../custom/HeaderWithIcon';
 import { useOwnership } from '../../helpers/customHooks';

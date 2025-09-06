@@ -2,7 +2,7 @@ import { FC, ReactElement, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppBar, Box, Toolbar, IconButton, InputBase, Stack } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import axios from 'axios';
+import { customAxios as axios } from '../custom/customAxios';
 
 const SearchBar: FC = (): ReactElement => {
   const navigate = useNavigate();
