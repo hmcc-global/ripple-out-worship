@@ -60,8 +60,12 @@ const SongsTitleCard = ({ song }: SongTitleCardProps) => {
             />
           )}
           {/* Mobile: Click displays bottom drawer/card */}
-          {isMobile && showMobileInfo && (
-            <SongsInfoCardMobile song={song} onClose={() => setShowMobileInfo(false)} />
+          {isMobile && (
+            <SongsInfoCardMobile
+              song={song}
+              open={showMobileInfo}
+              onClose={() => setShowMobileInfo(false)}
+            />
           )}
         </Box>
         <Typography

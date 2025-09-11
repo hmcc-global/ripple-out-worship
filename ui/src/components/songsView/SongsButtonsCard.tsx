@@ -520,9 +520,14 @@ const SongsButtonsCard = ({
           split={split}
         />
       </Box>
-      {showMobileInfo && (
-        <SongsInfoCardMobile song={song} onClose={() => setShowMobileInfo(false)} />
-      )}
+
+      {/* Not used? */}
+      <SongsInfoCardMobile
+        song={song}
+        open={showMobileInfo}
+        onClose={() => setShowMobileInfo(false)}
+      />
+
       <Snackbar
         open={showSplitSnackbar}
         autoHideDuration={3000}
