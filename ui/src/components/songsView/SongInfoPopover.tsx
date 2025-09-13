@@ -37,7 +37,7 @@ const SongInfoPopover = ({ song, anchorEl, open, onClose }: SongInfoPopoverProps
       disableRestoreFocus
     >
       <Box>
-        <Typography fontSize="1rem" fontWeight={700} mb={1} color="#CCC2DC">
+        <Typography variant="h5" fontWeight={700} mb={1} color="#CCC2DC">
           About The Song
         </Typography>
         <Box sx={{ flexGrow: 1 }}>
