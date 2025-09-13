@@ -42,7 +42,7 @@ const SongsButtonsCard = ({
   const [chordStatus, setChordStatus] = useState(false);
   const [count, setCount] = useState(0);
   const [useFlat, setUseFlat] = useState(false);
-  const [split, setSplit] = useState(1);
+  const [split, setSplit] = useState(2);
   const theme = useTheme();
   const [showMobileInfo, setShowMobileInfo] = useState(false);
   const [showSplitSnackbar, setShowSplitSnackbar] = useState(false);
@@ -87,7 +87,10 @@ const SongsButtonsCard = ({
   }, [song]);
 
   return (
-    <Container style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Container
+      maxWidth={false}
+      style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+    >
       <Box
         sx={{
           width: '100%',
@@ -261,64 +264,6 @@ const SongsButtonsCard = ({
                 </FormGroup>
               </Box>
             </Stack>
-            <Box display="flex" flexDirection="row" gap={1} mt={2}>
-              <Box display="flex" flexDirection="row" gap={1}>
-                {/*User Info button*/}
-                {userView ? null : (
-                  <Button
-                    variant="outlined"
-                    sx={{
-                      borderWidth: '1px',
-                      padding: '10px 16px',
-                      borderRadius: '40px',
-                      borderColor: '#332D41',
-                      color: 'secondary.main',
-                      textTransform: 'none',
-                    }}
-                    startIcon={<InfoIcon />}
-                    onClick={() => setShowMobileInfo(true)}
-                  >
-                    <Typography sx={{ fontSize: '14px' }}>About the Song</Typography>
-                  </Button>
-                )}
-
-                {/* add to setlist button
-              {userView ? null : (
-                <Button
-                  variant="outlined"
-                  sx={{
-                    borderWidth: '1px',
-                    borderColor: '#332D41',
-                    padding: '8px 14px',
-                    borderRadius: '40px',
-                    color: 'secondary.main',
-                    textTransform: 'none',
-                  }}
-                  startIcon={<PlaylistAdd />}
-                >
-                  <Typography sx={{ fontSize: '14px' }}>Add to Setlist</Typography>
-                </Button>
-              )} */}
-
-                {/* share button */}
-                {/* {userView ? null : (
-                <Button
-                  variant="outlined"
-                  sx={{
-                    borderWidth: '1px',
-                    borderColor: '#332D41',
-                    padding: '8px 14px',
-                    borderRadius: '40px',
-                    color: 'secondary.main',
-                    textTransform: 'none',
-                  }}
-                  startIcon={<Share />}
-                >
-                  <Typography sx={{ fontSize: '14px' }}>Share</Typography>
-                </Button>
-              )} */}
-              </Box>
-            </Box>
           </Box>
 
           {/* Desktop view */}
@@ -575,9 +520,14 @@ const SongsButtonsCard = ({
           split={split}
         />
       </Box>
-      {showMobileInfo && (
-        <SongsInfoCardMobile song={song} onClose={() => setShowMobileInfo(false)} />
-      )}
+
+      {/* Not used? */}
+      <SongsInfoCardMobile
+        song={song}
+        open={showMobileInfo}
+        onClose={() => setShowMobileInfo(false)}
+      />
+
       <Snackbar
         open={showSplitSnackbar}
         autoHideDuration={3000}
