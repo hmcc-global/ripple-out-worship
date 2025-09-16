@@ -92,12 +92,11 @@ const SongsViewContainer: FC = (): ReactElement => {
             <Button
               variant="outlined"
               onClick={() => navigate(`/song/edit/${id}`)}
-              startIcon={<EditIcon />}
+              startIcon={isMobile ? null : <EditIcon />}
               sx={{
                 borderWidth: '2px',
                 padding: isMobile ? '10px' : '10px 25px',
                 minWidth: isMobile ? 'unset' : 'inherit',
-                mr: isMobile ? '1em' : 'inherit',
                 borderRadius: '40px',
                 borderColor: '#938F99',
                 color: '#D0BCFF',
