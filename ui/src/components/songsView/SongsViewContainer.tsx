@@ -88,21 +88,23 @@ const SongsViewContainer: FC = (): ReactElement => {
           <Box sx={{ width: '100' }}>
             <SongsTitleCard song={song} />
           </Box>
-          {!isMobile && user?.accessType === 'admin' && (
+          {user?.accessType === 'admin' && (
             <Button
               variant="outlined"
               onClick={() => navigate(`/song/edit/${id}`)}
               startIcon={<EditIcon />}
               sx={{
                 borderWidth: '2px',
-                padding: '10px 25px',
+                padding: isMobile ? '10px' : '10px 25px',
+                minWidth: isMobile ? 'unset' : 'inherit',
+                mr: isMobile ? '1em' : 'inherit',
                 borderRadius: '40px',
                 borderColor: '#938F99',
                 color: '#D0BCFF',
                 textTransform: 'none',
               }}
             >
-              <Typography variant="subtitle1">Edit Song</Typography>
+              {isMobile ? <EditIcon /> : <Typography variant="subtitle1">Edit Song</Typography>}
             </Button>
           )}
         </Box>
