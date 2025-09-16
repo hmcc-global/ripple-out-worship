@@ -19,12 +19,13 @@ import { Add, MusicNote } from '@mui/icons-material';
 import PageHeader from '../navigation/PageHeader';
 import { getFirstLineLyrics } from '../../helpers/song';
 import { customAxios as axios } from '../custom/customAxios';
-import { useSongs, useUser } from '../../helpers/customHooks';
+import { useOwnership, useSongs } from '../../helpers/customHooks';
 import CircularProgress from '@mui/material/CircularProgress';
 import { mobileNavbarHeight } from '../../constants';
 
 const SongListContainer: FC = (): ReactElement => {
-  const { user } = useUser();
+  const ownership = useOwnership();
+  const isAdmin = ownership.accessType === 'admin';
   const [songResults, setSongResults] = useState<SongSchema[]>([]);
   const [filterData, setFilterData] = useState<SongSearchFilter>();
   const [open, setOpen] = useState(false);
@@ -158,7 +159,7 @@ const SongListContainer: FC = (): ReactElement => {
           overflow: 'hidden',
         }}
       >
-        {user?.accessType === 'admin' && (
+        {isAdmin && (
           <Button
             variant="outlined"
             sx={{
@@ -201,7 +202,7 @@ const SongListContainer: FC = (): ReactElement => {
           title="Songs"
           icon={<MusicNote />}
           actionButtons={
-            user?.accessType === 'admin' && (
+            isAdmin && (
               <Button
                 variant="outlined"
                 sx={{
