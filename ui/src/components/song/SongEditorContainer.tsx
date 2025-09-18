@@ -1,4 +1,4 @@
-import { FC, ReactElement, useCallback, useEffect, useState } from 'react';
+import { FC, useCallback, useEffect, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { customAxios as axios } from '../custom/customAxios';
 import { SongEditorFields, SongEditorProps, SongSchema } from '../../types/song.types';
@@ -19,7 +19,6 @@ import {
   Stack,
   TextareaAutosize,
   FormControl,
-  Toolbar,
   Button,
   Alert,
   AlertTitle,
@@ -107,16 +106,7 @@ const SongEditorContainer: FC<SongEditorProps> = () => {
         originalKey: song.originalKey,
       });
     }
-  }, [song]);
-
-  // editor mode is either NEW or EDIT. default is NEW
-  const editorMode = (actionOnEditor: string): ReactElement => {
-    return (
-      <Typography variant="h3" color="white" sx={{ flexGrow: 1 }} gap={1} mx={2}>
-        {actionOnEditor === 'edit' ? 'Edit Song' : 'New Song'}
-      </Typography>
-    );
-  };
+  }, [song, reset]);
 
   const handleSaveSong: SubmitHandler<SongEditorFields> = async (data) => {
     try {
@@ -197,101 +187,46 @@ const SongEditorContainer: FC<SongEditorProps> = () => {
     );
   };
 
+  const SongActionButtons = ({ display }: { display: boolean }) => {
+    return (
+      <Stack direction="row" display={display ? 'flex' : 'none'}>
+        <Button
+          type={'submit'}
+          color="secondary"
+          variant="contained"
+          sx={{
+            mr: 1,
+            textTransform: 'none',
+            borderRadius: '100px',
+            px: 3,
+          }}
+        >
+          Save
+        </Button>
+        <Button
+          color={'secondary'}
+          sx={{
+            textTransform: 'none',
+            borderRadius: '100px',
+            border: 1,
+            px: 2,
+          }}
+          onClick={() => navigate('/song')}
+        >
+          Cancel
+        </Button>
+      </Stack>
+    );
+  };
+
   return (
     <Container sx={{ py: '1rem', px: '2rem', height: '100%', minWidth: '100%', overflow: 'auto' }}>
-      {/* TODO: Mobile view */}
-      <Box display={{ base: 'block', md: 'none' }}>
-        <Toolbar sx={{ width: '100%' }}>{editorMode(action)}</Toolbar>
-
-        <Box>
-          {/* Error message */}
-          {invalidSong ? (
-            <Typography variant={'body2'} color={'error'}>
-              {invalidSong}
-            </Typography>
-          ) : null}
-
-          {/* Success message */}
-          <Snackbar
-            open={successSnackbarOpen}
-            onClose={handleCloseSuccessSnackbar}
-            autoHideDuration={6000}
-            TransitionComponent={Fade}
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-          >
-            <Alert severity="success" onClose={handleCloseSuccessSnackbar}>
-              <AlertTitle>Success</AlertTitle>
-              Song successfully saved!
-            </Alert>
-          </Snackbar>
-
-          <form onSubmit={handleSubmit(handleSaveSong)}>
-            {/* fields */}
-
-            {/* buttons */}
-            <Button
-              fullWidth
-              type={'submit'}
-              color="secondary"
-              variant="contained"
-              sx={{
-                my: 1,
-                textTransform: 'none',
-                borderRadius: '100px',
-              }}
-            >
-              Save
-            </Button>
-            <Button
-              fullWidth
-              color={'secondary'}
-              sx={{
-                textTransform: 'none',
-                borderRadius: '100px',
-                border: 1,
-              }}
-              onClick={() => navigate('/song')}
-            >
-              Cancel
-            </Button>
-          </form>
-        </Box>
-      </Box>
-      {/* Desktop view */}
-      <Box display={isDesktop ? 'block' : 'none'}>
+      <Box>
         <form onSubmit={handleSubmit(handleSaveSong)}>
           <PageHeader
             title={action === 'edit' ? 'Edit Song' : 'New Song'}
             icon={<MusicNote />}
-            actionButtons={
-              <Stack direction="row">
-                <Button
-                  type={'submit'}
-                  color="secondary"
-                  variant="contained"
-                  sx={{
-                    mr: 1,
-                    textTransform: 'none',
-                    borderRadius: '100px',
-                    px: 3,
-                  }}
-                >
-                  Save
-                </Button>
-                <Button
-                  color={'secondary'}
-                  sx={{
-                    textTransform: 'none',
-                    borderRadius: '100px',
-                    border: 1,
-                    px: 2,
-                  }}
-                  onClick={() => navigate('/song')}
-                >
-                  Cancel
-                </Button>
-              </Stack>
-            }
+            actionButtons={<SongActionButtons display={isDesktop} />}
           />
 
           <Box my={'24px'}>
@@ -316,9 +251,9 @@ const SongEditorContainer: FC<SongEditorProps> = () => {
               </Alert>
             </Snackbar>
 
-            <Stack direction={['row']} spacing={8} mt={2}>
+            <Stack direction={['column', 'row']} gap={4} mt={2}>
               {/* column 1: Song Details */}
-              <Box width={'35vw'}>
+              <Box width={isDesktop ? '35vw' : 'unset'}>
                 <Stack direction="column" spacing={2}>
                   {/* header */}
                   <HeaderWithIcon
@@ -613,6 +548,7 @@ const SongEditorContainer: FC<SongEditorProps> = () => {
                   />
                 </Stack>
               </Box>
+              <SongActionButtons display={!isDesktop} />
             </Stack>
           </Box>
         </form>

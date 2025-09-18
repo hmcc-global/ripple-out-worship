@@ -7,7 +7,7 @@ import { customAxios as axios } from '../custom/customAxios';
 import { AxiosResponse } from 'axios';
 import SongsTitleCard from './SongsTitleCard';
 import SongsButtonCard from './SongsButtonsCard';
-import { useUser } from '../../helpers/customHooks';
+import { useOwnership } from '../../helpers/customHooks';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { specificSongsTabletWidth } from '../../constants';
 import EditIcon from '@mui/icons-material/Edit';
@@ -17,7 +17,7 @@ const SongsViewContainer: FC = (): ReactElement => {
   const isMobile = useMediaQuery(`(max-width:${specificSongsTabletWidth})`);
 
   // Get user information
-  const { user } = useUser();
+  const ownership = useOwnership();
 
   const id: string = window.location.pathname.split('/')[2];
   const [song, setSong] = useState<SongViewSchema>();
@@ -88,21 +88,22 @@ const SongsViewContainer: FC = (): ReactElement => {
           <Box sx={{ width: '100' }}>
             <SongsTitleCard song={song} />
           </Box>
-          {!isMobile && user?.accessType === 'admin' && (
+          {ownership?.accessType === 'admin' && (
             <Button
               variant="outlined"
               onClick={() => navigate(`/song/edit/${id}`)}
-              startIcon={<EditIcon />}
+              startIcon={isMobile ? null : <EditIcon />}
               sx={{
                 borderWidth: '2px',
-                padding: '10px 25px',
+                padding: isMobile ? '10px' : '10px 25px',
+                minWidth: isMobile ? 'unset' : 'inherit',
                 borderRadius: '40px',
                 borderColor: '#938F99',
                 color: '#D0BCFF',
                 textTransform: 'none',
               }}
             >
-              <Typography variant="subtitle1">Edit Song</Typography>
+              {isMobile ? <EditIcon /> : <Typography variant="subtitle1">Edit Song</Typography>}
             </Button>
           )}
         </Box>

@@ -4,7 +4,6 @@ import {
   isValidElement,
   ReactElement,
   useEffect,
-  useMemo,
   useState,
   useTransition,
 } from 'react';
@@ -31,7 +30,6 @@ const PageWithNavBar = ({ children }: { children: ReactElement }) => {
             sx={{
               height: { xs: `calc(100% - ${mobileNavbarHeight})`, md: '100%' },
               width: { xs: '100%', md: `calc(100% - ${drawerWidth})` },
-              pb: { xs: mobileNavbarHeight, md: 0 },
             }}
           >
             {cloneElement(children)}
