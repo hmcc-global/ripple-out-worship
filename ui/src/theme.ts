@@ -3,6 +3,7 @@ import '@fontsource/work-sans';
 import '@fontsource/dm-sans';
 import '@mui/material/styles';
 import { createBreakpoints } from '@mui/system';
+import { ExpandMoreRounded } from '@mui/icons-material';
 const breakpoints = createBreakpoints({});
 
 const PRIMARY_MAIN = '#4F378B';
@@ -147,9 +148,9 @@ const customTheme = createTheme({
   palette: palette,
   breakpoints: {
     values: {
-      xs: 0,    // extra-small: unchanged
-      sm: 800,  // small: changed from 600 to 800
-      md: 960,  // medium: changed from 900 to 960
+      xs: 0, // extra-small: unchanged
+      sm: 800, // small: changed from 600 to 800
+      md: 960, // medium: changed from 900 to 960
       lg: 1280, // large: changed from 1200 to 1280
       xl: 1920, // extra-large: changed from 1536 to 1920
     },
@@ -177,6 +178,14 @@ const customTheme = createTheme({
       fontFamily: 'Work Sans',
       fontSize: '1.25rem',
       fontWeight: 700,
+      [breakpoints.up('sm')]: {
+        fontSize: '1.25rem',
+        fontWeight: 700,
+      },
+      [breakpoints.down('sm')]: {
+        fontSize: '0.75rem',
+        fontWeight: 600,
+      },
     },
     h4: {
       fontFamily: 'Work Sans',
@@ -428,8 +437,10 @@ const customTheme = createTheme({
     MuiMenu: {
       styleOverrides: {
         paper: {
-          backgroundColor: PRIMARY_DARKEST,
+          backgroundColor: '#1D192B',
           color: PRIMARY_LIGHTER,
+          boxShadow: '0 2px 6px 2px rgba(0, 0, 0, 0.15), 0 1px 2px 0 rgba(0, 0, 0, 0.30)',
+          borderRadius: '8px',
         },
       },
     },
@@ -437,8 +448,24 @@ const customTheme = createTheme({
       styleOverrides: {
         root: {
           '&:hover': {
-            backgroundColor: PRIMARY_DARK,
+            backgroundColor: PRIMARY_DARKEST,
           },
+        },
+      },
+    },
+    MuiListItemIcon: {
+      styleOverrides: {
+        root: {
+          color: SECONDARY_MAIN,
+        },
+      },
+    },
+
+    MuiListItemText: {
+      styleOverrides: {
+        root: {
+          color: PRIMARY_LIGHTER,
+          fontSize: '0.75rem !important',
         },
       },
     },
@@ -544,6 +571,31 @@ const customTheme = createTheme({
           '&:hover': {
             borderColor: SECONDARY_MAIN,
           },
+        },
+      },
+    },
+    MuiSelect: {
+      defaultProps: {
+        IconComponent: ExpandMoreRounded,
+      },
+      styleOverrides: {
+        root: {
+          paddingInline: '0.5rem',
+          borderRadius: '1.75rem',
+          fontSize: '0.875rem',
+          fontWeight: 700,
+          '.MuiOutlinedInput-notchedOutline': {
+            border: '1px solid #49454F',
+          },
+          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            border: '1px solid #49454F',
+          },
+          '&:hover .MuiOutlinedInput-notchedOutline': {
+            border: '1px solid #49454F',
+          },
+        },
+        icon: {
+          color: SECONDARY_MAIN,
         },
       },
     },
