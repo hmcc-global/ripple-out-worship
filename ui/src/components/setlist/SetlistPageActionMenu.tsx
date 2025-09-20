@@ -4,6 +4,7 @@ import { Box, Collapse, Fab, Slide, useMediaQuery } from '@mui/material';
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SetlistFolderDrawer from './SetlistFolderDrawer';
+import { MOBILE_NAVBAR_HEIGHT } from '../../constants';
 
 // Types
 interface SetlistPageActionMenuProps {
@@ -27,7 +28,6 @@ interface ActionItem {
 const ANIMATION_DURATION = 300;
 const MENU_GAP = 16;
 const FAB_SIZE = 64;
-const MOBILE_NAVBAR_HEIGHT = 80;
 
 const STYLES = {
   baseFab: {
@@ -76,8 +76,8 @@ const STYLES = {
 // Custom Hooks
 const useBreakpoints = () => {
   const theme = useTheme();
-  const isTablet = useMediaQuery(theme.breakpoints.between('md', 'xl'));
-  const isDesktop = useMediaQuery(theme.breakpoints.up('xl'));
+  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'lg'));
+  const isDesktop = useMediaQuery(theme.breakpoints.up('lg'));
   const isMobile = !isTablet && !isDesktop;
 
   return { isMobile, isTablet, isDesktop };
@@ -161,7 +161,7 @@ const useFolderDrawer = () => {
 
 // Utility Functions
 const calculateMobilePosition = (index: number) => ({
-  bottom: `calc(${MOBILE_NAVBAR_HEIGHT}px + 1rem + ${FAB_SIZE * index}px)`,
+  bottom: `calc(${MOBILE_NAVBAR_HEIGHT} + 1rem + ${FAB_SIZE * index}px)`,
 });
 
 const calculateDesktopPosition = (index: number) => ({
@@ -227,7 +227,7 @@ const MobileActionMenu: FC<{
         ...STYLES.primaryFab,
         position: 'fixed',
         right: '1rem',
-        bottom: `calc(${MOBILE_NAVBAR_HEIGHT}px + 1rem)`,
+        bottom: `calc(${MOBILE_NAVBAR_HEIGHT} + 1rem)`,
         zIndex: 1100,
       }}
     >

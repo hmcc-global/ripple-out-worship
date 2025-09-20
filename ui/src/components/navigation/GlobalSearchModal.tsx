@@ -8,6 +8,7 @@ import { SongSchema } from '../../types/song.types';
 import { Setlist } from '../../types/setlist.types';
 import SearchIcon from '@mui/icons-material/Search';
 import RadioCard from './searchModalComponents/RadioCard';
+import { MOBILE_NAVBAR_HEIGHT } from '../../constants';
 
 type GlobalSearchModalProps = {
   isOpen: boolean;
@@ -250,7 +251,7 @@ const GlobalSearchModal = (props: GlobalSearchModalProps) => {
           sx={{
             position: 'fixed',
             top: ['0vh', '22.5vh'],
-            height: { xs: 'calc(100vh - 80px)', md: 'auto' },
+            height: { xs: `calc(100vh - ${MOBILE_NAVBAR_HEIGHT})`, sm: 'auto' },
             left: ['0vw', '30vw'],
             backgroundColor: '#171717',
             borderRadius: '10px',
