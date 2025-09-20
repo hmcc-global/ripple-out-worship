@@ -174,7 +174,8 @@ const SetlistSongsTable: React.FC<SetlistSongsTableProps> = ({
     title: {
       width: readOnly ? '85%' : '80%',
       color: '#938F99',
-      padding: isMobile ? '0.5rem' : '0.75rem',
+      py: isMobile ? '0.75rem' : '1rem',
+      px: isMobile ? '0.75rem' : '1rem',
     },
     key: {
       width: '10%',

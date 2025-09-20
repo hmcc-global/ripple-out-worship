@@ -43,11 +43,10 @@ import {
   AddCircleOutline,
   Check,
   Add,
-  TuneOutlined,
 } from '@mui/icons-material';
 
 // Hooks
-import { useSongs, useOwnership } from '../../helpers/customHooks';
+import { useOwnership } from '../../helpers/customHooks';
 import { MOBILE_ACTION_BUTTONS_HEIGHT, MOBILE_NAVBAR_HEIGHT } from '../../constants';
 
 // Constants
