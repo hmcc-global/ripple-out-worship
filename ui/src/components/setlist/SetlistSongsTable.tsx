@@ -3,10 +3,7 @@ import {
   Box,
   Divider,
   IconButton,
-  ListItemIcon,
-  ListItemText,
   Menu,
-  MenuItem,
   Table,
   TableBody,
   TableCell,
@@ -17,14 +14,7 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
-import {
-  MoreVert,
-  Visibility,
-  ArrowUpward,
-  ArrowDownward,
-  Delete,
-  Tune,
-} from '@mui/icons-material';
+import { MoreVert, ArrowUpward, ArrowDownward, Delete, Tune } from '@mui/icons-material';
 import { SongSetlistSchema } from '../../types/song.types';
 import SongPreviewModal from '../utility/SongPreviewModal';
 import SetlistChangeKeyModal from './SetlistChangeKeyModal';
@@ -97,11 +87,6 @@ const SetlistSongsTable: React.FC<SetlistSongsTableProps> = ({
         song: open ? song : null,
       },
     }));
-  };
-
-  // Type-safe modal open handlers
-  const handlePreviewOpen = (song: SongSetlistSchema) => {
-    handleModalToggle('preview', true, song);
   };
 
   const handleChangeKeyOpen = (song: SongSetlistSchema) => {
@@ -181,7 +166,7 @@ const SetlistSongsTable: React.FC<SetlistSongsTableProps> = ({
       width: '10%',
       color: '#938F99',
       padding: isMobile ? '0.5rem' : '0.75rem',
-      textAlign: 'center'
+      textAlign: 'center',
     },
     actions: {
       width: '5%',
@@ -207,7 +192,7 @@ const SetlistSongsTable: React.FC<SetlistSongsTableProps> = ({
           backgroundColor: '#0F0D13',
           pt: '0.25rem',
           pb: '0.5rem',
-          px: '1rem'
+          px: '1rem',
         }}
       >
         <Table>
