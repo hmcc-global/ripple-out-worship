@@ -2,7 +2,7 @@ import { Drawer, CardContent, Typography, Chip, Box, Grid, IconButton, Stack } f
 import InfoIcon from '@mui/icons-material/Info';
 import CloseIcon from '@mui/icons-material/Close';
 import { SongViewSchema } from '../../types/song.types';
-import { mobileNavbarHeight } from '../../constants';
+import { MOBILE_NAVBAR_HEIGHT } from '../../constants';
 
 interface SongsInfoCardMobileProps {
   song: SongViewSchema | undefined;
@@ -18,13 +18,13 @@ const SongsInfoCardMobile = ({ song, open, onClose }: SongsInfoCardMobileProps) 
       anchor="bottom"
       open={open}
       onClose={onClose}
-      sx={{ bottom: mobileNavbarHeight, '& .MuiBackdrop-root': { bottom: mobileNavbarHeight } }}
+      sx={{ bottom: MOBILE_NAVBAR_HEIGHT, '& .MuiBackdrop-root': { bottom: MOBILE_NAVBAR_HEIGHT } }}
       PaperProps={{
         sx: {
           borderRadius: '20px 20px 0 0',
           bgcolor: 'primary.darkest',
           maxWidth: '100vw',
-          bottom: mobileNavbarHeight,
+          bottom: MOBILE_NAVBAR_HEIGHT,
         },
       }}
     >

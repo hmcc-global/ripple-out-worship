@@ -22,7 +22,12 @@ import { getFirstLineLyrics } from '../../helpers/song';
 import { customAxios as axios } from '../custom/customAxios';
 import { useOwnership, useSongs } from '../../helpers/customHooks';
 import CircularProgress from '@mui/material/CircularProgress';
-import { mobileNavbarHeight } from '../../constants';
+import {
+  DESKTOP_PAGE_HEADER_HEIGHT,
+  MOBILE_NAVBAR_HEIGHT,
+  MOBILE_PAGE_HEADER_HEIGHT,
+  TABLET_PAGE_HEADER_HEIGHT,
+} from '../../constants';
 
 const SongListContainer: FC = (): ReactElement => {
   const ownership = useOwnership();
@@ -37,7 +42,7 @@ const SongListContainer: FC = (): ReactElement => {
   const [totalPages, setTotalPages] = useState(1);
 
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const isTablet = useMediaQuery(theme.breakpoints.between('sm','lg'));
+  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'lg'));
   const isDesktop = useMediaQuery(theme.breakpoints.up('lg'));
   const navigate = useNavigate();
   const location = useLocation();
@@ -157,7 +162,7 @@ const SongListContainer: FC = (): ReactElement => {
         sx={{
           py: '1rem',
           px: '1rem',
-          maxHeight: { xs: 'calc(100vh - 80px)', sm: '100vh' },
+          maxHeight: { xs: `calc(100vh - ${MOBILE_NAVBAR_HEIGHT})`, sm: '100vh' },
           height: '100%',
           minWidth: '100%',
           overflow: 'hidden',
@@ -246,16 +251,24 @@ const SongListContainer: FC = (): ReactElement => {
             )
           }
         />
-        <Box display={{ base: 'block', md: 'none' }}></Box>
         <Grid
           container
           maxWidth="100%"
-          height={!isMobile ? 'calc(100vh - 8vh - 1rem)' : `calc(100% - ${mobileNavbarHeight})`}
+          height={'100%'}
+          maxHeight={{
+            xs: `calc(100% - ${MOBILE_PAGE_HEADER_HEIGHT})`,
+            sm: `calc(100vh - ${TABLET_PAGE_HEADER_HEIGHT} - 2rem)`,
+            lg: `calc(100vh - ${DESKTOP_PAGE_HEADER_HEIGHT} - 2rem)`,
+          }}
           width="100%"
-          spacing={1}
-          marginTop={1}
+          columnSpacing={isMobile ? 0 : '1rem'}
         >
-          <Grid item xs={isDesktop ? 4 : isTablet ? 5 : 12} height={!isMobile ? '100%' : 'auto'} p={0}>
+          <Grid
+            item
+            xs={isDesktop ? 4 : isTablet ? 5 : 12}
+            height={!isMobile ? '100%' : 'auto'}
+            p={0}
+          >
             {!isMobile ? (
               <SongSearch
                 filterData={filterData}

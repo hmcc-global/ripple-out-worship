@@ -7,6 +7,7 @@ import SetlistTabsContainer from './SetlistTabsContainer';
 import PageHeader from '../navigation/PageHeader';
 import SetlistPreview from './adminView/SetlistPreview';
 import SetlistActionMenu from './SetlistPageActionMenu';
+import { DESKTOP_SIDEBAR_WIDTH, MOBILE_NAVBAR_HEIGHT } from '../../constants';
 
 const SetlistListContainer: FC = (): ReactElement => {
   const theme = useTheme();
@@ -25,12 +26,17 @@ const SetlistListContainer: FC = (): ReactElement => {
     <Box sx={{ position: 'relative', height: '100%' }}>
       <Container
         sx={{
-          py: isTablet || isDesktop ? '1rem' : '0.75rem',
-          px: isTablet || isDesktop ? '1rem' : '0.75rem',
+          py: '1rem',
+          px: '1rem',
           width: '100%',
-          maxWidth: isMobile ? '100vw !important' : 'calc(100vw - 100px) !important',
+          maxWidth: isMobile
+            ? '100vw !important'
+            : `calc(100vw - ${DESKTOP_SIDEBAR_WIDTH}) !important`,
+          minWidth: '100%',
           height: '100%',
-          maxHeight: isMobile ? 'calc(100vh - 80px) !important' : '100vh !important',
+          maxHeight: isMobile
+            ? `calc(100vh - ${MOBILE_NAVBAR_HEIGHT}) !important`
+            : '100vh !important',
           margin: 'auto',
         }}
         disableGutters
@@ -77,7 +83,7 @@ const SetlistListContainer: FC = (): ReactElement => {
         <SetlistActionMenu anchorEl={createAnchorEl} setAnchorEl={setCreateAnchorEl} />
 
         {isDesktop ? (
-          <Stack direction="row" width="100%">
+          <Stack direction="row" width="100%" height={'100%'} maxHeight={'100%'}>
             {/* Tabs section displaying setlists and folders */}
             <SetlistTabsContainer />
             {/* Setlist View (detail) Container */}

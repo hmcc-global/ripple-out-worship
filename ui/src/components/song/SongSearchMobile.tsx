@@ -111,10 +111,9 @@ const SongSearch = (props: SongSearchProps) => {
     setShowSearchBox((prev) => !prev);
   };
   return (
-    <Container sx={{ py: '1em', borderRadius: '16px' }}>
-      <Box>
-        <Stack direction="column">
-          <Stack direction="row">
+    <Container sx={{ py: '1em', borderRadius: '16px', maxWidth: '100%' }} disableGutters>
+        <Stack direction="column" width={'100%'}>
+          <Stack direction="row" width={'100%'}>
             <TextField
               variant="standard"
               placeholder="Search"
@@ -141,7 +140,6 @@ const SongSearch = (props: SongSearchProps) => {
             <IconButton
               color="secondary"
               onClick={() => handleSearchToggle()}
-              edge="end"
               sx={{
                 borderRadius: '50%',
                 backgroundColor: '#D0BCFF',
@@ -432,7 +430,6 @@ const SongSearch = (props: SongSearchProps) => {
             )}
           </Stack>
         </Stack>
-      </Box>
     </Container>
   );
 };

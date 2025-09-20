@@ -1,11 +1,6 @@
 import { styled } from '@mui/material/styles';
 // Types
-import {
-  Setlist,
-  SetlistEditorFields,
-  SetlistEditorProps,
-  SetlistFolder,
-} from '../../types/setlist.types';
+import { SetlistEditorFields, SetlistEditorProps, SetlistFolder } from '../../types/setlist.types';
 import { SongSchema, SongSearchFilter, SongSetlistSchema } from '../../types/song.types';
 // Components
 import HeaderWithIcon from '../custom/HeaderWithIcon';
@@ -37,8 +32,7 @@ import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
 import { customAxios as axios } from '../custom/customAxios';
-import { AxiosResponse } from 'axios';
-import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -54,6 +48,7 @@ import {
 
 // Hooks
 import { useSongs, useOwnership } from '../../helpers/customHooks';
+import { MOBILE_ACTION_BUTTONS_HEIGHT, MOBILE_NAVBAR_HEIGHT } from '../../constants';
 
 // Constants
 const SONG_CARD_FIELDS = [
@@ -70,7 +65,9 @@ const MainContainer = styled(Container)<{ isMobileOrSmallTablet?: boolean }>(
   ({ isMobileOrSmallTablet }) => ({
     paddingBlock: isMobileOrSmallTablet ? '0.75rem' : '1rem',
     paddingInline: isMobileOrSmallTablet ? '0.75rem' : '2rem',
-    height: isMobileOrSmallTablet ? 'calc(100vh - 80px - 60px)' : '100vh',
+    height: isMobileOrSmallTablet
+      ? `calc(100vh - ${MOBILE_NAVBAR_HEIGHT} - ${MOBILE_ACTION_BUTTONS_HEIGHT})`
+      : '100vh',
     minWidth: '100%',
     overflow: 'hidden',
     display: 'flex',
@@ -166,7 +163,7 @@ const MobileActionButtonsContainer = styled(Box)({
   paddingBottom: '1rem',
   display: 'flex',
   zIndex: 1000,
-  height: '60px',
+  height: MOBILE_ACTION_BUTTONS_HEIGHT,
 });
 
 const MobileSongList = styled(Box)({

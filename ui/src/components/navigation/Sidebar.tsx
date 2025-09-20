@@ -21,7 +21,7 @@ import { useOwnership, useSongs } from '../../helpers/customHooks';
 import { SongSchema } from '../../types/song.types';
 import { Setlist } from '../../types/setlist.types';
 import { SearchButtonBox } from './NavigationPaper';
-import { drawerWidth, mobileNavbarHeight } from '../../constants';
+import { DESKTOP_SIDEBAR_WIDTH, MOBILE_NAVBAR_HEIGHT } from '../../constants';
 import { customAxios as axios } from '../custom/customAxios';
 
 const SideBar: FC = (): ReactElement => {
@@ -38,10 +38,10 @@ const SideBar: FC = (): ReactElement => {
   const location = useLocation();
 
   const DesktopDrawer = {
-    width: drawerWidth,
+    width: DESKTOP_SIDEBAR_WIDTH,
     flexShrink: 0,
     '& .MuiDrawer-paper': {
-      width: drawerWidth,
+      width: DESKTOP_SIDEBAR_WIDTH,
       boxSizing: 'border-box',
       ...(!isMobile && { position: 'relative' }),
       backgroundColor: 'primary.darkest',
@@ -53,13 +53,13 @@ const SideBar: FC = (): ReactElement => {
     minWidth: '100%',
     flexShrink: 0,
     '& .MuiDrawer-paper': {
-      height: mobileNavbarHeight,
+      height: MOBILE_NAVBAR_HEIGHT,
       boxSizing: 'border-box',
       flexDirection: 'row',
       overflow: 'hidden',
       backgroundColor: 'primary.darkest',
     },
-    height: mobileNavbarHeight,
+    height: MOBILE_NAVBAR_HEIGHT,
   };
 
   useEffect(() => {

@@ -31,6 +31,12 @@ import { Setlist, SetlistFolder } from '../../types/setlist.types';
 import SetlistFolderDrawer from './SetlistFolderDrawer';
 import SetlistActionsMenu from './SetlistActionsMenu';
 import { useOwnership } from '../../helpers/customHooks';
+import {
+  DESKTOP_PAGE_HEADER_HEIGHT,
+  MOBILE_PAGE_HEADER_HEIGHT,
+  MOBILE_NAVBAR_HEIGHT,
+  TABLET_PAGE_HEADER_HEIGHT,
+} from '../../constants';
 
 // Constants and Utility Functions
 const SELECTED_ITEM_STYLE = {
@@ -475,13 +481,11 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
       display="flex"
       flex={1}
       flexDirection={'column'}
-      maxHeight={
-        isDesktop
-          ? 'calc(100vh - 8vh - 2.25rem)'
-          : isMobile
-          ? 'calc(100vh - 6vh - 2.25rem - 80px)'
-          : 'calc(100vh - 6vh - 2.25rem)'
-      } // Page Header = 7/8vh, Mobile NavBar = 80px, Vertical Padding = ~2.25rem
+      maxHeight={{
+        xs: `calc(100vh - ${MOBILE_PAGE_HEADER_HEIGHT} - 2.25rem - ${MOBILE_NAVBAR_HEIGHT})`,
+        sm: `calc(100vh - ${TABLET_PAGE_HEADER_HEIGHT} - 2.25rem)`,
+        lg: `calc(100vh - ${DESKTOP_PAGE_HEADER_HEIGHT} - 2.25rem)`,
+      }}
       sx={{ overflow: 'hidden' }}
     >
       <Tabs

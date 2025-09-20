@@ -118,11 +118,17 @@ export const ChordColors: Record<string, string> = {
   Bm: '#992E00',
 };
 
-export const drawerWidth = '100px';
-export const mobileNavbarHeight = '80px';
+export const DESKTOP_SIDEBAR_WIDTH = '100px';
+export const MOBILE_NAVBAR_HEIGHT = '80px';
 
 export const specificSongsMobileWidth = '600px';
 export const specificSongsTabletWidth = '900px';
 export const specificSongsDesktopWidth = '1340px';
 
 export const MAXIMUM_DESKTOP_HEIGHT = '960px';
+
+export const MOBILE_PAGE_HEADER_HEIGHT = '60px';
+export const TABLET_PAGE_HEADER_HEIGHT = '70px';
+export const DESKTOP_PAGE_HEADER_HEIGHT = '80px';
+
+export const MOBILE_ACTION_BUTTONS_HEIGHT = '60px';

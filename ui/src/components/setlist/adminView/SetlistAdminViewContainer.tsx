@@ -19,7 +19,7 @@ const ActionButton = styled(Button)(({ theme }) => ({
   flex: 1,
   padding: '0.5rem 1rem',
   fontSize: '0.875rem',
-  [theme.breakpoints.down('md')]: {
+  '@container (max-width: 450px)': {
     flex: 'none',
     padding: '0.5rem 1.5rem',
     fontSize: '0.75rem',
@@ -53,6 +53,7 @@ const MainContainer = styled(Box)(({ theme }) => ({
   [theme.breakpoints.up('sm')]: {
     padding: '0',
   },
+  containerType: 'inline-size',
 }));
 
 // Types
