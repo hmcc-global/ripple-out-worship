@@ -8,11 +8,11 @@ import {
   ListItemIcon,
   ListItemText,
   useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
 import QueueMusicIcon from '@mui/icons-material/QueueMusic';
-import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import Language from '@mui/icons-material/Language';
 import Person from '@mui/icons-material/Person';
 import GlobalSearchModal from './GlobalSearchModal';
@@ -21,29 +21,29 @@ import { useOwnership, useSongs } from '../../helpers/customHooks';
 import { SongSchema } from '../../types/song.types';
 import { Setlist } from '../../types/setlist.types';
 import { SearchButtonBox } from './NavigationPaper';
-import { drawerWidth, mobileNavbarHeight } from '../../constants';
+import { DESKTOP_SIDEBAR_WIDTH, MOBILE_NAVBAR_HEIGHT } from '../../constants';
 import { customAxios as axios } from '../custom/customAxios';
 
 const SideBar: FC = (): ReactElement => {
   const navigate = useNavigate();
   const ownership = useOwnership();
-  const isMobile = useMediaQuery('(max-width: 768px)');
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
 
   const [setlists, setSetlists] = useState<Setlist[]>([]);
-  const isDesktop = useMediaQuery('(min-width: 769px)');
 
   const allSongs = useSongs() as SongSchema[];
 
   const location = useLocation();
 
   const DesktopDrawer = {
-    width: drawerWidth,
+    width: DESKTOP_SIDEBAR_WIDTH,
     flexShrink: 0,
     '& .MuiDrawer-paper': {
-      width: drawerWidth,
+      width: DESKTOP_SIDEBAR_WIDTH,
       boxSizing: 'border-box',
-      ...(isDesktop && { position: 'relative' }),
+      ...(!isMobile && { position: 'relative' }),
       backgroundColor: 'primary.darkest',
     },
     minHeight: '100%',
@@ -53,14 +53,13 @@ const SideBar: FC = (): ReactElement => {
     minWidth: '100%',
     flexShrink: 0,
     '& .MuiDrawer-paper': {
-      height: mobileNavbarHeight,
+      height: MOBILE_NAVBAR_HEIGHT,
       boxSizing: 'border-box',
       flexDirection: 'row',
       overflow: 'hidden',
-      ...(isDesktop && { position: 'relative' }),
       backgroundColor: 'primary.darkest',
     },
-    height: mobileNavbarHeight,
+    height: MOBILE_NAVBAR_HEIGHT,
   };
 
   useEffect(() => {

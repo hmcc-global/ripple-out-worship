@@ -1,9 +1,10 @@
-import { useMediaQuery } from '@mui/material';
+import { useMediaQuery, useTheme } from '@mui/material';
 import SetlistViewContainerMobile from './SetlistViewContainerMobile';
 import SetlistViewContainerDesktop from './SetlistViewContainerDesktop';
 
 const SetlistViewContainer = () => {
-  const isMobile = useMediaQuery('(max-width: 768px)');
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   return isMobile ? <SetlistViewContainerMobile /> : <SetlistViewContainerDesktop />;
 };

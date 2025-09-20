@@ -1,37 +1,37 @@
-import { Card, CardContent, Typography, Chip, Box, Grid, IconButton } from '@mui/material';
+import { Drawer, CardContent, Typography, Chip, Box, Grid, IconButton, Stack } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
-import { SongViewSchema } from '../../types/song.types';
 import CloseIcon from '@mui/icons-material/Close';
-import Stack from '@mui/material/Stack';
+import { SongViewSchema } from '../../types/song.types';
+import { MOBILE_NAVBAR_HEIGHT } from '../../constants';
 
 interface SongsInfoCardMobileProps {
   song: SongViewSchema | undefined;
+  open: boolean;
   onClose: () => void;
 }
 
-const SongsInfoCardMobile = ({ song, onClose }: SongsInfoCardMobileProps) => {
-  if (!song) {
-    return null;
-  }
+const SongsInfoCardMobile = ({ song, open, onClose }: SongsInfoCardMobileProps) => {
+  if (!song) return null;
 
   return (
-    <Card
-      elevation={8}
-      sx={{
-        position: 'fixed',
-        left: 0,
-        right: 0,
-        bottom: 80,
-        borderRadius: '20px 20px 0 0',
-        bgcolor: 'primary.darkest',
-        zIndex: (theme) => theme.zIndex.drawer + 2,
-        maxWidth: '100vw',
+    <Drawer
+      anchor="bottom"
+      open={open}
+      onClose={onClose}
+      sx={{ bottom: MOBILE_NAVBAR_HEIGHT, '& .MuiBackdrop-root': { bottom: MOBILE_NAVBAR_HEIGHT } }}
+      PaperProps={{
+        sx: {
+          borderRadius: '20px 20px 0 0',
+          bgcolor: 'primary.darkest',
+          maxWidth: '100vw',
+          bottom: MOBILE_NAVBAR_HEIGHT,
+        },
       }}
     >
       <CardContent>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2} p={1}>
           <Box display="flex" alignItems="center">
-            <InfoIcon color="primary" sx={{ mr: 1 }} />
+            <InfoIcon sx={{ mr: 1, color: 'secondary.main' }} />
             <Typography variant="subtitle1" color="#CCC2DC" fontWeight="bold">
               About The Song
             </Typography>
@@ -62,7 +62,6 @@ const SongsInfoCardMobile = ({ song, onClose }: SongsInfoCardMobileProps) => {
               ))}
             </Stack>
           </Grid>
-
           <Grid item xs={4}>
             <Typography color="#938F99">Tempo</Typography>
           </Grid>
@@ -89,14 +88,14 @@ const SongsInfoCardMobile = ({ song, onClose }: SongsInfoCardMobileProps) => {
             <Typography color="#CCC2DC">{song.year}</Typography>
           </Grid>
           <Grid item xs={4}>
-            <Typography color={'#938F99'}>Code</Typography>
+            <Typography color="#938F99">Code</Typography>
           </Grid>
           <Grid item xs={8}>
-            <Typography color="#CCC2DC">{song && song.code}</Typography>
+            <Typography color="#CCC2DC">{song.code}</Typography>
           </Grid>
         </Grid>
       </CardContent>
-    </Card>
+    </Drawer>
   );
 };
 

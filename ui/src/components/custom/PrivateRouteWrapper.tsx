@@ -4,7 +4,6 @@ import {
   isValidElement,
   ReactElement,
   useEffect,
-  useMemo,
   useState,
   useTransition,
 } from 'react';
@@ -12,7 +11,7 @@ import { Box, Skeleton } from '@mui/material';
 import ErrorPage from './ErrorPage';
 import Sidebar from '../navigation/Sidebar';
 import { useUser } from '../../helpers/customHooks';
-import { drawerWidth, mobileNavbarHeight } from '../../constants';
+import { DESKTOP_SIDEBAR_WIDTH, MOBILE_NAVBAR_HEIGHT } from '../../constants';
 
 interface PrivateRouteProps {
   children: ReactElement;
@@ -29,9 +28,8 @@ const PageWithNavBar = ({ children }: { children: ReactElement }) => {
           <Box
             overflow="auto"
             sx={{
-              height: { xs: `calc(100% - ${mobileNavbarHeight})`, md: '100%' },
-              width: { xs: '100%', md: `calc(100% - ${drawerWidth})` },
-              pb: { xs: mobileNavbarHeight, md: 0 },
+              height: { xs: `calc(100% - ${MOBILE_NAVBAR_HEIGHT})`, sm: '100%' },
+              width: { xs: '100%', md: `calc(100% - ${DESKTOP_SIDEBAR_WIDTH})` },
             }}
           >
             {cloneElement(children)}

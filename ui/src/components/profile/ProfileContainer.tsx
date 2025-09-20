@@ -1,10 +1,11 @@
 import { FC, ReactElement } from 'react';
 import ProfileDesktopView from './ProfileDesktopView';
 import ProfileMobileView from './ProfileMobileView';
-import { useMediaQuery } from '@mui/material';
+import { useMediaQuery, useTheme } from '@mui/material';
 
 const ProfileContainer: FC = (): ReactElement => {
-  const isMobile = useMediaQuery('(max-width: 768px)');
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   return isMobile ? <ProfileMobileView /> : <ProfileDesktopView />;
 };

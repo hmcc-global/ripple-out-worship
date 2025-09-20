@@ -67,8 +67,8 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
   // Hooks
   const ownership = useOwnership();
   const theme = useTheme();
-  const isTablet = useMediaQuery(theme.breakpoints.between('md', 'xl'));
-  const isDesktop = useMediaQuery(theme.breakpoints.up('xl'));
+  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'lg'));
+  const isDesktop = useMediaQuery(theme.breakpoints.up('lg'));
   const isMobileAndSmallTablet = !isTablet && !isDesktop;
 
   // State

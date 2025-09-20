@@ -7,21 +7,17 @@ import { customAxios as axios } from '../custom/customAxios';
 import { AxiosResponse } from 'axios';
 import SongsTitleCard from './SongsTitleCard';
 import SongsButtonCard from './SongsButtonsCard';
-import SongsInfoCard from './SongsInfoCard';
-import { useUser } from '../../helpers/customHooks';
+import { useOwnership } from '../../helpers/customHooks';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import {
-  specificSongsTabletWidth,
-  specificSongsDesktopWidth,
-  mobileNavbarHeight,
-} from '../../constants';
+import { specificSongsTabletWidth } from '../../constants';
+import EditIcon from '@mui/icons-material/Edit';
 
 const SongsViewContainer: FC = (): ReactElement => {
   const navigate = useNavigate();
   const isMobile = useMediaQuery(`(max-width:${specificSongsTabletWidth})`);
 
   // Get user information
-  const { user } = useUser();
+  const ownership = useOwnership();
 
   const id: string = window.location.pathname.split('/')[2];
   const [song, setSong] = useState<SongViewSchema>();
@@ -78,7 +74,6 @@ const SongsViewContainer: FC = (): ReactElement => {
           width: '100%',
           paddingLeft: 0,
           paddingRight: 0,
-          pb: isMobile ? mobileNavbarHeight : 0,
         }}
       >
         <Box
@@ -87,71 +82,35 @@ const SongsViewContainer: FC = (): ReactElement => {
             justifyContent: 'space-between',
             alignItems: 'center',
             marginBottom: ['0.1em', '0.3em'],
+            paddingRight: '1.5rem',
           }}
         >
           <Box sx={{ width: '100' }}>
             <SongsTitleCard song={song} />
           </Box>
-          {!isMobile && user?.accessType === 'admin' && (
+          {ownership?.accessType === 'admin' && (
             <Button
               variant="outlined"
               onClick={() => navigate(`/song/edit/${id}`)}
+              startIcon={isMobile ? null : <EditIcon />}
               sx={{
                 borderWidth: '2px',
-                padding: '10px 25px',
+                padding: isMobile ? '10px' : '10px 25px',
+                minWidth: isMobile ? 'unset' : 'inherit',
                 borderRadius: '40px',
                 borderColor: '#938F99',
                 color: '#D0BCFF',
                 textTransform: 'none',
               }}
             >
-              <Typography variant="subtitle1">Edit Song</Typography>
+              {isMobile ? <EditIcon /> : <Typography variant="subtitle1">Edit Song</Typography>}
             </Button>
           )}
         </Box>
         <Stack direction={['row']}>
-          {isMobile && (
-            <Box sx={{ marginBottom: ['10px', '15vh'], width: '100%' }}>
-              <SongsButtonCard song={song} />
-            </Box>
-          )}
-          {!isMobile && (
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'row',
-                [`@media (max-width:${specificSongsDesktopWidth})`]: {
-                  flexDirection: 'column',
-                },
-              }}
-            >
-              <Box
-                sx={{
-                  [`@media (max-width:${specificSongsDesktopWidth})`]: {
-                    width: '100%',
-                  },
-                  [`@media (min-width:${specificSongsDesktopWidth})`]: {
-                    width: '70%',
-                    marginBottom: '20px',
-                  },
-                }}
-              >
-                <SongsButtonCard song={song} />
-              </Box>
-              <Box
-                sx={{
-                  [`@media (max-width:${specificSongsDesktopWidth})`]: {
-                    width: '50%',
-                  },
-                  [`@media (min-width:${specificSongsDesktopWidth})`]: {
-                    width: '30%',
-                  },
-                }}
-              >
-                <SongsInfoCard song={song} />
-              </Box>
-            </Box>
-          )}
+          <Box sx={{ marginBottom: ['10px', '3vh'], width: '100%' }}>
+            <SongsButtonCard song={song} />
+          </Box>
         </Stack>
       </Container>
     </>

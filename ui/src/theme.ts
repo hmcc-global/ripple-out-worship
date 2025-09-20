@@ -145,6 +145,15 @@ const palette: ExtendedPaletteOptions = {
 
 const customTheme = createTheme({
   palette: palette,
+  breakpoints: {
+    values: {
+      xs: 0,    // extra-small: unchanged
+      sm: 800,  // small: changed from 600 to 800
+      md: 960,  // medium: changed from 900 to 960
+      lg: 1280, // large: changed from 1200 to 1280
+      xl: 1920, // extra-large: changed from 1536 to 1920
+    },
+  },
   typography: {
     htmlFontSize: 16,
     fontFamily: ['DM Sans', 'Work Sans'].join(','),
