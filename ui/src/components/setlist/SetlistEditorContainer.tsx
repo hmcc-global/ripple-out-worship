@@ -691,6 +691,9 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
   const handleToggleFilterDrawer = () => setIsFilterDrawerToggled(!isFilterDrawerToggled);
 
   return (
+        <form
+          onSubmit={handleSubmit(handleSaveSetlist)}
+        >
     <MainContainer isMobileOrSmallTablet={isMobileOrSmallTablet} disableGutters>
       <ContentWrapper>
         {errorMessage && (
@@ -701,10 +704,6 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
 
         <SuccessSnackbar open={successSnackbarOpen} onClose={() => setSuccessSnackbarOpen(false)} />
 
-        <form
-          onSubmit={handleSubmit(handleSaveSetlist)}
-          style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
-        >
           <PageHeader
             title={`${action === 'edit' ? 'Edit' : 'New'} Setlist`}
             icon={<QueueMusic />}
@@ -763,20 +762,19 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
               />
             )}
           </SectionsContainer>
-        </form>
 
         {/* Mobile Drawer for Song Search */}
         {isMobileOrSmallTablet && (
           <Drawer
-            anchor="bottom"
-            open={drawerOpen}
-            onClose={() => setDrawerOpen(false)}
-            PaperProps={{
-              sx: {
-                height: '100%',
-                bgcolor: '#171717',
-              },
-            }}
+          anchor="bottom"
+          open={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+          PaperProps={{
+            sx: {
+              height: '100%',
+              bgcolor: '#171717',
+            },
+          }}
           >
             <DrawerContent>
               <DrawerBody>
@@ -806,6 +804,8 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
       </ContentWrapper>
       {isMobileOrSmallTablet && <MobileActionButtons onCancel={handleCancel} />}
     </MainContainer>
+    </form>
+
   );
 };
 
@@ -839,41 +839,40 @@ const ActionButtons: FC<{ onCancel: () => void }> = ({ onCancel }) => (
 
 // Mobile Action Buttons component
 const MobileActionButtons: FC<{ onCancel: () => void }> = ({ onCancel }) => (
-    <Stack
-      direction="row"
-      spacing={2}
-      width={'100%'}
-      maxWidth={'100%'}
-      paddingX={'1rem'}
-      height={MOBILE_ACTION_BUTTONS_HEIGHT}
-      maxHeight={MOBILE_ACTION_BUTTONS_HEIGHT}
+  <Stack
+    direction="row"
+    spacing={2}
+    width={'100%'}
+    maxWidth={'100%'}
+    paddingX={'1rem'}
+    height={MOBILE_ACTION_BUTTONS_HEIGHT}
+    maxHeight={MOBILE_ACTION_BUTTONS_HEIGHT}
+  >
+    <Button
+      sx={{
+        width: '50%',
+        color: 'secondary.main',
+        border: '1px solid #938F99',
+        borderRadius: '40px',
+        textTransform: 'none',
+      }}
+      onClick={onCancel}
     >
-      <Button
-        sx={{
-          width: '50%',
-          color: 'secondary.main',
-          border: '1px solid #938F99',
-          borderRadius: '40px',
-          textTransform: 'none',
-        }}
-        onClick={onCancel}
-      >
-        Cancel
-      </Button>
-      <Button
-        type="submit"
-        form="setlist-form"
-        sx={{
-          width: '50%',
-          backgroundColor: 'secondary.main',
-          color: '#381E72',
-          borderRadius: '40px',
-          textTransform: 'none',
-        }}
-      >
-        Save
-      </Button>
-    </Stack>
+      Cancel
+    </Button>
+    <Button
+      type="submit"
+      sx={{
+        width: '50%',
+        backgroundColor: 'secondary.main',
+        color: '#381E72',
+        borderRadius: '40px',
+        textTransform: 'none',
+      }}
+    >
+      Save
+    </Button>
+  </Stack>
 );
 
 // Unified Setlist Details Section

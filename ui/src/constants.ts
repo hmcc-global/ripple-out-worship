@@ -134,4 +134,4 @@ export const MOBILE_PAGE_HEADER_HEIGHT = '60px';
 export const TABLET_PAGE_HEADER_HEIGHT = '70px';
 export const DESKTOP_PAGE_HEADER_HEIGHT = '80px';
 
-export const MOBILE_ACTION_BUTTONS_HEIGHT = '60px';
+export const MOBILE_ACTION_BUTTONS_HEIGHT = '50px';
