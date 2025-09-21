@@ -20,6 +20,7 @@ import {
   sharpMusicKeysOptions,
   specificSongsDesktopWidth,
 } from '../../constants';
+import SongsTitleCard from '../songsView/SongsTitleCard';
 
 interface SetlistViewSongDisplayProps {
   song: SongViewSchema | undefined;
@@ -58,13 +59,13 @@ const SetlistViewSongDisplay = ({
 
   // Key change handler
   const handleKeyChange = useCallback((increment: boolean) => {
-    setKeyIndex(prev => (prev + (increment ? 1 : -1) + 12) % 12);
+    setKeyIndex((prev) => (prev + (increment ? 1 : -1) + 12) % 12);
   }, []);
 
   // Capo change handler
   const handleCapoChange = useCallback((increment: boolean) => {
-    setCapo(prev => (prev + (increment ? 1 : -1) + 12) % 12);
-    setKeyIndex(prev => (prev + (increment ? -1 : 1) + 12) % 12);
+    setCapo((prev) => (prev + (increment ? 1 : -1) + 12) % 12);
+    setKeyIndex((prev) => (prev + (increment ? -1 : 1) + 12) % 12);
   }, []);
 
   const handleFlatToggle = useCallback(() => {
@@ -220,16 +221,9 @@ const SetlistViewSongDisplay = ({
       sx={{ height: '100%', display: 'flex', flexDirection: 'column', width: '100%', gap: '1rem' }}
     >
       {/* Song Title Section */}
-      {userHeader && (
-        <Stack direction="column" spacing={0.25} sx={{ width: '100%' }}>
-          <Typography variant="h2" color="#E8DEF8">
-            {song?.title}
-          </Typography>
-          <Typography variant="subtitle2" sx={{ color: theme.palette.secondary.main }}>
-            {song?.artist}
-          </Typography>
-        </Stack>
-      )}
+      <Box sx={{ width: '100', alignItems: 'left' }}>
+        <SongsTitleCard song={song} isSetlistView={true} />
+      </Box>
 
       {/* Chord Controls Section */}
       {showChords && (
@@ -285,11 +279,6 @@ const SetlistViewSongDisplay = ({
           split={splitColumns}
         />
       </Box>
-
-      {/* Mobile Info Modal */}
-      {showMobileInfo && (
-        <SongsInfoCardMobile song={song} onClose={() => setShowMobileInfo(false)} />
-      )}
     </Box>
   );
 };
