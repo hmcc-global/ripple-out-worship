@@ -35,12 +35,11 @@ const PageWrapper = ({
             overflow="auto"
             sx={{
               height: showNavBar
-                ? { xs: `calc(100% - ${MOBILE_NAVBAR_HEIGHT})`, md: '100%' }
+                ? { xs: `calc(100% - ${MOBILE_NAVBAR_HEIGHT})`, sm: '100%' }
                 : '100%',
               width: showNavBar
-                ? { xs: '100%', md: `calc(100% - ${DESKTOP_SIDEBAR_WIDTH})` }
+                ? { xs: '100%', sm: `calc(100% - ${DESKTOP_SIDEBAR_WIDTH})` }
                 : '100%',
-              pb: showNavBar ? { xs: MOBILE_NAVBAR_HEIGHT, md: 0 } : 0,
             }}
           >
             {cloneElement(children)}
