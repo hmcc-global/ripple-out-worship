@@ -155,6 +155,8 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
   const [allSetlists, setAllSetlists] = useState<Setlist[]>([]);
   const [ownedSetlists, setOwnedSetlists] = useState<Setlist[]>([]);
   const [ownedFolders, setOwnedFolders] = useState<SetlistFolder[]>([]);
+  const [filteredSetlists, setFilteredSetlists] = useState<Setlist[]>([]);
+  const [filteredFolders, setFilteredFolders] = useState<SetlistFolder[]>([]);
   const [openFolders, setOpenFolders] = useState<string[]>([]);
   const [selectedSetlistId, setSelectedSetlistId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -178,6 +180,20 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
   const handleSnackbarOpen = useCallback((message: string) => {
     setSnackbar({ open: true, message });
   }, []);
+
+  useEffect(() => {
+    if (searchTerm && searchTerm.length > 2) {
+      setFilteredSetlists(ownedSetlists.filter((setlist) => 
+        setlist.name.toLowerCase().includes(searchTerm)
+      ))
+      setFilteredFolders(ownedFolders.filter((folder) => 
+        folder.groupName.toLowerCase().includes(searchTerm)
+      ))
+    } else {
+      setFilteredSetlists(ownedSetlists);
+      setFilteredFolders(ownedFolders);
+    }
+  },[ownedFolders, ownedSetlists, searchTerm])
 
   // Data Fetching
   const getSetlistsAndFolders = useCallback(async () => {
@@ -503,16 +519,16 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
 
       <Divider sx={{ borderColor: '#49454F' }} />
 
+      <SearchTextField searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
       {/* All Tab */}
       <Box sx={{ overflowY: 'auto', flex: 1 }}>
-        <SearchTextField searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
         <SetlistTabPanel value={tab} index={0}>
           <List>
-            {(ownedSetlists && ownedSetlists.length > 0) ||
-            (ownedFolders && ownedFolders.length > 0) ? (
+            {(filteredSetlists && filteredSetlists.length > 0) ||
+            (filteredFolders && filteredFolders.length > 0) ? (
               <>
-                {ownedFolders.map(renderFolderItem)}
-                {ownedSetlists.map(renderSetlistItem)}
+                {filteredFolders.map(renderFolderItem)}
+                {filteredSetlists.map(renderSetlistItem)}
               </>
             ) : (
               renderEmptyState('No Setlists or Folders Found')
@@ -523,8 +539,8 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
         {/* Folders Tab */}
         <SetlistTabPanel value={tab} index={1}>
           <List>
-            {ownedFolders && ownedFolders.length > 0
-              ? ownedFolders.map(renderFolderItem)
+            {filteredFolders && filteredFolders.length > 0
+              ? filteredFolders.map(renderFolderItem)
               : renderEmptyState('No Folders Found')}
           </List>
         </SetlistTabPanel>
@@ -532,8 +548,8 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
         {/* Setlists Tab */}
         <SetlistTabPanel value={tab} index={2}>
           <List>
-            {ownedSetlists && ownedSetlists.length > 0
-              ? ownedSetlists.map(renderSetlistItem)
+            {filteredSetlists && filteredSetlists.length > 0
+              ? filteredSetlists.map(renderSetlistItem)
               : renderEmptyState('No Personal Setlists Found')}
           </List>
         </SetlistTabPanel>

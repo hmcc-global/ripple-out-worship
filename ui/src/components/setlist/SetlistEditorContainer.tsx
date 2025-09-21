@@ -43,11 +43,10 @@ import {
   AddCircleOutline,
   Check,
   Add,
-  TuneOutlined,
 } from '@mui/icons-material';
 
 // Hooks
-import { useSongs, useOwnership } from '../../helpers/customHooks';
+import { useOwnership } from '../../helpers/customHooks';
 import { MOBILE_ACTION_BUTTONS_HEIGHT, MOBILE_NAVBAR_HEIGHT } from '../../constants';
 
 // Constants
@@ -98,7 +97,7 @@ const SetlistDetailsBox = styled(Box)<{ isMobileOrSmallTablet?: boolean }>(
   ({ isMobileOrSmallTablet }) => ({
     display: 'flex',
     flexDirection: 'column',
-    flex: 1,
+    flex: isMobileOrSmallTablet ? 0 : 1,
     overflow: isMobileOrSmallTablet ? 'visible' : 'hidden',
     flexShrink: isMobileOrSmallTablet ? 0 : undefined,
   })
@@ -118,7 +117,7 @@ const SongSearchBox = styled(Box)<{ isMobileOrSmallTablet?: boolean; isTablet?: 
   ({ isMobileOrSmallTablet, isTablet }) => ({
     display: 'flex',
     flexDirection: 'column',
-    width: isMobileOrSmallTablet ? '100%' : isTablet ? '47.5vw' : '57.5vw',
+    width: isMobileOrSmallTablet ? '100%' : isTablet ? '45vw' : '57.5vw',
     overflow: 'hidden',
     maxHeight: isMobileOrSmallTablet ? 'calc(100vh - 5rem)' : '90vh',
   })
@@ -317,8 +316,6 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
   const isMobileOrSmallTablet = !isTablet && !isDesktop;
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const allSongs = useSongs() as SongSchema[];
-  // const allFolders = useFolders() as SetlistFolder[];
   const ownership = useOwnership();
 
   // Form and state management
@@ -952,7 +949,7 @@ const SetlistDetailsSection: FC<{
 
       {/* Desktop/Tablet Song List */}
       {!isMobileOrSmallTablet && (
-        <Box pt={3} sx={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+        <Box sx={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
           <Stack direction="column" spacing={'1rem'} sx={{ height: '100%' }}>
             <HeaderWithIcon
               Icon={MusicNote}
@@ -1052,12 +1049,13 @@ const SearchInputComponent: FC<{
       fullWidth
       onChange={(e) => onSearchChange(e.target.value)}
     />
-    <FilterIconButton
+    {/* TODO: Implement song filter panel */}
+    {/* <FilterIconButton
       isFilterDrawerToggled={isFilterDrawerToggled}
       onClick={handleToggleFilterDrawer}
     >
       <TuneOutlined sx={{ fontSize: '20px' }} />
-    </FilterIconButton>
+    </FilterIconButton> */}
   </SearchContainer>
 );
 
