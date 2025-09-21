@@ -251,7 +251,6 @@ const GlobalSearchModal = (props: GlobalSearchModalProps) => {
           sx={{
             position: 'fixed',
             top: ['0vh', '22.5vh'],
-            height: { sm: 'auto' },
             left: ['0vw', '30vw'],
             backgroundColor: '#171717',
             borderRadius: '10px',
