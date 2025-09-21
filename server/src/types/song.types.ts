@@ -9,7 +9,7 @@ type SongSchema = {
   themes: Types.Array<string>;
   artist: string;
   year: string;
-  code: string;
+  code?: string;
   createdBy: Types.ObjectId;
   lastUpdatedBy: Types.ObjectId;
   isVerified: boolean;

@@ -10,7 +10,7 @@ const songSchema = new Schema<SongSchema>(
     themes: [{ type: String, required: true }],
     artist: { type: String, required: true },
     year: { type: String, required: true },
-    code: { type: String, required: true },
+    code: { type: String, required: false },
     createdBy: { type: Schema.Types.ObjectId, ref: 'Ownership' },
     lastUpdatedBy: { type: Schema.Types.ObjectId, ref: 'Ownership' },
     timeSignature: [{ type: String, required: true }],
