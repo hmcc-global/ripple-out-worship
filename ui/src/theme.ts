@@ -183,7 +183,7 @@ const customTheme = createTheme({
         fontWeight: 700,
       },
       [breakpoints.down('sm')]: {
-        fontSize: '0.75rem',
+        fontSize: '1rem',
         fontWeight: 600,
       },
     },
