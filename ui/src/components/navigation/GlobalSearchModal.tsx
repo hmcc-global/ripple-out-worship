@@ -251,7 +251,7 @@ const GlobalSearchModal = (props: GlobalSearchModalProps) => {
           sx={{
             position: 'fixed',
             top: ['0vh', '22.5vh'],
-            height: { xs: `calc(100vh - ${MOBILE_NAVBAR_HEIGHT})`, sm: 'auto' },
+            height: { sm: 'auto' },
             left: ['0vw', '30vw'],
             backgroundColor: '#171717',
             borderRadius: '10px',
