@@ -185,7 +185,7 @@ const SetlistViewSongsHeader = ({
       >
         <Box sx={snackbarContentStyles}>
           <ScreenRotation sx={{ color: '#4F378B', fontSize: 22, mr: 1 }} />
-          <Box sx={{ px: 0.5 }}>Rotate phone to landscape to split</Box>
+          <Box sx={{ px: 0.5 }}>Rotate phone to landscape to split (Tip: Better on tablets/ laptops)</Box>
           <IconButton
             size="small"
             onClick={closeSplitSnackbar}

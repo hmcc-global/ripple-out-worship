@@ -1,8 +1,6 @@
 import {
   PUBLIC_SETLIST_FOOTER_HEIGHT,
-  PUBLIC_SETLIST_FOOTER_MAX_HEIGHT,
   PUBLIC_SETLIST_HEADER_HEIGHT,
-  PUBLIC_SETLIST_HEADER_MAX_HEIGHT,
 } from '../../constants';
 import { Box, styled } from '@mui/material';
 
@@ -15,7 +13,7 @@ export const SetlistViewHeader = styled(Box)<{ isMobile: boolean }>(({ isMobile 
   width: isMobile ? '100%' : '100vw',
   maxWidth: isMobile ? '100%' : '100vw',
   height: PUBLIC_SETLIST_HEADER_HEIGHT,
-  maxHeight: PUBLIC_SETLIST_HEADER_MAX_HEIGHT,
+  maxHeight: PUBLIC_SETLIST_HEADER_HEIGHT,
 }));
 
 export const SetlistViewFooter = styled(Box)(({ theme }) => ({
@@ -26,7 +24,7 @@ export const SetlistViewFooter = styled(Box)(({ theme }) => ({
   width: '100vw',
   maxWidth: '100vw',
   height: PUBLIC_SETLIST_FOOTER_HEIGHT,
-  maxHeight: PUBLIC_SETLIST_FOOTER_MAX_HEIGHT,
+  maxHeight: PUBLIC_SETLIST_FOOTER_HEIGHT,
   color: '#938F99',
   fontSize: '0.75rem',
 }));
