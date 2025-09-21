@@ -25,21 +25,16 @@ interface SetlistViewSongDisplayProps {
   song: SongViewSchema | undefined;
   splitColumns: number;
   showChords: boolean;
-  userView?: boolean;
-  userHeader?: boolean;
 }
 
 const SetlistViewSongDisplay = ({
   song,
   splitColumns,
   showChords,
-  userView = false,
-  userHeader = false,
 }: SetlistViewSongDisplayProps) => {
   const [keyIndex, setKeyIndex] = useState(0);
   const [capo, setCapo] = useState(0);
   const [useFlat, setUseFlat] = useState(false);
-  const [showMobileInfo, setShowMobileInfo] = useState(false);
 
   const theme = useTheme();
   const isDesktop = useMediaQuery(`(min-width:${specificSongsDesktopWidth})`);
@@ -220,7 +215,7 @@ const SetlistViewSongDisplay = ({
       sx={{ height: '100%', display: 'flex', flexDirection: 'column', width: '100%', gap: '1rem' }}
     >
       {/* Song Title Section */}
-      <Box sx={{ width: '100', alignItems: 'left' }}>
+      <Box sx={{ width: '100%', alignItems: 'flex-start' }}>
         <SongsTitleCard song={song} isSetlistView={true} />
       </Box>
 

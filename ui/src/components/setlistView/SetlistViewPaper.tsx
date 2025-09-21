@@ -32,7 +32,7 @@ export const SetlistViewFooter = styled(Box)(({ theme }) => ({
 export const SetlistViewSongsControlChip = styled(Box)<{ isSelected: boolean }>(
   ({ isSelected }) => ({
     display: 'flex',
-    dir: 'row',
+    flexDirection: 'row',
     gap: '0.5rem',
     justifyContent: 'center',
     border: isSelected ? '1px solid #4A4458' : '1px solid #938F99',

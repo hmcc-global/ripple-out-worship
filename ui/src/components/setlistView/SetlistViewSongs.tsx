@@ -133,8 +133,6 @@ const SetlistViewSongs = ({
                   song={song}
                   splitColumns={splitColumns}
                   showChords={showChords}
-                  userView={userView}
-                  userHeader={userHeader}
                 />
               </Box>
               {!isLastSong && <Divider sx={{ borderColor: '#938F99' }} />}
