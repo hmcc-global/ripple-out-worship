@@ -37,7 +37,7 @@ const SongsTitleCard = ({ song }: SongTitleCardProps) => {
     <Container>
       <Box sx={{ minWidth: 150 }}>
         <Box display="flex" alignItems="center">
-          <Typography variant="h2" fontSize={{ sm: '24px', md: '34px' }}>
+          <Typography variant="h2" fontSize={{ sm: '24px', md: '28px' }}>
             {song?.title}
           </Typography>
           <IconButton
@@ -71,7 +71,7 @@ const SongsTitleCard = ({ song }: SongTitleCardProps) => {
         <Typography
           variant="subtitle2"
           color="primary.lightest"
-          fontSize={{ sm: '14px', md: '26px' }}
+          fontSize={{ sm: '14px', md: '20px' }}
         >
           {song?.artist}
         </Typography>
