@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateAxiosClient } from '../components/custom/customAxios';
 import { User } from '../types/user.types';
-import { fetchOwnership } from '../reducers';
+import { fetchOwnership, fetchSongs } from '../reducers';
 import { Ownership } from '../types/ownership.types';
 
 type RootState = {
@@ -70,6 +70,21 @@ export const useUser = (): { token: string; user?: User; loading: boolean } => {
   return { token, user: user, loading: loading };
 };
 export const useSongs = (id?: string) => {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    const fetchAllSongs = async () => {
+      try {
+        const { data, status } = await axios.get('/api/songs/get');
+        if (status === 200) {
+          dispatch(fetchSongs(data));
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    fetchAllSongs();
+  }, [dispatch]);
+
   const allSongs = useSelector((state: RootState) => state.songs);
   if (id) {
     const song = allSongs.find((song) => song._id === id);
