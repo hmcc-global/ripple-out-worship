@@ -13,7 +13,6 @@ import {
 } from '@mui/material';
 import { KeyboardArrowUp, KeyboardArrowDown } from '@mui/icons-material';
 import SongsLyrics from '../songsView/SongsLyrics';
-import SongsInfoCardMobile from '../songsView/SongsInfoCardMobile';
 import { SongViewSchema } from '../../types/song.types';
 import {
   flatMusicKeysOptions,
