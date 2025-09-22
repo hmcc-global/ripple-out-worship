@@ -57,6 +57,7 @@ const SongListContainer: FC = (): ReactElement => {
       try {
         const payload = await axios.get('/api/songs/search', {
           params: {
+            code: filterData.search,
             keyword: filterData.search,
             themes: filterData.themes,
             tempo: filterData.tempo,
