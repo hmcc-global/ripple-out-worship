@@ -36,6 +36,7 @@ import { useNavigate } from 'react-router-dom';
 import { MusicNote } from '@mui/icons-material';
 import PageHeader from '../navigation/PageHeader';
 import HeaderWithIcon from '../custom/HeaderWithIcon';
+import { findFirstLetterLyrics } from '../../helpers/global';
 
 const SongEditorContainer: FC<SongEditorProps> = () => {
   // hook to detect the window size
@@ -109,6 +110,15 @@ const SongEditorContainer: FC<SongEditorProps> = () => {
   }, [song, reset]);
 
   const handleSaveSong: SubmitHandler<SongEditorFields> = async (data) => {
+    const songLetter = findFirstLetterLyrics(data.chordLyrics) || '';
+    const payload = await axios.get('/api/songs/search', {
+      params: {
+        code: songLetter,
+      },
+    });
+    const songs: SongSchema[] = payload.data.data;
+    const songIndex = songs.length > 0 ? songs.length + 1 : 1;
+
     try {
       let payload;
       if (action === 'edit') {
@@ -133,7 +143,7 @@ const SongEditorContainer: FC<SongEditorProps> = () => {
           themes: themeList,
           tempo: tempoList,
           year: data.year,
-          code: data.code,
+          code: songLetter + songIndex,
           timeSignature: timeSignatureList,
           simplifiedChordLyrics: data.simplifiedChordLyrics,
           originalKey: data.originalKey,
@@ -430,25 +440,6 @@ const SongEditorContainer: FC<SongEditorProps> = () => {
                         type="number"
                         error={!!errors.year}
                         helperText={errors?.year?.message}
-                        variant="outlined"
-                        fullWidth
-                      />
-                    )}
-                  />
-
-                  {/* Code field */}
-                  <Controller
-                    name="code"
-                    control={control}
-                    defaultValue=""
-                    rules={{ required: 'Code is required' }}
-                    render={({ field }) => (
-                      <TextField
-                        {...field}
-                        id="code"
-                        label="Code"
-                        error={!!errors.code}
-                        helperText={errors?.code?.message}
                         variant="outlined"
                         fullWidth
                       />

@@ -63,7 +63,7 @@ const getSong: RequestHandler = async (req: Request, res: Response): Promise<voi
   }
 };
 const searchSongs: RequestHandler = async (req: Request, res: Response): Promise<void> => {
-  const { keyword, tempo, themes, page = 1, limit = 20 } = req.query;
+  const { keyword, code, tempo, themes, page = 1, limit = 20 } = req.query;
 
   const tempoArray = Array.isArray(tempo) ? tempo : [tempo].filter(Boolean);
   const themesArray = Array.isArray(themes) ? themes : [themes].filter(Boolean);
@@ -76,8 +76,16 @@ const searchSongs: RequestHandler = async (req: Request, res: Response): Promise
       isDeleted: false,
     };
 
+    const textSearchConditions = [];
     if (keyword) {
-      query.title = { $regex: keyword, $options: 'i' };
+      textSearchConditions.push({ title: { $regex: keyword, $options: 'i' } });
+    }
+    if (code) {
+      textSearchConditions.push({ code: { $regex: code, $options: 'i' } });
+    }
+
+    if (textSearchConditions.length > 0) {
+      query.$or = textSearchConditions;
     }
     if (tempoArray.length > 0) {
       query.tempo = { $in: tempoArray };
