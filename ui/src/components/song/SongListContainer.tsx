@@ -101,7 +101,7 @@ const SongListContainer: FC = (): ReactElement => {
         searchDisplayBox.scrollTop = scrollTop - 30;
       }
     }
-  }, [loading, page, totalPages, getSongResults]);
+  }, [loading, page, totalPages]);
 
   useEffect(() => {
     const searchDisplayBox = document.getElementById('search-display');
@@ -334,7 +334,7 @@ const SongListContainer: FC = (): ReactElement => {
                   },
                 }}
               >
-                {loading && songResults.length === 0 ? (
+                {loading || songResults.length === 0 ? (
                   <Stack height="80%" justifyContent="center" alignItems="center" width={'400'}>
                     <CircularProgress />
                   </Stack>
