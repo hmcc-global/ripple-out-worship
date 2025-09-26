@@ -9,13 +9,14 @@ import {
   IconButton,
 } from '@mui/material';
 import { SongSearchProps } from '../../types/song.types';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { tempoOptions, themeOptions, displayResultOptions } from '../../constants';
 import { ArrowDropDown, Info, Refresh, Tune } from '@mui/icons-material';
 import HeaderWithIcon from '../custom/HeaderWithIcon';
 import { useLocation } from 'react-router-dom';
 
 const SongSearch = (props: SongSearchProps) => {
+  const { setFilterData } = props;
   const [searchString, setSearchString] = useState<string>('');
   const [tempoList, setTempoList] = useState<string[]>([]);
   const [disabledTempo, setDisabledTempo] = useState<string[]>(tempoOptions);
@@ -86,12 +87,8 @@ const SongSearch = (props: SongSearchProps) => {
   //   }
   // }, [Songs]);
 
-  useEffect(() => {
-    updateFilterData();
-  }, [tempoList, themeList, displayResultList]);
-
-  const updateFilterData = () => {
-    props.setFilterData({
+  const updateFilterData = useCallback(() => {
+    setFilterData({
       search: searchString,
       tempo: tempoList,
       themes: themeList,
@@ -105,7 +102,11 @@ const SongSearch = (props: SongSearchProps) => {
         timeSignature: displayResultList.includes('Time'),
       },
     });
-  };
+  }, [searchString, tempoList, themeList, displayResultList, setFilterData]);
+
+  useEffect(() => {
+    updateFilterData();
+  }, [updateFilterData]);
 
   const location = useLocation();
 

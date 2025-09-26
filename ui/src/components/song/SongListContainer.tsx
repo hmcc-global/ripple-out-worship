@@ -117,9 +117,6 @@ const SongListContainer: FC = (): ReactElement => {
 
   // useffect for filter
   useEffect(() => {
-    setSongResults([]);
-    setPage(1);
-
     const shouldQuery =
       filterData &&
       (filterData.search?.trim() ||
@@ -127,6 +124,8 @@ const SongListContainer: FC = (): ReactElement => {
         filterData.tempo);
     if (shouldQuery) {
       const timer = setTimeout(() => {
+        setSongResults([]);
+        setPage(1);
         getSongResults();
       }, 1000);
 
@@ -334,7 +333,7 @@ const SongListContainer: FC = (): ReactElement => {
                   },
                 }}
               >
-                {loading || songResults.length === 0 ? (
+                {loading ? (
                   <Stack height="80%" justifyContent="center" alignItems="center" width={'400'}>
                     <CircularProgress />
                   </Stack>

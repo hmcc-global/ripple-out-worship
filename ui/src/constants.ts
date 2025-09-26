@@ -58,7 +58,6 @@ export const timeSignatureOptions = ['4/4', '3/4', '6/8', '2/4', '2/2', '9/8', '
 export const themeOptions = [
   'Attributes of God',
   'Declaration (Victorious/Kingdom)',
-  'The Cross',
   'Call to Worship',
   'Celebration',
   'Church / Unity',
