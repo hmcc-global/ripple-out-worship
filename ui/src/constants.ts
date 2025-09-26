@@ -138,6 +138,9 @@ export const ChordColors: Record<string, string> = {
 export const DESKTOP_SIDEBAR_WIDTH = '100px';
 export const MOBILE_NAVBAR_HEIGHT = '80px';
 
+export const PUBLIC_SETLIST_HEADER_HEIGHT = '64px';
+export const PUBLIC_SETLIST_FOOTER_HEIGHT = '48px';
+
 export const specificSongsMobileWidth = '600px';
 export const specificSongsTabletWidth = '900px';
 export const specificSongsDesktopWidth = '1340px';
@@ -148,4 +151,4 @@ export const MOBILE_PAGE_HEADER_HEIGHT = '60px';
 export const TABLET_PAGE_HEADER_HEIGHT = '70px';
 export const DESKTOP_PAGE_HEADER_HEIGHT = '80px';
 
-export const MOBILE_ACTION_BUTTONS_HEIGHT = '60px';
+export const MOBILE_ACTION_BUTTONS_HEIGHT = '50px';
