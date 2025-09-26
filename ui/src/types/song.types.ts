@@ -11,7 +11,7 @@ type SongEditorFields = {
   originalKey: string;
   recommendedKeys: Array<string>;
   chordLyrics: string;
-  simplifiedChordLyrics: string;
+  simplifiedChordLyrics?: string;
 };
 
 interface SongEditorProps {
