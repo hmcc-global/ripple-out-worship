@@ -1,7 +1,8 @@
 import React from 'react';
 import { Modal, Stack, Typography, Button, Box } from '@mui/material';
-import { SongSchema, SongSetlistSchema } from '../../types/song.types';
+import { SongSchema } from '../../types/song.types';
 import { getLyricsPreview } from '../../helpers/song';
+import { formWidth, specificSongsMobileWidth } from '../../constants';
 
 interface SongPreviewModalProps {
   open: boolean;
@@ -18,7 +19,8 @@ const SongPreviewModal: React.FC<SongPreviewModalProps> = ({ open, onClose, song
           top: '50%',
           left: '50%',
           transform: 'translate(-50%, -50%)',
-          width: 'fit-content',
+          width: formWidth.xs,
+          maxWidth: specificSongsMobileWidth,
           bgcolor: '#2B2930',
           borderRadius: '10px',
           boxShadow: 2,
