@@ -1,7 +1,7 @@
-import SetlistViewContainerMobile from '../../../components/setlistView/SetlistViewContainerMobile';
+import SetlistViewContainer from '../../../components/setlistView/SetlistViewContainer';
 
 const SetlistPreview = () => {
-  return <SetlistViewContainerMobile preview={true} />;
+  return <SetlistViewContainer isSetlistPreview={true} />;
 };
 
 export default SetlistPreview;

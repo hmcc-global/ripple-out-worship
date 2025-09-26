@@ -24,23 +24,3 @@ p {
   font-weight: 400;
   color: #ffffff;
 }
-
-::-webkit-scrollbar {
-  width: 12px;
-}
-
-::-webkit-scrollbar-track {
-  background: #4F378B; 
-  padding: 2px;
-  border-radius: 10px;
-}
- 
-::-webkit-scrollbar-thumb {
-  background: #C9CDFF; 
-  border-radius: 10px;
-  border: 2.5px solid #4F378B
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #6750A4; 
-}
