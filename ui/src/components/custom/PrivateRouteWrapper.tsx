@@ -18,18 +18,28 @@ interface PrivateRouteProps {
   permissions: string[];
 }
 
-const PageWithNavBar = ({ children }: { children: ReactElement }) => {
+const PageWrapper = ({
+  children,
+  showNavBar = true,
+}: {
+  children: ReactElement;
+  showNavBar?: boolean;
+}) => {
   if (isValidElement(children)) {
     // Render the navbar, sidebar, and the children of the route
     return (
       <>
         <Box component="main" display="flex" width="100%" height="100%" sx={{ flexGrow: 1 }}>
-          <Sidebar />
+          {showNavBar && <Sidebar />}
           <Box
             overflow="auto"
             sx={{
-              height: { xs: `calc(100% - ${MOBILE_NAVBAR_HEIGHT})`, sm: '100%' },
-              width: { xs: '100%', md: `calc(100% - ${DESKTOP_SIDEBAR_WIDTH})` },
+              height: showNavBar
+                ? { xs: `calc(100% - ${MOBILE_NAVBAR_HEIGHT})`, sm: '100%' }
+                : '100%',
+              width: showNavBar
+                ? { xs: '100%', sm: `calc(100% - ${DESKTOP_SIDEBAR_WIDTH})` }
+                : '100%',
             }}
           >
             {cloneElement(children)}
@@ -83,7 +93,7 @@ const PrivateRouteWrapper = ({ children, permissions }: PrivateRouteProps) => {
   }
   // CASE 2: Routes that don't care about auth status (public routes)
   if (isPublic && isAuthenticated) {
-    return <PageWithNavBar children={children} />;
+    return <PageWrapper children={children} showNavBar={false} />;
   }
 
   // CASE 3: Routes that specifically require NO user (exclusive guest routes)
@@ -103,7 +113,7 @@ const PrivateRouteWrapper = ({ children, permissions }: PrivateRouteProps) => {
   // CASE 4: Routes that require any authenticated user
   if (requiresUser) {
     if (isAuthenticated) {
-      return <PageWithNavBar children={children} />;
+      return <PageWrapper children={children} />;
     } else {
       // Redirect to login if not authenticated
       return <Navigate to="/login" state={{ from: location.pathname }} replace />;
@@ -113,7 +123,7 @@ const PrivateRouteWrapper = ({ children, permissions }: PrivateRouteProps) => {
   // CASE 5: Routes that require admin access
   if (requiresAdmin) {
     if (isAuthenticated && isAdmin) {
-      return <PageWithNavBar children={children} />;
+      return <PageWrapper children={children} />;
     } else if (isAuthenticated) {
       // User is logged in but not admin
       return <ErrorPage />;
