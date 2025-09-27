@@ -247,7 +247,7 @@ const SetlistSongsTable: React.FC<SetlistSongsTableProps> = ({
                         open={menuState.anchorEl !== null && menuState.currentSongId === song._id}
                         onClose={handleMenuClose}
                         PaperProps={{
-                          sx: { backgroundColor: 'primary.darker', border: '1px solid #938F99' },
+                          sx: { backgroundColor: 'primary.darker' },
                         }}
                       >
                         <SetlistMenuActionItem

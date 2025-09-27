@@ -13,7 +13,6 @@ import MobileBackButton from '../../navigation/MobileBackButton';
 const ActionButton = styled(Button)(({ theme }) => ({
   borderRadius: '6.25rem',
   color: theme.palette.secondary.main,
-  // borderColor: theme.palette.secondary.main,
   minWidth: 'auto',
   fontWeight: 400,
   flex: 1,
@@ -47,6 +46,7 @@ const MainContainer = styled(Box)(({ theme }) => ({
   flexDirection: 'column',
   gap: '1rem',
   width: '100%',
+  height: '100%',
   [theme.breakpoints.down('sm')]: {
     padding: '1rem',
   },
@@ -54,7 +54,14 @@ const MainContainer = styled(Box)(({ theme }) => ({
     padding: '0',
   },
   containerType: 'inline-size',
+  overflow: 'hidden',
 }));
+
+const ScrollableTableContainer = styled(Box)({
+  flex: 1,
+  overflowY: 'auto',
+  minHeight: 0,
+});
 
 // Types
 interface SnackbarState {
@@ -170,7 +177,9 @@ const SetlistAdminViewContainer: FC = (): ReactElement | null => {
           </ActionButton>
         </ButtonContainer>
 
-        <SetlistSongsTable songList={setlist.songs} readOnly />
+        <ScrollableTableContainer>
+          <SetlistSongsTable songList={setlist.songs} readOnly />
+        </ScrollableTableContainer>
       </MainContainer>
 
       <Snackbar

@@ -1,4 +1,8 @@
-import { DESKTOP_PAGE_HEADER_HEIGHT, MOBILE_PAGE_HEADER_HEIGHT, TABLET_PAGE_HEADER_HEIGHT } from '../../constants';
+import {
+  DESKTOP_PAGE_HEADER_HEIGHT,
+  MOBILE_PAGE_HEADER_HEIGHT,
+  TABLET_PAGE_HEADER_HEIGHT,
+} from '../../constants';
 import { Box, Typography } from '@mui/material';
 
 type PageHeaderProps = {
@@ -16,7 +20,12 @@ const PageHeader = (props: PageHeaderProps) => {
         justifyContent: 'space-between',
         alignItems: 'center',
         width: '100%',
-        height: { xs: MOBILE_PAGE_HEADER_HEIGHT, sm: TABLET_PAGE_HEADER_HEIGHT, lg: DESKTOP_PAGE_HEADER_HEIGHT },
+        height: {
+          xs: MOBILE_PAGE_HEADER_HEIGHT,
+          sm: TABLET_PAGE_HEADER_HEIGHT,
+          lg: DESKTOP_PAGE_HEADER_HEIGHT,
+        },
+        paddingBottom: '10px'
       }}
     >
       <Box

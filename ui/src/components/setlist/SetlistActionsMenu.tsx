@@ -37,7 +37,7 @@ interface SetlistActionsMenuProps {
 const DIALOG_STYLES = {
   paper: {
     width: '30rem',
-    height: '30rem',
+    height: '70vh',
     borderRadius: '1.75rem',
     padding: '0.5rem',
   },
@@ -45,21 +45,12 @@ const DIALOG_STYLES = {
     alignSelf: 'center',
     width: '90%',
     px: '1.25rem',
-    py: '0.75rem',
+    py: '0.5rem',
     color: 'secondary.light',
     backgroundColor: 'secondary.lighter',
     borderRadius: '1.75rem',
     fontWeight: 400,
     fontSize: '1rem',
-  },
-};
-
-const MENU_STYLES = {
-  paper: {
-    color: '#E6E0E9',
-    border: '1px solid #938F99',
-    borderRadius: '8px',
-    boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.3)',
   },
 };
 
@@ -139,9 +130,9 @@ const useSetlistActions = (
 
 const useFolderManagement = (
   setlist: Setlist,
-  ownedFolders: SetlistFolder[],
   handleSnackbarOpen: (message: string) => void,
-  onFolderAssignmentChanged?: (type?: 'folders' | 'setlists' | 'all') => Promise<void>
+  onFolderAssignmentChanged?: (type?: 'folders' | 'setlists' | 'all') => Promise<void>,
+  refetchFolders?: () => Promise<void>
 ) => {
   const [updatedFolderIds, setUpdatedFolderIds] = useState<string[]>([]);
   const [originalFolderIds, setOriginalFolderIds] = useState<string[]>([]);
@@ -171,23 +162,27 @@ const useFolderManagement = (
       const foldersToAdd = updatedFolderIds.filter((id) => !originalFolderIds.includes(id));
       const foldersToRemove = originalFolderIds.filter((id) => !updatedFolderIds.includes(id));
 
+      const { data: freshFolders } = await axios.get<SetlistFolder[]>('/api/groups/get');
+
       // Update folder setlist references
       const updatePromises = [
         ...foldersToAdd.map((folderId) => {
-          const folder = ownedFolders.find((f) => f._id === folderId);
+          const folder = freshFolders.find((f) => f._id === folderId);
           return folder
             ? axios.put('/api/groups/update', {
                 id: folderId,
-                setlistIds: [...(folder.setlistIds || []), setlist._id],
+                setlistIds: Array.from(new Set([...(folder.setlistIds || []), setlist._id])),
               })
             : Promise.resolve();
         }),
         ...foldersToRemove.map((folderId) => {
-          const folder = ownedFolders.find((f) => f._id === folderId);
+          const folder = freshFolders.find((f) => f._id === folderId);
           return folder
             ? axios.put('/api/groups/update', {
                 id: folderId,
-                setlistIds: (folder.setlistIds || []).filter((id) => id !== setlist._id),
+                setlistIds: Array.from(
+                  new Set((folder.setlistIds || []).filter((id) => id !== setlist._id))
+                ),
               })
             : Promise.resolve();
         }),
@@ -199,6 +194,10 @@ const useFolderManagement = (
       if (allSuccessful) {
         handleSnackbarOpen('Folder assignments updated successfully');
         setOriginalFolderIds(updatedFolderIds);
+        // Refetch folders to get updated data
+        if (refetchFolders) {
+          await refetchFolders();
+        }
         // Trigger parent refresh
         if (onFolderAssignmentChanged) {
           await onFolderAssignmentChanged('all');
@@ -217,9 +216,9 @@ const useFolderManagement = (
     setlist._id,
     updatedFolderIds,
     originalFolderIds,
-    ownedFolders,
     handleSnackbarOpen,
     onFolderAssignmentChanged,
+    refetchFolders,
   ]);
 
   const resetFolderChanges = useCallback(() => {
@@ -314,7 +313,17 @@ const FolderActionsDialog: FC<{
   onToggleFolder: (folderId: string) => void;
   onSave: () => Promise<boolean>;
   onReset: () => void;
-}> = ({ open, onClose, folders, updatedFolderIds, onToggleFolder, onSave, onReset }) => {
+  setlistName: string;
+}> = ({
+  open,
+  onClose,
+  folders,
+  updatedFolderIds,
+  onToggleFolder,
+  onSave,
+  onReset,
+  setlistName,
+}) => {
   const [searchString, setSearchString] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
@@ -350,8 +359,8 @@ const FolderActionsDialog: FC<{
       >
         <HeaderWithIcon
           Icon={Folder}
-          headerText="Folder Actions"
-          headerVariant="h3"
+          headerText={`Folder Actions for ${setlistName}`}
+          headerVariant="h4"
           iconColor="secondary.main"
         />
         <IconButton onClick={handleClose} sx={{ color: 'grey.500' }}>
@@ -411,14 +420,14 @@ const SetlistActionsMenu: FC<SetlistActionsMenuProps> = ({
   onFolderAssignmentChanged,
 }) => {
   const ownership = useOwnership();
-  const { ownedFolders } = useFolders(ownership, handleSnackbarOpen);
+  const { ownedFolders, refetchFolders } = useFolders(ownership, handleSnackbarOpen);
   const { handleEdit, handleCopyLink, handleDelete } = useSetlistActions(
     setlist,
     handleSnackbarOpen,
     onSetlistDeleted
   );
   const { updatedFolderIds, toggleFolder, saveFolderChanges, resetFolderChanges } =
-    useFolderManagement(setlist, ownedFolders, handleSnackbarOpen, onFolderAssignmentChanged);
+    useFolderManagement(setlist, handleSnackbarOpen, onFolderAssignmentChanged, refetchFolders);
 
   // Dialog states
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -458,7 +467,6 @@ const SetlistActionsMenu: FC<SetlistActionsMenuProps> = ({
         open={open}
         onClose={onClose}
         MenuListProps={{ 'aria-labelledby': `setlist-menu-button-${setlist._id}` }}
-        PaperProps={{ sx: MENU_STYLES.paper }}
       >
         <SetlistMenuActionItem icon={Edit} text="Edit Setlist" onClick={handleEditClick} />
         <SetlistMenuActionItem icon={LinkRounded} text="Copy Link" onClick={handleCopyLinkClick} />
@@ -495,6 +503,7 @@ const SetlistActionsMenu: FC<SetlistActionsMenuProps> = ({
         onToggleFolder={toggleFolder}
         onSave={saveFolderChanges}
         onReset={resetFolderChanges}
+        setlistName={setlist.name}
       />
     </>
   );

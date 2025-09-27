@@ -322,7 +322,7 @@ const FolderHeader: React.FC<{
   onDrawerOpen: () => void;
 }> = ({ folder, onDrawerOpen }) => (
   <HeaderContainer>
-    <MobileBackButton />
+    <MobileBackButton path="/setlist" />
     <ListItemButton sx={{ width: '100%' }} disableRipple disableTouchRipple>
       <ListItemIcon sx={{ minWidth: '40px', mr: '0.5rem' }}>
         <Folder sx={STYLES.listItemIcon} />

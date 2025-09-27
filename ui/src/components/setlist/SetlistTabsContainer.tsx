@@ -31,12 +31,6 @@ import { Setlist, SetlistFolder } from '../../types/setlist.types';
 import SetlistFolderDrawer from './SetlistFolderDrawer';
 import SetlistActionsMenu from './SetlistActionsMenu';
 import { useOwnership } from '../../helpers/customHooks';
-import {
-  DESKTOP_PAGE_HEADER_HEIGHT,
-  MOBILE_PAGE_HEADER_HEIGHT,
-  MOBILE_NAVBAR_HEIGHT,
-  TABLET_PAGE_HEADER_HEIGHT,
-} from '../../constants';
 
 // Constants and Utility Functions
 const SELECTED_ITEM_STYLE = {
@@ -77,6 +71,10 @@ const LIST_ITEM_TEXT_STYLE = {
 };
 
 const LIST_ITEM_ICON_STYLE = { color: 'secondary.main', fontSize: '1.75rem' };
+const SMALL_LIST_ITEM_ICON_STYLE = {
+  fontSize: '1.125rem',
+  color: 'secondary.main',
+};
 
 const formatDate = (dateString: string): string => {
   return new Date(dateString).toISOString().split('T')[0];
@@ -90,6 +88,13 @@ interface TabPanelProps {
 }
 
 interface SetlistTabsContainerProps {}
+
+interface CollapsibleGroupProps {
+  title: string;
+  open: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+}
 
 // Helper Components
 const SetlistTabPanel: FC<TabPanelProps> = ({ children, value, index, ...other }) => {
@@ -135,8 +140,36 @@ const SearchTextField = ({
       }}
       value={searchTerm}
       onChange={(e) => setSearchTerm(e.target.value)}
-      autoFocus
     />
+  );
+};
+
+const CollapsibleGroup: FC<CollapsibleGroupProps> = ({ title, open, onToggle, children }) => {
+  return (
+    <>
+      <ListItemButton
+        onClick={onToggle}
+        sx={{ borderBottom: '1px solid #49454F', background: '#211F26', py: '2px' }}
+      >
+        <ListItemText
+          primary={title}
+          sx={{
+            fontSize: '0.75rem',
+            fontWeight: 500,
+          }}
+        />
+        {open ? (
+          <ExpandLess sx={SMALL_LIST_ITEM_ICON_STYLE} />
+        ) : (
+          <ExpandMore sx={SMALL_LIST_ITEM_ICON_STYLE} />
+        )}
+      </ListItemButton>
+      <Collapse in={open} timeout="auto" unmountOnExit>
+        <List component="div" disablePadding>
+          {children}
+        </List>
+      </Collapse>
+    </>
   );
 };
 
@@ -154,10 +187,15 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
   const [tab, setTab] = useState(0);
   const [allSetlists, setAllSetlists] = useState<Setlist[]>([]);
   const [ownedSetlists, setOwnedSetlists] = useState<Setlist[]>([]);
+  const [sharedSetlists, setSharedSetlists] = useState<Setlist[]>([]);
   const [ownedFolders, setOwnedFolders] = useState<SetlistFolder[]>([]);
   const [filteredSetlists, setFilteredSetlists] = useState<Setlist[]>([]);
+  const [filteredPersonalSetlists, setFilteredPersonalSetlists] = useState<Setlist[]>([]);
+  const [filteredSharedSetlists, setFilteredSharedSetlists] = useState<Setlist[]>([]);
   const [filteredFolders, setFilteredFolders] = useState<SetlistFolder[]>([]);
   const [openFolders, setOpenFolders] = useState<string[]>([]);
+  const [openPersonalSetlists, setOpenPersonalSetlists] = useState(true);
+  const [openSharedSetlists, setOpenSharedSetlists] = useState(true);
   const [selectedSetlistId, setSelectedSetlistId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
 
@@ -181,19 +219,37 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
     setSnackbar({ open: true, message });
   }, []);
 
+  const handleSearch = useCallback(
+    (term: string) => {
+      const lowercasedSearchTerm = term.toLowerCase();
+      const newFilteredFolders = ownedFolders.filter((folder) => {
+        const folderSetlists = allSetlists.filter((s) => folder.setlistIds.includes(s._id));
+
+        return (
+          folder.groupName.toLowerCase().includes(lowercasedSearchTerm) ||
+          folderSetlists.some((setlist) =>
+            setlist.name.toLowerCase().includes(lowercasedSearchTerm)
+          )
+        );
+      });
+      const newFilteredPersonal = ownedSetlists.filter((setlist) =>
+        setlist.name.toLowerCase().includes(lowercasedSearchTerm)
+      );
+      const newFilteredShared = sharedSetlists.filter((setlist) =>
+        setlist.name.toLowerCase().includes(lowercasedSearchTerm)
+      );
+      const newFilteredSetlists = [...newFilteredPersonal, ...newFilteredShared];
+      setFilteredPersonalSetlists(newFilteredPersonal);
+      setFilteredSharedSetlists(newFilteredShared);
+      setFilteredSetlists(newFilteredSetlists);
+      setFilteredFolders(newFilteredFolders);
+    },
+    [ownedFolders, ownedSetlists, sharedSetlists]
+  );
+
   useEffect(() => {
-    if (searchTerm && searchTerm.length > 2) {
-      setFilteredSetlists(
-        ownedSetlists.filter((setlist) => setlist.name.toLowerCase().includes(searchTerm))
-      );
-      setFilteredFolders(
-        ownedFolders.filter((folder) => folder.groupName.toLowerCase().includes(searchTerm))
-      );
-    } else {
-      setFilteredSetlists(ownedSetlists);
-      setFilteredFolders(ownedFolders);
-    }
-  }, [ownedFolders, ownedSetlists, searchTerm]);
+    handleSearch(searchTerm);
+  }, [searchTerm, handleSearch]);
 
   // Data Fetching
   const getSetlistsAndFolders = useCallback(async () => {
@@ -230,7 +286,11 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
       const folderSetlists = setlistRes.data.filter((setlist) =>
         foldersSetlistIds.includes(setlist._id)
       );
-      setAllSetlists([...ownedSetlists, ...folderSetlists]);
+      const shared = folderSetlists.filter(
+        (setlist) => !ownedSetlists.some((owned) => owned._id === setlist._id)
+      );
+      setSharedSetlists(shared);
+      setAllSetlists([...ownedSetlists, ...shared]);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'An unexpected error occurred';
       handleSnackbarOpen(`Error fetching data: ${message}`);
@@ -264,13 +324,19 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
   const [menuState, setMenuState] = useState({
     anchorEl: null as HTMLElement | null,
     currentSetlistId: null as string | null,
+    currentFolderId: null as string | null,
   });
 
-  const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>, setlistId: string) => {
+  const handleMenuOpen = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    setlistId: string,
+    folderId: string
+  ) => {
     event.stopPropagation();
     setMenuState({
       anchorEl: event.currentTarget,
       currentSetlistId: setlistId,
+      currentFolderId: folderId,
     });
   };
 
@@ -278,6 +344,7 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
     setMenuState({
       anchorEl: null,
       currentSetlistId: null,
+      currentFolderId: null,
     });
   };
 
@@ -313,7 +380,11 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
             const folderSetlists = setlistRes.data.filter((setlist) =>
               foldersSetlistIds.includes(setlist._id)
             );
-            setAllSetlists([...ownedSetlists, ...folderSetlists]);
+            const shared = folderSetlists.filter(
+              (setlist) => !ownedSetlists.some((owned) => owned._id === setlist._id)
+            );
+            setSharedSetlists(shared);
+            setAllSetlists([...ownedSetlists, ...shared]);
           }
         }
       } catch (error) {
@@ -330,47 +401,63 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
     if (!setlist) return null;
 
     return (
-      <ListItemButton
-        sx={{
-          pl: 6,
-          ...(selectedSetlistId === setlistId && selectedFolderId === folderId
-            ? SELECTED_ITEM_STYLE
-            : { borderBottom: '1px solid #49454F' }),
-        }}
-        key={setlistId}
-        onClick={() => {
-          setSelectedFolderId(folderId);
-          handleSelectSetlist(setlistId);
-        }}
-      >
-        <ListItemIcon sx={{ minWidth: '40px', mr: '0.5rem' }}>
-          <QueueMusic sx={LIST_ITEM_ICON_STYLE} />
-        </ListItemIcon>
-        <ListItemText
-          primary={setlist.name}
-          secondary={formatDate(setlist.date.toString())}
-          sx={LIST_ITEM_TEXT_STYLE}
-        />
-        <IconButton
-          onClick={(e) => {
-            e.stopPropagation();
-            handleMenuOpen(e, setlist._id);
+      <>
+        <ListItemButton
+          sx={{
+            pl: 6,
+            ...(selectedSetlistId === setlistId && selectedFolderId === folderId
+              ? SELECTED_ITEM_STYLE
+              : { borderBottom: '1px solid #49454F' }),
           }}
-          aria-controls={`setlist-menu-${setlist._id}`}
-          aria-haspopup="true"
-          aria-label={`Open menu for setlist ${setlist.name}`}
+          key={setlistId}
+          onClick={() => {
+            setSelectedFolderId(folderId);
+            handleSelectSetlist(setlistId);
+          }}
         >
-          <MoreVertRounded
-            sx={{
-              color:
-                selectedSetlistId === setlist._id && selectedFolderId === ''
-                  ? 'secondary.main'
-                  : '#4A4458',
-              fontSize: '1.75rem',
-            }}
+          <ListItemIcon sx={{ minWidth: '40px', mr: '0.5rem' }}>
+            <QueueMusic sx={LIST_ITEM_ICON_STYLE} />
+          </ListItemIcon>
+          <ListItemText
+            primary={setlist.name}
+            secondary={formatDate(setlist.date.toString())}
+            sx={LIST_ITEM_TEXT_STYLE}
           />
-        </IconButton>
-      </ListItemButton>
+          <IconButton
+            onClick={(e) => {
+              e.stopPropagation();
+              handleMenuOpen(e, setlistId, folderId);
+            }}
+            aria-controls={`setlist-menu-${setlistId}`}
+            aria-haspopup="true"
+            aria-label={`Open menu for setlist ${setlist.name}`}
+          >
+            <MoreVertRounded
+              sx={{
+                color: '#4A4458',
+                fontSize: '1.75rem',
+              }}
+            />
+          </IconButton>
+        </ListItemButton>
+        <SetlistActionsMenu
+          anchorEl={menuState.anchorEl}
+          open={
+            menuState.anchorEl !== null &&
+            menuState.currentSetlistId === setlistId &&
+            menuState.currentFolderId === folderId
+          }
+          onClose={handleMenuClose}
+          setlist={setlist}
+          handleSnackbarOpen={handleSnackbarOpen}
+          onSetlistDeleted={(setlistId) => {
+            // Remove from local state immediately
+            setOwnedSetlists((prev) => prev.filter((s) => s._id !== setlistId));
+            setAllSetlists((prev) => prev.filter((s) => s._id !== setlistId));
+          }}
+          onFolderAssignmentChanged={handleDataRefresh}
+        />
+      </>
     );
   };
 
@@ -455,7 +542,7 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
           <IconButton
             onClick={(e) => {
               e.stopPropagation();
-              handleMenuOpen(e, setlist._id);
+              handleMenuOpen(e, setlist._id, '');
             }}
             aria-controls={`setlist-menu-${setlist._id}`}
             aria-haspopup="true"
@@ -463,10 +550,7 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
           >
             <MoreVertRounded
               sx={{
-                color:
-                  selectedSetlistId === setlist._id && selectedFolderId === ''
-                    ? 'secondary.main'
-                    : '#4A4458',
+                color: '#4A4458',
                 fontSize: '1.75rem',
               }}
             />
@@ -497,6 +581,30 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
     </ListItem>
   );
 
+  const renderPersonalGroup = () => (
+    <CollapsibleGroup
+      title="Personal Setlists"
+      open={openPersonalSetlists}
+      onToggle={() => setOpenPersonalSetlists(!openPersonalSetlists)}
+    >
+      {filteredPersonalSetlists && filteredPersonalSetlists.length > 0
+        ? filteredPersonalSetlists.map(renderSetlistItem)
+        : renderEmptyState('No Personal Setlists Found')}
+    </CollapsibleGroup>
+  );
+
+  const renderSharedGroup = () => (
+    <CollapsibleGroup
+      title="Shared Setlists"
+      open={openSharedSetlists}
+      onToggle={() => setOpenSharedSetlists(!openSharedSetlists)}
+    >
+      {filteredSharedSetlists && filteredSharedSetlists.length > 0
+        ? filteredSharedSetlists.map(renderSetlistItem)
+        : renderEmptyState('No Shared Setlists Found')}
+    </CollapsibleGroup>
+  );
+
   // handle folder detail drawer
   const [openDrawer, setOpenDrawer] = useState<boolean>(false);
   const [selectedFolderId, setSelectedFolderId] = useState<string>('');
@@ -511,17 +619,7 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
 
   // Main Render
   return (
-    <Box
-      display="flex"
-      flex={1}
-      flexDirection={'column'}
-      maxHeight={{
-        xs: `calc(100vh - ${MOBILE_PAGE_HEADER_HEIGHT} - 2.25rem - ${MOBILE_NAVBAR_HEIGHT})`,
-        sm: `calc(100vh - ${TABLET_PAGE_HEADER_HEIGHT} - 2.25rem)`,
-        lg: `calc(100vh - ${DESKTOP_PAGE_HEADER_HEIGHT} - 2.25rem)`,
-      }}
-      sx={{ overflow: 'hidden' }}
-    >
+    <Box display="flex" flex={1} flexDirection={'column'} sx={{ overflow: 'hidden' }}>
       <Tabs
         selectionFollowsFocus
         variant="fullWidth"
@@ -538,12 +636,11 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
       <Divider sx={{ borderColor: '#49454F' }} />
 
       <SearchTextField searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-      {/* All Tab */}
       <Box sx={{ overflowY: 'auto', flex: 1 }}>
+        {/* All Tab */}
         <SetlistTabPanel value={tab} index={0}>
           <List>
-            {(filteredSetlists && filteredSetlists.length > 0) ||
-            (filteredFolders && filteredFolders.length > 0) ? (
+            {filteredFolders.length > 0 || filteredSetlists.length > 0 ? (
               <>
                 {filteredFolders.map(renderFolderItem)}
                 {filteredSetlists.map(renderSetlistItem)}
@@ -566,9 +663,10 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
         {/* Setlists Tab */}
         <SetlistTabPanel value={tab} index={2}>
           <List>
-            {filteredSetlists && filteredSetlists.length > 0
-              ? filteredSetlists.map(renderSetlistItem)
-              : renderEmptyState('No Personal Setlists Found')}
+            {/* Personal Setlists */}
+            {renderPersonalGroup()}
+            {/* Shared Setlists */}
+            {renderSharedGroup()}
           </List>
         </SetlistTabPanel>
       </Box>
