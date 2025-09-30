@@ -3,6 +3,7 @@ import { SongViewSchema } from '../../types/song.types';
 import { flatMusicKeysOptions, sharpMusicKeysOptions, ChordColors } from '../../constants';
 import { ReactNode, useCallback, useEffect, useState } from 'react';
 import { specificSongsMobileWidth } from '../../constants';
+import { isChordLyricsBlockEmpty } from '../../helpers/global';
 
 interface SongsLyricsProps {
   chordStatus: boolean;
@@ -154,7 +155,8 @@ const SongsLyrics = ({ chordStatus, changeKey, song, split, useFlat }: SongsLyri
 
                     const textLyrics = lyric.slice(endChord + 1);
                     const chipColor = getColor(transpossedChord);
-                    return (
+
+                    return chordStatus || textLyrics.trim() ? (
                       <Box key={i}>
                         {chordStatus ? (
                           <Chip
@@ -188,7 +190,7 @@ const SongsLyrics = ({ chordStatus, changeKey, song, split, useFlat }: SongsLyri
                           {textLyrics}
                         </Typography>
                       </Box>
-                    );
+                    ) : null;
                   } else {
                     return (
                       <Box key={i}>
@@ -230,8 +232,13 @@ const SongsLyrics = ({ chordStatus, changeKey, song, split, useFlat }: SongsLyri
         if (inputSong[i].includes(seperator)) {
           if (i !== 0) {
             const parsedGroup = parseLyrics(song, currentGroup);
-            result.push(parsedGroup);
-            currentGroup = [inputSong[i]];
+            if (isChordLyricsBlockEmpty(currentGroup.join('\n'))) {
+              currentGroup.push(inputSong[i]);
+              continue;
+            } else {
+              result.push(parsedGroup);
+              currentGroup = [inputSong[i]];
+            }
           }
         }
       }
