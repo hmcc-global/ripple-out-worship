@@ -13,13 +13,14 @@ const SongDeleteDialog = ({ open, onClose, songId }: Props) => {
   const navigate = useNavigate();
 
   const handleDelete = async () => {
+    // TODO: add snackbar messages
     try {
       await axios.put('/api/songs/delete', { id: songId });
+      onClose();
+      navigate('/song');
     } catch (error) {
       console.log(error);
     }
-    onClose();
-    navigate('/song');
   };
 
   return (
