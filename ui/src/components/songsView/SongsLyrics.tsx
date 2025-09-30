@@ -256,17 +256,37 @@ const SongsLyrics = ({ chordStatus, changeKey, song, split, useFlat }: SongsLyri
     const res = groupLyricsToParagraphs(song);
     setFinalLyrics(res);
   }, [parseLyrics, song, groupLyricsToParagraphs]);
+
   return (
     <>
       <Grid container width={'100%'} spacing={2} marginTop={1} marginBottom={0}>
-        {finalLyrics &&
-          finalLyrics.map((chunk, i) => {
-            return (
-              <Grid item xs={12 / noSplit} key={i}>
-                {chunk}
-              </Grid>
-            );
-          })}
+        {Array.from({ length: noSplit }, (_, columnIndex) => {
+          const totalChunks = finalLyrics?.length || 0;
+          const baseChunksPerColumn = Math.floor(totalChunks / noSplit);
+          const extraChunks = totalChunks % noSplit;
+
+          const chunksInThisColumn =
+            columnIndex < extraChunks ? baseChunksPerColumn + 1 : baseChunksPerColumn;
+
+          const startIndex =
+            columnIndex < extraChunks
+              ? columnIndex * (baseChunksPerColumn + 1)
+              : extraChunks * (baseChunksPerColumn + 1) +
+                (columnIndex - extraChunks) * baseChunksPerColumn;
+
+          const endIndex = startIndex + chunksInThisColumn;
+
+          return (
+            <Grid item xs={12 / noSplit} key={columnIndex}>
+              <Stack spacing={2}>
+                {finalLyrics &&
+                  finalLyrics
+                    .slice(startIndex, endIndex)
+                    .map((chunk, i) => <Box key={startIndex + i}>{chunk}</Box>)}
+              </Stack>
+            </Grid>
+          );
+        })}
       </Grid>
     </>
   );
