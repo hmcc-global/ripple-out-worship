@@ -86,7 +86,11 @@ const searchSongs: RequestHandler = async (req: Request, res: Response): Promise
       query.themes = { $in: themesArray };
     }
     const skip = (parsedPage - 1) * parsedLimit;
-    const data: SongDocument[] = await Song.find(query).skip(skip).limit(parsedLimit).exec();
+    const data: SongDocument[] = await Song.find(query)
+      .sort({ title: 1 })
+      .skip(skip)
+      .limit(parsedLimit)
+      .exec();
     const totalCount = await Song.countDocuments(query).exec();
     res.status(200).json({
       data,
