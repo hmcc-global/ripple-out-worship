@@ -234,7 +234,7 @@ const SongEditorContainer: FC<SongEditorProps> = () => {
               border: 1,
               px: 2,
             }}
-            onClick={() => navigate('/song')}
+            onClick={() => navigate(action === 'edit' ? `/song/${songId}` : '/song')}
           >
             Cancel
           </Button>
