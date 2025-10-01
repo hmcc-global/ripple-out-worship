@@ -48,6 +48,7 @@ interface SnackbarState {
   open: boolean;
   message: string;
   severity: 'success' | 'error' | 'warning' | 'info';
+  showRefreshButton?: boolean;
 }
 
 // Component
@@ -84,6 +85,7 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
     open: false,
     message: '',
     severity: 'success',
+    showRefreshButton: false,
   });
   // Add People Function
   const [searchString, setSearchString] = useState('');
@@ -103,11 +105,16 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
 
   // Helper function to show snackbar messages
   const showSnackbar = useCallback(
-    (message: string, severity: 'success' | 'error' | 'warning' | 'info' = 'success') => {
+    (
+      message: string,
+      severity: 'success' | 'error' | 'warning' | 'info' = 'success',
+      showRefreshButton: boolean = false
+    ) => {
       setSnackbar({
         open: true,
         message,
         severity,
+        showRefreshButton,
       });
     },
     []
@@ -191,7 +198,11 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
 
         // Show specific message based on action
         if (mode === 'create') {
-          showSnackbar(`Folder "${folderName}" created successfully!`);
+          showSnackbar(
+            `Folder "${folderName}" created successfully! Refresh to see changes `,
+            'success',
+            true
+          );
         } else {
           showSnackbar(`Folder "${folderName}" updated successfully!`);
         }
@@ -349,6 +360,10 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
     setSnackbar((prev) => ({ ...prev, open: false }));
   }, []);
 
+  const handleRefreshPage = useCallback(() => {
+    window.location.reload();
+  }, []);
+
   // Effects
   useEffect(() => {
     fetchFolderDetails();
@@ -457,7 +472,29 @@ const SetlistFolderDrawer = (props: SetlistFolderDrawerProps) => {
         TransitionComponent={Fade}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
-        <Alert severity={snackbar.severity} onClose={handleCloseSnackbar}>
+        <Alert
+          severity={snackbar.severity}
+          onClose={handleCloseSnackbar}
+          action={
+            snackbar.showRefreshButton ? (
+              <Typography
+                component="span"
+                sx={{
+                  color: 'inherit',
+                  textDecoration: 'underline',
+                  cursor: 'pointer',
+                  fontSize: '0.875rem',
+                  '&:hover': {
+                    textDecoration: 'none',
+                  },
+                }}
+                onClick={handleRefreshPage}
+              >
+                Refresh page
+              </Typography>
+            ) : null
+          }
+        >
           <AlertTitle>
             {snackbar.severity === 'success'
               ? 'Success'
