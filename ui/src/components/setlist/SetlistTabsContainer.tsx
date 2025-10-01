@@ -183,17 +183,17 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
 
   useEffect(() => {
     if (searchTerm && searchTerm.length > 2) {
-      setFilteredSetlists(ownedSetlists.filter((setlist) => 
-        setlist.name.toLowerCase().includes(searchTerm)
-      ))
-      setFilteredFolders(ownedFolders.filter((folder) => 
-        folder.groupName.toLowerCase().includes(searchTerm)
-      ))
+      setFilteredSetlists(
+        ownedSetlists.filter((setlist) => setlist.name.toLowerCase().includes(searchTerm))
+      );
+      setFilteredFolders(
+        ownedFolders.filter((folder) => folder.groupName.toLowerCase().includes(searchTerm))
+      );
     } else {
       setFilteredSetlists(ownedSetlists);
       setFilteredFolders(ownedFolders);
     }
-  },[ownedFolders, ownedSetlists, searchTerm])
+  }, [ownedFolders, ownedSetlists, searchTerm]);
 
   // Data Fetching
   const getSetlistsAndFolders = useCallback(async () => {
@@ -226,7 +226,6 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
         (setlist) => ownership.setlistIds?.some(({ id }) => id === setlist._id)
       );
       setOwnedSetlists(ownedSetlists);
-      console.log(ownedSetlists);
       // Get folder setlists and combine with owned setlists
       const folderSetlists = setlistRes.data.filter((setlist) =>
         foldersSetlistIds.includes(setlist._id)
@@ -352,6 +351,25 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
           secondary={formatDate(setlist.date.toString())}
           sx={LIST_ITEM_TEXT_STYLE}
         />
+        <IconButton
+          onClick={(e) => {
+            e.stopPropagation();
+            handleMenuOpen(e, setlist._id);
+          }}
+          aria-controls={`setlist-menu-${setlist._id}`}
+          aria-haspopup="true"
+          aria-label={`Open menu for setlist ${setlist.name}`}
+        >
+          <MoreVertRounded
+            sx={{
+              color:
+                selectedSetlistId === setlist._id && selectedFolderId === ''
+                  ? 'secondary.main'
+                  : '#4A4458',
+              fontSize: '1.75rem',
+            }}
+          />
+        </IconButton>
       </ListItemButton>
     );
   };
