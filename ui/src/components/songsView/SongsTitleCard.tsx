@@ -1,4 +1,4 @@
-import { Container, Box, Typography, IconButton, useMediaQuery } from '@mui/material';
+import { Container, Box, Typography, IconButton, useMediaQuery, Stack } from '@mui/material';
 import React, { useState } from 'react';
 import { SongViewSchema } from '../../types/song.types';
 import InfoIcon from '@mui/icons-material/Info';
@@ -8,9 +8,10 @@ import SongInfoPopover from './SongInfoPopover';
 
 type SongTitleCardProps = {
   song: SongViewSchema | undefined;
+  isSetlistView?: boolean;
 };
 
-const SongsTitleCard = ({ song }: SongTitleCardProps) => {
+const SongsTitleCard = ({ song, isSetlistView = false }: SongTitleCardProps) => {
   const isMobile = useMediaQuery(`(max-width:${specificSongsTabletWidth})`);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [showMobileInfo, setShowMobileInfo] = useState(false);
@@ -34,10 +35,20 @@ const SongsTitleCard = ({ song }: SongTitleCardProps) => {
   const popoverOpen = Boolean(anchorEl) && !isMobile;
 
   return (
-    <Container>
-      <Box sx={{ minWidth: 150 }}>
+    <Container disableGutters={isSetlistView} maxWidth={false}>
+      <Stack
+        flexDirection={'column'}
+        alignItems={'flex-start'}
+        justifyContent={'center'}
+        sx={{ minWidth: '100%', width: '100%' }}
+      >
         <Box display="flex" alignItems="center">
-          <Typography variant="h2" fontSize={{ sm: '24px', md: '34px' }}>
+          <Typography
+            variant="h2"
+            fontSize={
+              isSetlistView ? { xs: '1.25rem', lg: '1.375rem' } : { sm: '24px', md: '34px' }
+            }
+          >
             {song?.title}
           </Typography>
           <IconButton
@@ -65,17 +76,18 @@ const SongsTitleCard = ({ song }: SongTitleCardProps) => {
               song={song}
               open={showMobileInfo}
               onClose={() => setShowMobileInfo(false)}
+              isSetlistView={isSetlistView}
             />
           )}
         </Box>
         <Typography
           variant="subtitle2"
           color="primary.lightest"
-          fontSize={{ sm: '14px', md: '26px' }}
+          fontSize={isSetlistView ? { xs: '0.75rem', lg: '0.875rem' } : { sm: '14px', md: '26px' }}
         >
           {song?.artist}
         </Typography>
-      </Box>
+      </Stack>
     </Container>
   );
 };
