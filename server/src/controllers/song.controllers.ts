@@ -63,7 +63,7 @@ const getSong: RequestHandler = async (req: Request, res: Response): Promise<voi
   }
 };
 const searchSongs: RequestHandler = async (req: Request, res: Response): Promise<void> => {
-  const { keyword, code, tempo, themes, page = 1, limit = 20 } = req.query;
+  const { keyword, code, tempo, themes, sortBy, page = 1, limit = 20 } = req.query;
 
   const tempoArray = Array.isArray(tempo) ? tempo : [tempo].filter(Boolean);
   const themesArray = Array.isArray(themes) ? themes : [themes].filter(Boolean);
@@ -93,9 +93,18 @@ const searchSongs: RequestHandler = async (req: Request, res: Response): Promise
     if (themesArray.length > 0) {
       query.themes = { $in: themesArray };
     }
+
+    // Handle sorting
+    let sortOptions = {};
+    if (sortBy === 'code') {
+      sortOptions = { code: 1 };
+    } else {
+      sortOptions = { title: 1 };
+    }
+
     const skip = (parsedPage - 1) * parsedLimit;
     const data: SongDocument[] = await Song.find(query)
-      .sort({ title: 1 })
+      .sort(sortOptions)
       .skip(skip)
       .limit(parsedLimit)
       .exec();

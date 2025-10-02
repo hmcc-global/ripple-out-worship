@@ -116,10 +116,13 @@ const SongEditorContainer: FC<SongEditorProps> = () => {
     const payload = await axios.get('/api/songs/search', {
       params: {
         code: songLetter,
+        sortBy: 'code',
       },
     });
     const songs: SongSchema[] = payload.data.data;
-    const songIndex = songs.length > 0 ? songs.length + 1 : 1;
+    const songIndex = songs.reverse()[0]?.code
+      ? parseInt(songs.reverse()[0].code.replace(songLetter, '')) + 1
+      : 1;
 
     try {
       let payload;
