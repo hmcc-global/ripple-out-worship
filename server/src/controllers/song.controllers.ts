@@ -167,7 +167,7 @@ const updateSong: RequestHandler = async (req: Request, res: Response): Promise<
 };
 
 const deleteSong: RequestHandler = async (req: Request, res: Response): Promise<void> => {
-  const { id: songId } = req.query;
+  const { id: songId } = req.body;
 
   if (songId) {
     try {

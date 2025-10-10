@@ -1,4 +1,5 @@
 import { FC, useCallback, useEffect, useState } from 'react';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { customAxios as axios } from '../custom/customAxios';
 import { SongEditorFields, SongEditorProps, SongSchema } from '../../types/song.types';
@@ -26,6 +27,7 @@ import {
   Fade,
   Chip,
   Autocomplete,
+  Divider,
 } from '@mui/material';
 
 // ICONS
@@ -37,6 +39,7 @@ import { MusicNote } from '@mui/icons-material';
 import PageHeader from '../navigation/PageHeader';
 import HeaderWithIcon from '../custom/HeaderWithIcon';
 import { findFirstLetterLyrics } from '../../helpers/global';
+import SongDeleteDialog from './SongDeleteDialog';
 
 const SongEditorContainer: FC<SongEditorProps> = () => {
   // hook to detect the window size
@@ -46,6 +49,7 @@ const SongEditorContainer: FC<SongEditorProps> = () => {
   // STATES
   // TODO: To be refactored to use RHF as a single source of truth instead of keeping 2 types of states
   const [action, setAction] = useState<string>('new');
+  const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
 
   const [tempoList, setTempoList] = useState<string[]>([]);
   const [disabledTempo, setDisabledTempo] = useState<string[]>(tempoOptions);
@@ -210,33 +214,70 @@ const SongEditorContainer: FC<SongEditorProps> = () => {
 
   const SongActionButtons = ({ display }: { display: boolean }) => {
     return (
-      <Stack direction="row" display={display ? 'flex' : 'none'}>
-        <Button
-          type={'submit'}
-          color="secondary"
-          variant="contained"
-          sx={{
-            mr: 1,
-            textTransform: 'none',
-            borderRadius: '100px',
-            px: 3,
-          }}
-        >
-          Save
-        </Button>
-        <Button
-          color={'secondary'}
-          sx={{
-            textTransform: 'none',
-            borderRadius: '100px',
-            border: 1,
-            px: 2,
-          }}
-          onClick={() => navigate('/song')}
-        >
-          Cancel
-        </Button>
-      </Stack>
+      <Box>
+        <Stack direction="row" display={display ? 'flex' : 'none'}>
+          {action === 'edit' && isDesktop ? (
+            <>
+              <Button
+                color="error"
+                variant="outlined"
+                startIcon={<DeleteIcon />}
+                onClick={() => setOpenDeleteDialog(true)}
+                sx={{
+                  textTransform: 'none',
+                  borderRadius: '100px',
+                  px: 3,
+                }}
+              >
+                Delete
+              </Button>
+              <Divider variant="fullWidth" orientation="vertical" flexItem sx={{ mx: 2 }} />
+            </>
+          ) : null}
+          <Button
+            type={'submit'}
+            color="secondary"
+            variant="contained"
+            sx={{
+              mr: 1,
+              textTransform: 'none',
+              borderRadius: '100px',
+              px: 3,
+            }}
+          >
+            Save
+          </Button>
+          <Button
+            color={'secondary'}
+            sx={{
+              textTransform: 'none',
+              borderRadius: '100px',
+              border: 1,
+              px: 2,
+            }}
+            onClick={() => navigate(action === 'edit' ? `/song/${songId}` : '/song')}
+          >
+            Cancel
+          </Button>
+        </Stack>
+        {action === 'edit' && !isDesktop ? (
+          <Button
+            color="error"
+            variant="outlined"
+            startIcon={<DeleteIcon />}
+            onClick={() => setOpenDeleteDialog(true)}
+            sx={{
+              textTransform: 'none',
+              borderRadius: '100px',
+              px: 3,
+              py: '6px',
+              mt: 2,
+            }}
+          >
+            Delete
+          </Button>
+        ) : null}
+      </Box>
     );
   };
 
@@ -582,6 +623,11 @@ const SongEditorContainer: FC<SongEditorProps> = () => {
             </Stack>
           </Box>
         </form>
+        <SongDeleteDialog
+          open={openDeleteDialog}
+          onClose={() => setOpenDeleteDialog(false)}
+          songId={songId}
+        />
       </Box>
     </Container>
   );

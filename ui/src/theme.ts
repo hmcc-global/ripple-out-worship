@@ -20,6 +20,7 @@ const SECONDARY_LIGHTER = '#4A4458';
 const SECONDARY_DARK = '#EADDFF';
 
 const WARNING_MAIN = '#EFB8C8';
+const ERROR_TEXT = '#8C1D18';
 
 // Module augmentation to include @mui/x-date-pickers components
 declare module '@mui/material/styles' {
@@ -560,14 +561,14 @@ const customTheme = createTheme({
         },
         containedError: {
           backgroundColor: WARNING_MAIN,
-          color: PRIMARY_DARKEST,
+          color: ERROR_TEXT,
           '&:hover': {
             backgroundColor: 'rgba(239, 184, 200, 0.2)',
             color: WARNING_MAIN,
           },
         },
         outlined: {
-          border: '1px solid #938F99',
+          border: `1px solid ${WARNING_MAIN}`,
           '&:hover': {
             borderColor: SECONDARY_MAIN,
           },
@@ -596,6 +597,13 @@ const customTheme = createTheme({
         },
         icon: {
           color: SECONDARY_MAIN,
+        },
+      },
+    },
+    MuiDivider: {
+      styleOverrides: {
+        root: {
+          borderColor: '#49454F',
         },
       },
     },
