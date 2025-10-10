@@ -5,13 +5,13 @@ type SongEditorFields = {
   title: string;
   themes: Array<string>;
   tempo: Array<string>;
-  year: string;
+  year?: string;
   code: string;
   timeSignature: string[];
   originalKey: string;
   recommendedKeys: Array<string>;
   chordLyrics: string;
-  simplifiedChordLyrics: string;
+  simplifiedChordLyrics?: string;
 };
 
 interface SongEditorProps {

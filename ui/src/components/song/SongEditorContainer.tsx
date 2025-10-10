@@ -38,6 +38,7 @@ import { useNavigate } from 'react-router-dom';
 import { MusicNote } from '@mui/icons-material';
 import PageHeader from '../navigation/PageHeader';
 import HeaderWithIcon from '../custom/HeaderWithIcon';
+import { findFirstLetterLyrics } from '../../helpers/global';
 import SongDeleteDialog from './SongDeleteDialog';
 
 const SongEditorContainer: FC<SongEditorProps> = () => {
@@ -46,6 +47,7 @@ const SongEditorContainer: FC<SongEditorProps> = () => {
   const navigate = useNavigate();
 
   // STATES
+  // TODO: To be refactored to use RHF as a single source of truth instead of keeping 2 types of states
   const [action, setAction] = useState<string>('new');
   const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
 
@@ -89,7 +91,8 @@ const SongEditorContainer: FC<SongEditorProps> = () => {
   }, [getSong]);
 
   // FORM HANDLER
-  const { register, handleSubmit, formState, reset, control } = useForm<SongEditorFields>();
+  const { register, handleSubmit, formState, reset, control, setValue, getValues } =
+    useForm<SongEditorFields>();
   const { errors } = formState;
 
   useEffect(() => {
@@ -113,6 +116,18 @@ const SongEditorContainer: FC<SongEditorProps> = () => {
   }, [song, reset]);
 
   const handleSaveSong: SubmitHandler<SongEditorFields> = async (data) => {
+    const songLetter = findFirstLetterLyrics(data.chordLyrics) || '';
+    const payload = await axios.get('/api/songs/search', {
+      params: {
+        code: songLetter,
+        sortBy: 'code',
+      },
+    });
+    const songs: SongSchema[] = payload.data.data;
+    const songIndex = songs.reverse()[0]?.code
+      ? parseInt(songs.reverse()[0].code.replace(songLetter, '')) + 1
+      : 1;
+
     try {
       let payload;
       if (action === 'edit') {
@@ -137,7 +152,7 @@ const SongEditorContainer: FC<SongEditorProps> = () => {
           themes: themeList,
           tempo: tempoList,
           year: data.year,
-          code: data.code,
+          code: songLetter + songIndex,
           timeSignature: timeSignatureList,
           simplifiedChordLyrics: data.simplifiedChordLyrics,
           originalKey: data.originalKey,
@@ -179,16 +194,22 @@ const SongEditorContainer: FC<SongEditorProps> = () => {
     );
   };
 
+  // TODO: refactor to use a single source of truth from RHF form states
+  // Manually retrigger validation from the themes external states for nwo
   const handleDeleteTheme = (chipToDelete: string) => () => {
-    setThemeList((chips) => chips.filter((chip) => chip !== chipToDelete));
+    const newThemeList = themeList.filter((chip) => chip !== chipToDelete);
+    setThemeList(newThemeList);
     setDisabledTheme((prevDisabledChips) => [...prevDisabledChips, chipToDelete]);
+    setValue('themes', newThemeList, { shouldValidate: true });
   };
 
   const handleReactivateTheme = (chipToActivate: string) => () => {
-    setThemeList((prevTempoList) => [...prevTempoList, chipToActivate]);
+    const newThemeList = [...themeList, chipToActivate];
+    setThemeList(newThemeList);
     setDisabledTheme((prevDisabledChips) =>
       prevDisabledChips.filter((chip) => chip !== chipToActivate)
     );
+    setValue('themes', newThemeList, { shouldValidate: true });
   };
 
   const SongActionButtons = ({ display }: { display: boolean }) => {
@@ -315,8 +336,10 @@ const SongEditorContainer: FC<SongEditorProps> = () => {
                       <TextField
                         {...field}
                         id="title"
-                        label="Song Title"
+                        label="Song Title*"
                         variant="outlined"
+                        error={!!errors.title}
+                        helperText={errors?.title?.message}
                         fullWidth
                       />
                     )}
@@ -332,19 +355,46 @@ const SongEditorContainer: FC<SongEditorProps> = () => {
                       <TextField
                         {...field}
                         id="artist"
-                        label="Artist Name"
+                        label="Artist Name*"
                         variant="outlined"
+                        error={!!errors.artist}
+                        helperText={errors?.artist?.message}
                         fullWidth
                       />
                     )}
                   />
 
                   {/* Themes field */}
+                  <Controller
+                    name="themes"
+                    control={control}
+                    defaultValue={[]}
+                    rules={{
+                      validate: () => {
+                        const currentThemes = getValues('themes') || [];
+                        return currentThemes.length > 0 || 'At least one theme must be selected';
+                      },
+                    }}
+                    render={() => <input type="hidden" />}
+                  />
                   <FormControl fullWidth>
                     <Box>
-                      <Typography variant="h4" sx={{ pb: 1 }}>
-                        Themes
+                      <Typography
+                        variant="h4"
+                        sx={{ pb: 1 }}
+                        color={errors.themes ? 'error' : 'inherit'}
+                      >
+                        Themes*
                       </Typography>
+                      {errors.themes && (
+                        <Typography
+                          variant="caption"
+                          color="error"
+                          sx={{ mb: 1, display: 'block' }}
+                        >
+                          {errors.themes.message}
+                        </Typography>
+                      )}
                       {themeOptions.map((item) => (
                         <Chip
                           sx={{
@@ -431,7 +481,7 @@ const SongEditorContainer: FC<SongEditorProps> = () => {
                             <TextField
                               {...params}
                               variant="outlined"
-                              label="Original Key"
+                              label="Original Key*"
                               error={!!errors.originalKey}
                               helperText={errors?.originalKey?.message}
                             />
@@ -462,7 +512,6 @@ const SongEditorContainer: FC<SongEditorProps> = () => {
                     name="year"
                     control={control}
                     defaultValue={''}
-                    rules={{ required: 'Year is required' }}
                     render={({ field }) => (
                       <TextField
                         {...field}
@@ -471,25 +520,6 @@ const SongEditorContainer: FC<SongEditorProps> = () => {
                         type="number"
                         error={!!errors.year}
                         helperText={errors?.year?.message}
-                        variant="outlined"
-                        fullWidth
-                      />
-                    )}
-                  />
-
-                  {/* Code field */}
-                  <Controller
-                    name="code"
-                    control={control}
-                    defaultValue=""
-                    rules={{ required: 'Code is required' }}
-                    render={({ field }) => (
-                      <TextField
-                        {...field}
-                        id="code"
-                        label="Code"
-                        error={!!errors.code}
-                        helperText={errors?.code?.message}
                         variant="outlined"
                         fullWidth
                       />
@@ -508,7 +538,7 @@ const SongEditorContainer: FC<SongEditorProps> = () => {
                     justifyContent="space-between"
                   >
                     <HeaderWithIcon
-                      headerText={'Lyrics & Chords'}
+                      headerText={'Lyrics & Chords*'}
                       headerVariant={'h4'}
                       iconColor={'secondary.main'}
                       headerColor={'secondary.main'}

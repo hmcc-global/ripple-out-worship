@@ -57,11 +57,28 @@ export const timeSignatureOptions = ['4/4', '3/4', '6/8', '2/4', '2/2', '9/8', '
 
 export const themeOptions = [
   'Attributes of God',
-  'Declaration',
-  'The Cross',
+  'Declaration (Victorious/Kingdom)',
   'Call to Worship',
   'Celebration',
-  'Church/Unity',
+  'Church / Unity',
+  'Dependence',
+  'Freedom / Overcoming Sin',
+  `God's Faithfulness`,
+  `God's Presence`,
+  'Holiness / Purity',
+  'Holy Spirit',
+  'Hope',
+  'Intimacy / Love for God',
+  'Missions / Evangelism',
+  'Obedience / Trust',
+  'Prayer',
+  'Purpose/Destiny',
+  'Repentance',
+  'Resurrection',
+  'Surrender / Sacrifice',
+  'Thankfulness/Gratitude',
+  'The Cross',
+  `Worship / Adoration / Praise`,
 ];
 export const themeSelectionLimit = 3;
 
