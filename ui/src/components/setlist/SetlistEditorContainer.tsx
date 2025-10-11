@@ -942,7 +942,6 @@ const SetlistDetailsSection: FC<{
           onChange={(_, newValue) => onFolderChange(newValue as string[])}
           register={register}
           multiple
-          required={false}
         />
       </FormControl>
 
