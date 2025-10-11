@@ -572,7 +572,7 @@ const customTheme = createTheme({
           },
         },
         outlined: {
-          border: `1px solid ${WARNING_MAIN}`,
+          border: '1px solid #938F99',
           '&:hover': {
             borderColor: SECONDARY_MAIN,
           },
