@@ -213,70 +213,76 @@ const SongEditorContainer: FC<SongEditorProps> = () => {
   };
 
   const SongActionButtons = ({ display }: { display: boolean }) => {
+    console.log(isDesktop);
+    console.log(action);
+    console.log(action === 'edit' && isDesktop);
     return (
       <Box>
-        <Stack direction="row" display={display ? 'flex' : 'none'}>
-          {action === 'edit' && isDesktop ? (
-            <>
-              <Button
-                color="error"
-                variant="outlined"
-                startIcon={<DeleteIcon />}
-                onClick={() => setOpenDeleteDialog(true)}
-                sx={{
-                  textTransform: 'none',
-                  borderRadius: '100px',
-                  px: 3,
-                }}
-              >
-                Delete
-              </Button>
-              <Divider variant="fullWidth" orientation="vertical" flexItem sx={{ mx: 2 }} />
-            </>
+        <Stack direction="column" display={display ? 'flex' : 'none'}>
+          <Stack direction="row">
+            {action === 'edit' && isDesktop ? (
+              <>
+                <Button
+                  color="error"
+                  variant="outlined"
+                  startIcon={<DeleteIcon />}
+                  onClick={() => setOpenDeleteDialog(true)}
+                  sx={{
+                    textTransform: 'none',
+                    borderRadius: '100px',
+                    px: 3,
+                  }}
+                >
+                  Delete
+                </Button>
+                <Divider variant="fullWidth" orientation="vertical" flexItem sx={{ mx: 2 }} />
+              </>
+            ) : null}
+            <Button
+              type={'submit'}
+              color="secondary"
+              variant="contained"
+              sx={{
+                mr: 1,
+                textTransform: 'none',
+                borderRadius: '100px',
+                px: 3,
+              }}
+            >
+              Save
+            </Button>
+            <Button
+              color={'secondary'}
+              sx={{
+                textTransform: 'none',
+                borderRadius: '100px',
+                border: 1,
+                px: 2,
+              }}
+              onClick={() => navigate(action === 'edit' ? `/song/${songId}` : '/song')}
+            >
+              Cancel
+            </Button>
+          </Stack>
+          {action === 'edit' && !isDesktop ? (
+            <Button
+              color="error"
+              variant="outlined"
+              startIcon={<DeleteIcon />}
+              onClick={() => setOpenDeleteDialog(true)}
+              sx={{
+                textTransform: 'none',
+                borderRadius: '100px',
+                px: 3,
+                py: '6px',
+                width: '33%',
+                mt: 2,
+              }}
+            >
+              Delete
+            </Button>
           ) : null}
-          <Button
-            type={'submit'}
-            color="secondary"
-            variant="contained"
-            sx={{
-              mr: 1,
-              textTransform: 'none',
-              borderRadius: '100px',
-              px: 3,
-            }}
-          >
-            Save
-          </Button>
-          <Button
-            color={'secondary'}
-            sx={{
-              textTransform: 'none',
-              borderRadius: '100px',
-              border: 1,
-              px: 2,
-            }}
-            onClick={() => navigate(action === 'edit' ? `/song/${songId}` : '/song')}
-          >
-            Cancel
-          </Button>
         </Stack>
-        {action === 'edit' && !isDesktop ? (
-          <Button
-            color="error"
-            variant="outlined"
-            startIcon={<DeleteIcon />}
-            onClick={() => setOpenDeleteDialog(true)}
-            sx={{
-              textTransform: 'none',
-              borderRadius: '100px',
-              px: 3,
-              py: '6px',
-              mt: 2,
-            }}
-          >
-            Delete
-          </Button>
-        ) : null}
       </Box>
     );
   };
