@@ -52,7 +52,6 @@ const SongListContainer: FC = (): ReactElement => {
   const [loading, setLoading] = useState(true);
 
   const getSongResults = useCallback(async () => {
-    setLoading(true);
     if (filterData) {
       try {
         const payload = await axios.get('/api/songs/search', {
@@ -126,6 +125,7 @@ const SongListContainer: FC = (): ReactElement => {
       const timer = setTimeout(() => {
         setSongResults([]);
         setPage(1);
+        setLoading(true);
         getSongResults();
       }, 1000);
 
