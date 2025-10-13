@@ -77,7 +77,7 @@ const SMALL_LIST_ITEM_ICON_STYLE = {
 };
 
 const formatDate = (dateString: string): string => {
-  return new Date(dateString).toISOString().split('T')[0];
+  return dateString === '' ? '' : new Date(dateString).toISOString().split('T')[0];
 };
 
 // Component Interfaces
@@ -420,7 +420,7 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
           </ListItemIcon>
           <ListItemText
             primary={setlist.name}
-            secondary={formatDate(setlist.date.toString())}
+            secondary={formatDate(setlist.date?.toString() || '')}
             sx={LIST_ITEM_TEXT_STYLE}
           />
           <IconButton
@@ -536,7 +536,7 @@ const SetlistTabsContainer: FC<SetlistTabsContainerProps> = () => {
           </ListItemIcon>
           <ListItemText
             primary={setlist.name}
-            secondary={formatDate(setlist.date.toString())}
+            secondary={formatDate(setlist.date?.toString() || '')}
             sx={LIST_ITEM_TEXT_STYLE}
           />
           <IconButton

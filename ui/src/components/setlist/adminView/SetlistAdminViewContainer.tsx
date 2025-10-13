@@ -161,7 +161,7 @@ const SetlistAdminViewContainer: FC = (): ReactElement | null => {
           {!isTablet && !isDesktop && <MobileBackButton />}
           <Typography variant="h2">{setlist.name}</Typography>
           <Typography variant="subtitle2" sx={{ color: SUBTITLE_COLOR, fontWeight: 400 }}>
-            {formatDate(setlist.date?.toString() ?? '')}
+            {formatDate(setlist.date?.toString() || '')}
           </Typography>
         </HeaderContainer>
 
