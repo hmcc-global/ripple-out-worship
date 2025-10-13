@@ -529,13 +529,13 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
         ? axios.put('/api/setlists/update', {
             id: setlistId,
             name: data.name,
-            date: date ? date.toDate() : null,
+            date: date ? date.toDate() : new Date(),
             songs: addedSongList,
             groupIds: updatedSetlistFolderIds,
           })
         : axios.post('/api/setlists/create', {
             name: data.name,
-            date: date ? date.toDate() : null,
+            date: date ? date.toDate() : new Date(),
             songs: addedSongList,
             groupIds: updatedSetlistFolderIds,
             createdBy: ownership.userId,
