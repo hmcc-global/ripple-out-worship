@@ -12,6 +12,7 @@ type AutocompleteInputProps = {
   label: string;
   autoComplete: string;
   value: string | string[] | null;
+  required?: boolean;
   onChange: (
     event: SyntheticEvent<Element, Event>,
     value: string | string[] | null,
@@ -39,6 +40,7 @@ const AutocompleteInput: FC<AutocompleteInputProps> = ({
   multiple,
   getOptionDisabled,
   helperText,
+  required = false,
 }) => {
   return (
     <Autocomplete
@@ -63,7 +65,7 @@ const AutocompleteInput: FC<AutocompleteInputProps> = ({
             inputProps={{
               ...params.inputProps,
               autoComplete: autoComplete,
-              required: value && value.length === 0,
+              required: required,
             }}
           />
         </>

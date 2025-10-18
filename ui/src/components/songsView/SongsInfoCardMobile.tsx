@@ -8,9 +8,10 @@ interface SongsInfoCardMobileProps {
   song: SongViewSchema | undefined;
   open: boolean;
   onClose: () => void;
+  isSetlistView?: boolean;
 }
 
-const SongsInfoCardMobile = ({ song, open, onClose }: SongsInfoCardMobileProps) => {
+const SongsInfoCardMobile = ({ song, open, onClose, isSetlistView }: SongsInfoCardMobileProps) => {
   if (!song) return null;
 
   return (
@@ -18,13 +19,16 @@ const SongsInfoCardMobile = ({ song, open, onClose }: SongsInfoCardMobileProps) 
       anchor="bottom"
       open={open}
       onClose={onClose}
-      sx={{ bottom: MOBILE_NAVBAR_HEIGHT, '& .MuiBackdrop-root': { bottom: MOBILE_NAVBAR_HEIGHT } }}
+      sx={{
+        bottom: isSetlistView ? 0 : MOBILE_NAVBAR_HEIGHT,
+        '& .MuiBackdrop-root': { bottom: isSetlistView ? 0 : MOBILE_NAVBAR_HEIGHT },
+      }}
       PaperProps={{
         sx: {
           borderRadius: '20px 20px 0 0',
           bgcolor: 'primary.darkest',
           maxWidth: '100vw',
-          bottom: MOBILE_NAVBAR_HEIGHT,
+          bottom: isSetlistView ? 0 : MOBILE_NAVBAR_HEIGHT,
         },
       }}
     >

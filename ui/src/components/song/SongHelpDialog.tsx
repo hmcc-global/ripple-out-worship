@@ -11,7 +11,7 @@ const SongHelpDialog: FC = () => {
         title="Markdown Hints"
         content={
           <>
-            <Typography color="primary" mb={2}>
+            <Typography color="secondary.light" mb={2}>
               Use curly brackets “{`{ }`}” to indicate sections <br />
               Use square brackets “[ ]” to indicate chords
             </Typography>

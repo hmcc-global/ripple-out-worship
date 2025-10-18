@@ -3,10 +3,7 @@ import {
   Box,
   Divider,
   IconButton,
-  ListItemIcon,
-  ListItemText,
   Menu,
-  MenuItem,
   Table,
   TableBody,
   TableCell,
@@ -14,18 +11,14 @@ import {
   TableHead,
   TableRow,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
-import {
-  MoreVert,
-  Visibility,
-  ArrowUpward,
-  ArrowDownward,
-  Delete,
-  Tune,
-} from '@mui/icons-material';
+import { MoreVert, ArrowUpward, ArrowDownward, Delete, Tune } from '@mui/icons-material';
 import { SongSetlistSchema } from '../../types/song.types';
 import SongPreviewModal from '../utility/SongPreviewModal';
 import SetlistChangeKeyModal from './SetlistChangeKeyModal';
+import SetlistMenuActionItem from './SetlistMenuActionItem';
 
 interface SetlistSongsTableProps {
   songList: SongSetlistSchema[];
@@ -38,6 +31,9 @@ const SetlistSongsTable: React.FC<SetlistSongsTableProps> = ({
   setSongList,
   readOnly = false,
 }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   // State management
   const [sortedSongList, setSortedSongList] = useState<SongSetlistSchema[]>([]);
   const [menuState, setMenuState] = useState({
@@ -91,11 +87,6 @@ const SetlistSongsTable: React.FC<SetlistSongsTableProps> = ({
         song: open ? song : null,
       },
     }));
-  };
-
-  // Type-safe modal open handlers
-  const handlePreviewOpen = (song: SongSetlistSchema) => {
-    handleModalToggle('preview', true, song);
   };
 
   const handleChangeKeyOpen = (song: SongSetlistSchema) => {
@@ -158,21 +149,28 @@ const SetlistSongsTable: React.FC<SetlistSongsTableProps> = ({
   const tableCellStyles = {
     header: {
       color: '#938F99',
+      padding: isMobile ? '0.5rem' : '0.75rem',
     },
     sequence: {
       width: '5%',
       color: '#938F99',
+      padding: isMobile ? '0.5rem' : '0.75rem',
     },
     title: {
       width: readOnly ? '85%' : '80%',
       color: '#938F99',
+      py: isMobile ? '0.75rem' : '1rem',
+      px: isMobile ? '0.75rem' : '1rem',
     },
     key: {
       width: '10%',
       color: '#938F99',
+      padding: isMobile ? '0.5rem' : '0.75rem',
+      textAlign: 'center',
     },
     actions: {
       width: '5%',
+      padding: '0.25rem',
     },
   };
 
@@ -186,31 +184,15 @@ const SetlistSongsTable: React.FC<SetlistSongsTableProps> = ({
     height: '2.5rem',
   };
 
-  // Menu item component
-  const MenuActionItem = ({
-    icon: Icon,
-    text,
-    onClick,
-  }: {
-    icon: React.ElementType;
-    text: string;
-    onClick: () => void;
-  }) => (
-    <MenuItem onClick={onClick}>
-      <ListItemIcon sx={{ color: 'secondary.main' }}>
-        <Icon />
-      </ListItemIcon>
-      <ListItemText sx={{ color: 'primary.lighter' }}>{text}</ListItemText>
-    </MenuItem>
-  );
-
   return (
     <Box>
       <TableContainer
         sx={{
           borderRadius: '1rem',
           backgroundColor: '#0F0D13',
-          paddingInline: '1rem',
+          pt: '0.25rem',
+          pb: '0.5rem',
+          px: '1rem',
         }}
       >
         <Table>
@@ -227,7 +209,7 @@ const SetlistSongsTable: React.FC<SetlistSongsTableProps> = ({
               sortedSongList.map((song, index) => (
                 <TableRow key={song._id} sx={{ '& td': { border: 0 } }}>
                   <TableCell sx={tableCellStyles.sequence}>{index + 1}</TableCell>
-                  <TableCell>
+                  <TableCell sx={tableCellStyles.title}>
                     <Typography
                       fontWeight={700}
                       sx={{ color: '#E6E0E9', fontSize: '1rem !important' }}
@@ -241,7 +223,7 @@ const SetlistSongsTable: React.FC<SetlistSongsTableProps> = ({
                       {song.artist}
                     </Typography>
                   </TableCell>
-                  <TableCell>
+                  <TableCell sx={tableCellStyles.key}>
                     <Box sx={keyBoxStyles}>
                       <Typography color="#EADDFF" fontSize="1rem" fontWeight={400}>
                         {song.key}
@@ -249,11 +231,12 @@ const SetlistSongsTable: React.FC<SetlistSongsTableProps> = ({
                     </Box>
                   </TableCell>
                   {!readOnly && (
-                    <TableCell>
+                    <TableCell sx={tableCellStyles.actions}>
                       <IconButton
                         onClick={(e) => handleMenuOpen(e, song._id)}
                         aria-controls={`song-menu-${song._id}`}
                         aria-haspopup="true"
+                        sx={{ padding: 0 }}
                       >
                         <MoreVert color="secondary" />
                       </IconButton>
@@ -267,32 +250,29 @@ const SetlistSongsTable: React.FC<SetlistSongsTableProps> = ({
                           sx: { backgroundColor: 'primary.darker', border: '1px solid #938F99' },
                         }}
                       >
-                        <MenuActionItem
-                          icon={Visibility}
-                          text="Preview"
-                          onClick={() => handlePreviewOpen(song)}
-                        />
-                        <Divider sx={{ bgcolor: '#49454F' }} />
-                        <MenuActionItem
+                        <SetlistMenuActionItem
                           icon={Tune}
                           text="Change Key"
                           onClick={() => handleChangeKeyOpen(song)}
                         />
-                        <MenuActionItem
+                        <SetlistMenuActionItem
                           icon={ArrowUpward}
                           text="Move Up"
                           onClick={() => handleMoveSong('up', song._id)}
                         />
-                        <MenuActionItem
+                        <SetlistMenuActionItem
                           icon={ArrowDownward}
                           text="Move Down"
                           onClick={() => handleMoveSong('down', song._id)}
                         />
                         <Divider sx={{ bgcolor: '#49454F' }} />
-                        <MenuActionItem
+                        <SetlistMenuActionItem
                           icon={Delete}
                           text="Remove Song"
                           onClick={() => handleRemoveSong(song._id)}
+                          iconColor="#EFB8C8"
+                          color="#EFB8C8"
+                          hoverBgColor="rgba(239, 184, 200, 0.2)"
                         />
                       </Menu>
                     </TableCell>

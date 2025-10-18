@@ -31,7 +31,7 @@ const HelpDialog: FC<HelpDialogProps> = ({ icon, title, content }) => {
             position: 'absolute',
             right: 8,
             top: 8,
-            color: 'secondary',
+            color: 'white',
           }}
         >
           <CloseIcon />

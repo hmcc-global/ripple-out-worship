@@ -3,6 +3,7 @@ import { SongViewSchema } from '../../types/song.types';
 import { flatMusicKeysOptions, sharpMusicKeysOptions, ChordColors } from '../../constants';
 import { ReactNode, useCallback, useEffect, useState } from 'react';
 import { specificSongsMobileWidth } from '../../constants';
+import { isChordLyricsBlockEmpty } from '../../helpers/global';
 
 interface SongsLyricsProps {
   chordStatus: boolean;
@@ -32,10 +33,18 @@ const SongsLyrics = ({ chordStatus, changeKey, song, split, useFlat }: SongsLyri
     return chordKey ? ChordColors[chordKey] : undefined;
   };
 
-  const getColor = (label: any) => {
-    const regexPattern = /[A-G][#b]?(m)?/;
-    label.match(regexPattern);
-    return searchChordColor(label);
+  const getColor = (chord: string) => {
+    const chordPattern = /^([A-G][#b]?)(m)?/;
+    const match = chord.match(chordPattern);
+
+    if (!match) return undefined;
+
+    const rootNote = match[1];
+    const isMinor = match[2] === 'm';
+
+    const baseChord = isMinor ? `${rootNote}m` : rootNote;
+
+    return searchChordColor(baseChord);
   };
 
   const parseLyrics = useCallback(
@@ -99,7 +108,13 @@ const SongsLyrics = ({ chordStatus, changeKey, song, split, useFlat }: SongsLyri
                     const endChord = lyric.indexOf(']');
                     const chord = lyric.slice(startChord + 1, endChord);
 
-                    let cleanedChord = chord.slice(0, 2);
+                    // Handle slash chords by separating base chord and bass note
+                    const chordParts = chord.split('/');
+                    const baseChord = chordParts[0];
+                    const bassNote = chordParts[1];
+
+                    // Transpose the base chord
+                    let cleanedChord = baseChord.slice(0, 2);
                     if (cleanedChord.length > 1 && !['#', 'b'].includes(cleanedChord[1])) {
                       cleanedChord = cleanedChord[0];
                     }
@@ -112,12 +127,36 @@ const SongsLyrics = ({ chordStatus, changeKey, song, split, useFlat }: SongsLyri
                     const transpossedChordBase = useFlat
                       ? flatMusicKeysOptions[(chordIndex + transpossedChordIndex) % 12]
                       : sharpMusicKeysOptions[(chordIndex + transpossedChordIndex) % 12];
-                    const transpossedChord =
-                      transpossedChordBase + chord.slice(cleanedChord.length);
+
+                    // Reconstruct the base chord with the transposed root
+                    const chordSuffix = baseChord.slice(cleanedChord.length);
+                    const transposedBaseChord = transpossedChordBase + chordSuffix;
+
+                    // Transpose the bass note if it exists
+                    let transpossedChord = transposedBaseChord;
+                    if (bassNote) {
+                      let cleanedBassNote = bassNote.slice(0, 2);
+                      if (cleanedBassNote.length > 1 && !['#', 'b'].includes(cleanedBassNote[1])) {
+                        cleanedBassNote = cleanedBassNote[0];
+                      }
+                      cleanedBassNote = cleanedBassNote[0].toUpperCase() + cleanedBassNote.slice(1);
+
+                      const bassNoteIndex =
+                        flatMusicKeysOptions.indexOf(cleanedBassNote) === -1
+                          ? sharpMusicKeysOptions.indexOf(cleanedBassNote)
+                          : flatMusicKeysOptions.indexOf(cleanedBassNote);
+
+                      const transposedBassNote = useFlat
+                        ? flatMusicKeysOptions[(bassNoteIndex + transpossedChordIndex) % 12]
+                        : sharpMusicKeysOptions[(bassNoteIndex + transpossedChordIndex) % 12];
+
+                      transpossedChord = transposedBaseChord + '/' + transposedBassNote;
+                    }
 
                     const textLyrics = lyric.slice(endChord + 1);
                     const chipColor = getColor(transpossedChord);
-                    return (
+
+                    return chordStatus || textLyrics.trim() ? (
                       <Box key={i}>
                         {chordStatus ? (
                           <Chip
@@ -151,7 +190,7 @@ const SongsLyrics = ({ chordStatus, changeKey, song, split, useFlat }: SongsLyri
                           {textLyrics}
                         </Typography>
                       </Box>
-                    );
+                    ) : null;
                   } else {
                     return (
                       <Box key={i}>
@@ -193,8 +232,13 @@ const SongsLyrics = ({ chordStatus, changeKey, song, split, useFlat }: SongsLyri
         if (inputSong[i].includes(seperator)) {
           if (i !== 0) {
             const parsedGroup = parseLyrics(song, currentGroup);
-            result.push(parsedGroup);
-            currentGroup = [inputSong[i]];
+            if (isChordLyricsBlockEmpty(currentGroup.join('\n'))) {
+              currentGroup.push(inputSong[i]);
+              continue;
+            } else {
+              result.push(parsedGroup);
+              currentGroup = [inputSong[i]];
+            }
           }
         }
       }
@@ -212,17 +256,37 @@ const SongsLyrics = ({ chordStatus, changeKey, song, split, useFlat }: SongsLyri
     const res = groupLyricsToParagraphs(song);
     setFinalLyrics(res);
   }, [parseLyrics, song, groupLyricsToParagraphs]);
+
   return (
     <>
       <Grid container width={'100%'} spacing={2} marginTop={1} marginBottom={0}>
-        {finalLyrics &&
-          finalLyrics.map((chunk, i) => {
-            return (
-              <Grid item xs={12 / noSplit} key={i}>
-                {chunk}
-              </Grid>
-            );
-          })}
+        {Array.from({ length: noSplit }, (_, columnIndex) => {
+          const totalChunks = finalLyrics?.length || 0;
+          const baseChunksPerColumn = Math.floor(totalChunks / noSplit);
+          const extraChunks = totalChunks % noSplit;
+
+          const chunksInThisColumn =
+            columnIndex < extraChunks ? baseChunksPerColumn + 1 : baseChunksPerColumn;
+
+          const startIndex =
+            columnIndex < extraChunks
+              ? columnIndex * (baseChunksPerColumn + 1)
+              : extraChunks * (baseChunksPerColumn + 1) +
+                (columnIndex - extraChunks) * baseChunksPerColumn;
+
+          const endIndex = startIndex + chunksInThisColumn;
+
+          return (
+            <Grid item xs={12 / noSplit} key={columnIndex}>
+              <Stack spacing={2}>
+                {finalLyrics &&
+                  finalLyrics
+                    .slice(startIndex, endIndex)
+                    .map((chunk, i) => <Box key={startIndex + i}>{chunk}</Box>)}
+              </Stack>
+            </Grid>
+          );
+        })}
       </Grid>
     </>
   );

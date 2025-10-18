@@ -43,11 +43,10 @@ import {
   AddCircleOutline,
   Check,
   Add,
-  TuneOutlined,
 } from '@mui/icons-material';
 
 // Hooks
-import { useSongs, useOwnership } from '../../helpers/customHooks';
+import { useOwnership } from '../../helpers/customHooks';
 import { MOBILE_ACTION_BUTTONS_HEIGHT, MOBILE_NAVBAR_HEIGHT } from '../../constants';
 
 // Constants
@@ -63,11 +62,9 @@ const SONG_CARD_FIELDS = [
 // Styled Components
 const MainContainer = styled(Container)<{ isMobileOrSmallTablet?: boolean }>(
   ({ isMobileOrSmallTablet }) => ({
-    paddingBlock: isMobileOrSmallTablet ? '0.75rem' : '1rem',
-    paddingInline: isMobileOrSmallTablet ? '0.75rem' : '2rem',
-    height: isMobileOrSmallTablet
-      ? `calc(100vh - ${MOBILE_NAVBAR_HEIGHT} - ${MOBILE_ACTION_BUTTONS_HEIGHT})`
-      : '100vh',
+    padding: '1rem',
+    height: isMobileOrSmallTablet ? `calc(100vh - ${MOBILE_NAVBAR_HEIGHT})` : '100vh',
+    maxHeight: isMobileOrSmallTablet ? `calc(100vh - ${MOBILE_NAVBAR_HEIGHT})` : '100vh',
     minWidth: '100%',
     overflow: 'hidden',
     display: 'flex',
@@ -75,13 +72,19 @@ const MainContainer = styled(Container)<{ isMobileOrSmallTablet?: boolean }>(
   })
 );
 
-const ContentWrapper = styled(Box)({
-  flex: 1,
-  display: 'flex',
-  flexDirection: 'column',
-  overflow: 'hidden',
-  height: '100%',
-});
+const ContentWrapper = styled(Box)<{ isMobileOrSmallTablet?: boolean }>(
+  ({ isMobileOrSmallTablet }) => ({
+    display: 'flex',
+    flexDirection: 'column',
+    overflow: 'hidden',
+    height: isMobileOrSmallTablet
+      ? `calc(100vh - ${MOBILE_NAVBAR_HEIGHT} - ${MOBILE_ACTION_BUTTONS_HEIGHT})`
+      : '100vh',
+    maxHeight: isMobileOrSmallTablet
+      ? `calc(100vh - ${MOBILE_NAVBAR_HEIGHT} - ${MOBILE_ACTION_BUTTONS_HEIGHT})`
+      : '100vh',
+  })
+);
 
 const SectionsContainer = styled(Box)<{ isMobileOrSmallTablet?: boolean }>(
   ({ isMobileOrSmallTablet }) => ({
@@ -98,7 +101,7 @@ const SetlistDetailsBox = styled(Box)<{ isMobileOrSmallTablet?: boolean }>(
   ({ isMobileOrSmallTablet }) => ({
     display: 'flex',
     flexDirection: 'column',
-    flex: 1,
+    flex: isMobileOrSmallTablet ? 0 : 1,
     overflow: isMobileOrSmallTablet ? 'visible' : 'hidden',
     flexShrink: isMobileOrSmallTablet ? 0 : undefined,
   })
@@ -118,7 +121,7 @@ const SongSearchBox = styled(Box)<{ isMobileOrSmallTablet?: boolean; isTablet?: 
   ({ isMobileOrSmallTablet, isTablet }) => ({
     display: 'flex',
     flexDirection: 'column',
-    width: isMobileOrSmallTablet ? '100%' : isTablet ? '47.5vw' : '57.5vw',
+    width: isMobileOrSmallTablet ? '100%' : isTablet ? '45vw' : '57.5vw',
     overflow: 'hidden',
     maxHeight: isMobileOrSmallTablet ? 'calc(100vh - 5rem)' : '90vh',
   })
@@ -156,13 +159,6 @@ const SongResultsContainer = styled(Box)({
 });
 
 const MobileActionButtonsContainer = styled(Box)({
-  position: 'fixed',
-  bottom: '80px',
-  left: 0,
-  right: 0,
-  paddingBottom: '1rem',
-  display: 'flex',
-  zIndex: 1000,
   height: MOBILE_ACTION_BUTTONS_HEIGHT,
 });
 
@@ -317,8 +313,6 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
   const isMobileOrSmallTablet = !isTablet && !isDesktop;
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const allSongs = useSongs() as SongSchema[];
-  // const allFolders = useFolders() as SetlistFolder[];
   const ownership = useOwnership();
 
   // Form and state management
@@ -697,69 +691,93 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
   const handleToggleFilterDrawer = () => setIsFilterDrawerToggled(!isFilterDrawerToggled);
 
   return (
-    <>
-      <MainContainer isMobileOrSmallTablet={isMobileOrSmallTablet}>
-        <ContentWrapper>
-          {errorMessage && (
-            <Typography variant="body2" color="error" sx={{ mb: 2 }}>
-              {errorMessage}
-            </Typography>
-          )}
+        <form
+          onSubmit={handleSubmit(handleSaveSetlist)}
+        >
+    <MainContainer isMobileOrSmallTablet={isMobileOrSmallTablet} disableGutters>
+      <ContentWrapper>
+        {errorMessage && (
+          <Typography variant="body2" color="error" sx={{ mb: 2 }}>
+            {errorMessage}
+          </Typography>
+        )}
 
-          <SuccessSnackbar
-            open={successSnackbarOpen}
-            onClose={() => setSuccessSnackbarOpen(false)}
+        <SuccessSnackbar open={successSnackbarOpen} onClose={() => setSuccessSnackbarOpen(false)} />
+
+          <PageHeader
+            title={`${action === 'edit' ? 'Edit' : 'New'} Setlist`}
+            icon={<QueueMusic />}
+            actionButtons={!isMobileOrSmallTablet && <ActionButtons onCancel={handleCancel} />}
           />
 
-          <form
-            onSubmit={handleSubmit(handleSaveSetlist)}
-            style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
-          >
-            <PageHeader
-              title={`${action === 'edit' ? 'Edit' : 'New'} Setlist`}
-              icon={<QueueMusic />}
-              actionButtons={!isMobileOrSmallTablet && <ActionButtons onCancel={handleCancel} />}
+          <SectionsContainer isMobileOrSmallTablet={isMobileOrSmallTablet}>
+            {/* Setlist Details Section */}
+            <SetlistDetailsSection
+              control={control}
+              errors={errors}
+              date={date}
+              onDateChange={setDate}
+              folderOptions={folderOptions}
+              folderList={folderList}
+              onFolderChange={setFolderList}
+              register={register}
+              addedSongList={addedSongList}
+              setAddedSongList={setAddedSongList}
+              isMobileOrSmallTablet={isMobileOrSmallTablet}
             />
 
-            <SectionsContainer isMobileOrSmallTablet={isMobileOrSmallTablet}>
-              {/* Setlist Details Section */}
-              <SetlistDetailsSection
-                control={control}
-                errors={errors}
-                date={date}
-                onDateChange={setDate}
-                folderOptions={folderOptions}
-                folderList={folderList}
-                onFolderChange={setFolderList}
-                register={register}
-                addedSongList={addedSongList}
-                setAddedSongList={setAddedSongList}
+            {/* Song Search/List Section */}
+            {isMobileOrSmallTablet ? (
+              <MobileSongList>
+                <HeaderWithIcon
+                  Icon={MusicNote}
+                  headerText="Songs"
+                  headerVariant="h3"
+                  iconColor="secondary.main"
+                  headerColor="secondary.main"
+                />
+                <AddSongsSection>
+                  <AddSongsButton
+                    variant="outlined"
+                    color="secondary"
+                    startIcon={<AddCircleOutline />}
+                    onClick={() => setDrawerOpen(true)}
+                  >
+                    Add Songs
+                  </AddSongsButton>
+                </AddSongsSection>
+                <SetlistSongsTable songList={addedSongList} setSongList={setAddedSongList} />
+              </MobileSongList>
+            ) : (
+              <SongSearchSection
+                filterData={filterData}
+                setFilterData={setFilterData}
+                songResults={songResults}
                 isMobileOrSmallTablet={isMobileOrSmallTablet}
+                isTablet={isTablet}
+                onAddSong={handleAddSong}
+                addedSongIds={addedSongIds}
+                isFilterDrawerToggled={isFilterDrawerToggled}
+                handleToggleFilterDrawer={handleToggleFilterDrawer}
               />
+            )}
+          </SectionsContainer>
 
-              {/* Song Search/List Section */}
-              {isMobileOrSmallTablet ? (
-                <MobileSongList>
-                  <HeaderWithIcon
-                    Icon={MusicNote}
-                    headerText="Songs"
-                    headerVariant="h3"
-                    iconColor="secondary.main"
-                    headerColor="secondary.main"
-                  />
-                  <AddSongsSection>
-                    <AddSongsButton
-                      variant="outlined"
-                      color="secondary"
-                      startIcon={<AddCircleOutline />}
-                      onClick={() => setDrawerOpen(true)}
-                    >
-                      Add Songs
-                    </AddSongsButton>
-                  </AddSongsSection>
-                  <SetlistSongsTable songList={addedSongList} setSongList={setAddedSongList} />
-                </MobileSongList>
-              ) : (
+        {/* Mobile Drawer for Song Search */}
+        {isMobileOrSmallTablet && (
+          <Drawer
+          anchor="bottom"
+          open={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+          PaperProps={{
+            sx: {
+              height: '100%',
+              bgcolor: '#171717',
+            },
+          }}
+          >
+            <DrawerContent>
+              <DrawerBody>
                 <SongSearchSection
                   filterData={filterData}
                   setFilterData={setFilterData}
@@ -769,55 +787,25 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
                   onAddSong={handleAddSong}
                   addedSongIds={addedSongIds}
                   isFilterDrawerToggled={isFilterDrawerToggled}
+                  showHeader={false}
                   handleToggleFilterDrawer={handleToggleFilterDrawer}
                 />
-              )}
-            </SectionsContainer>
-          </form>
+              </DrawerBody>
+              <StyledButton
+                color="secondary"
+                variant="contained"
+                onClick={() => setDrawerOpen(false)}
+              >
+                Done
+              </StyledButton>
+            </DrawerContent>
+          </Drawer>
+        )}
+      </ContentWrapper>
+      {isMobileOrSmallTablet && <MobileActionButtons onCancel={handleCancel} />}
+    </MainContainer>
+    </form>
 
-          {/* Mobile Drawer for Song Search */}
-          {isMobileOrSmallTablet && (
-            <Drawer
-              anchor="bottom"
-              open={drawerOpen}
-              onClose={() => setDrawerOpen(false)}
-              PaperProps={{
-                sx: {
-                  height: '100%',
-                  bgcolor: '#171717',
-                },
-              }}
-            >
-              <DrawerContent>
-                <DrawerBody>
-                  <SongSearchSection
-                    filterData={filterData}
-                    setFilterData={setFilterData}
-                    songResults={songResults}
-                    isMobileOrSmallTablet={isMobileOrSmallTablet}
-                    isTablet={isTablet}
-                    onAddSong={handleAddSong}
-                    addedSongIds={addedSongIds}
-                    isFilterDrawerToggled={isFilterDrawerToggled}
-                    showHeader={false}
-                    handleToggleFilterDrawer={handleToggleFilterDrawer}
-                  />
-                </DrawerBody>
-                <StyledButton
-                  color="secondary"
-                  variant="contained"
-                  onClick={() => setDrawerOpen(false)}
-                >
-                  Done
-                </StyledButton>
-              </DrawerContent>
-            </Drawer>
-          )}
-        </ContentWrapper>
-
-        {isMobileOrSmallTablet && <MobileActionButtons onCancel={handleCancel} />}
-      </MainContainer>
-    </>
   );
 };
 
@@ -851,35 +839,40 @@ const ActionButtons: FC<{ onCancel: () => void }> = ({ onCancel }) => (
 
 // Mobile Action Buttons component
 const MobileActionButtons: FC<{ onCancel: () => void }> = ({ onCancel }) => (
-  <MobileActionButtonsContainer>
-    <Stack direction="row" spacing={2} px={2} width={'100%'}>
-      <Button
-        sx={{
-          width: '50%',
-          color: 'secondary.main',
-          border: '1px solid #938F99',
-          borderRadius: '40px',
-          textTransform: 'none',
-        }}
-        onClick={onCancel}
-      >
-        Cancel
-      </Button>
-      <Button
-        type="submit"
-        form="setlist-form"
-        sx={{
-          width: '50%',
-          backgroundColor: 'secondary.main',
-          color: '#381E72',
-          borderRadius: '40px',
-          textTransform: 'none',
-        }}
-      >
-        Save
-      </Button>
-    </Stack>
-  </MobileActionButtonsContainer>
+  <Stack
+    direction="row"
+    spacing={2}
+    width={'100%'}
+    maxWidth={'100%'}
+    paddingX={'1rem'}
+    height={MOBILE_ACTION_BUTTONS_HEIGHT}
+    maxHeight={MOBILE_ACTION_BUTTONS_HEIGHT}
+  >
+    <Button
+      sx={{
+        width: '50%',
+        color: 'secondary.main',
+        border: '1px solid #938F99',
+        borderRadius: '40px',
+        textTransform: 'none',
+      }}
+      onClick={onCancel}
+    >
+      Cancel
+    </Button>
+    <Button
+      type="submit"
+      sx={{
+        width: '50%',
+        backgroundColor: 'secondary.main',
+        color: '#381E72',
+        borderRadius: '40px',
+        textTransform: 'none',
+      }}
+    >
+      Save
+    </Button>
+  </Stack>
 );
 
 // Unified Setlist Details Section
@@ -952,7 +945,7 @@ const SetlistDetailsSection: FC<{
 
       {/* Desktop/Tablet Song List */}
       {!isMobileOrSmallTablet && (
-        <Box pt={3} sx={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+        <Box sx={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
           <Stack direction="column" spacing={'1rem'} sx={{ height: '100%' }}>
             <HeaderWithIcon
               Icon={MusicNote}
@@ -1052,12 +1045,13 @@ const SearchInputComponent: FC<{
       fullWidth
       onChange={(e) => onSearchChange(e.target.value)}
     />
-    <FilterIconButton
+    {/* TODO: Implement song filter panel */}
+    {/* <FilterIconButton
       isFilterDrawerToggled={isFilterDrawerToggled}
       onClick={handleToggleFilterDrawer}
     >
       <TuneOutlined sx={{ fontSize: '20px' }} />
-    </FilterIconButton>
+    </FilterIconButton> */}
   </SearchContainer>
 );
 
