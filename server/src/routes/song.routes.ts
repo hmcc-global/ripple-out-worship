@@ -6,15 +6,15 @@ import {
   deleteSong,
   searchSongs,
 } from '../controllers/song.controllers';
-import { Router } from 'express';
+import { createPermissionRouter } from '../policies';
 
-const songRouter = Router();
+const router = createPermissionRouter('/songs');
 
-songRouter.post('/create', createSong);
-songRouter.get('/get', getSong);
-songRouter.get('/get-view', getSongView);
-songRouter.put('/update', updateSong);
-songRouter.put('/delete', deleteSong);
-songRouter.get('/search', searchSongs);
+router.post('/create', createSong);
+router.get('/get', getSong);
+router.get('/get-view', getSongView);
+router.put('/update', updateSong);
+router.put('/delete', deleteSong);
+router.get('/search', searchSongs);
 
-export default songRouter;
+export default router.getRouter();

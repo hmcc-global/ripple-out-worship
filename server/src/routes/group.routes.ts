@@ -1,11 +1,11 @@
 import { createGroup, getGroup, updateGroup, deleteGroup } from '../controllers/group.controllers';
-import { Router } from 'express';
+import { createPermissionRouter } from '../policies';
 
-const groupRouter = Router();
+const router = createPermissionRouter('/groups');
 
-groupRouter.post('/create', createGroup);
-groupRouter.get('/get', getGroup);
-groupRouter.put('/update', updateGroup);
-groupRouter.put('/delete', deleteGroup);
+router.post('/create', createGroup);
+router.get('/get', getGroup);
+router.put('/update', updateGroup);
+router.put('/delete', deleteGroup);
 
-export default groupRouter;
+export default router.getRouter();

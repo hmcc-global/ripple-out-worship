@@ -4,13 +4,13 @@ import {
   getSetlist,
   updateSetlist,
 } from '../controllers/setlist.controllers';
-import { Router } from 'express';
+import { createPermissionRouter } from '../policies';
 
-const setlistRouter = Router();
+const router = createPermissionRouter('/setlists');
 
-setlistRouter.post('/create', createSetlist);
-setlistRouter.get('/get', getSetlist);
-setlistRouter.put('/update', updateSetlist);
-setlistRouter.put('/delete', deleteSetlist);
+router.post('/create', createSetlist);
+router.get('/get', getSetlist);
+router.put('/update', updateSetlist);
+router.put('/delete', deleteSetlist);
 
-export default setlistRouter;
+export default router.getRouter();
