@@ -58,7 +58,7 @@ export const ROUTE_PERMISSIONS: Record<string, PermissionConfig> = {
     description: 'Create new setlist',
   },
   'GET /setlists/get': {
-    requiresAuth: true,
+    requiresAuth: false,
     description: 'View setlists',
   },
   'PUT /setlists/update': {
@@ -77,7 +77,7 @@ export const ROUTE_PERMISSIONS: Record<string, PermissionConfig> = {
     description: 'Create new song',
   },
   'GET /songs/get': {
-    requiresAuth: true,
+    requiresAuth: false,
     allowedAccessTypes: ['admin', 'ministry'],
     description: 'View songs (admin view)',
   },
