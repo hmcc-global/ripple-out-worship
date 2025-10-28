@@ -1,6 +1,6 @@
 import { ReactElement, useEffect, useState } from 'react';
 import { Box, Container, Skeleton, Typography, useMediaQuery, useTheme } from '@mui/material';
-import axios from 'axios';
+import { customAxios as axios } from '../custom/customAxios';
 import { Setlist } from '../../types/setlist.types';
 import SetlistViewSongs from './SetlistViewSongs';
 import { SetlistViewHeader, SetlistViewFooter } from './SetlistViewPaper';
