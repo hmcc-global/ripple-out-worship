@@ -1,4 +1,4 @@
-export type AccessType = 'ministry' | 'admin';
+export type AccessType = 'ministry' | 't3ch' | 'tc' | 'admin';
 
 export interface PermissionConfig {
   requiresAuth: boolean;
@@ -9,11 +9,14 @@ export interface PermissionConfig {
 // Centralized permissions configuration
 /**
  * By default, there is a hierarchy in this accessTypes
- * Admin > tc > t3ch > ministry > isLoggedIn
+ * Admin > tc > t3ch > ministry > isLoggedIn (requiresAuth)
  * But this permission schema will not follow the ones in the main web.
  * It will use the more conventional approach, i.e. only the access types listed can access it.
  * Please make sure the proper access level are listed.
  */
+
+const ALL_ACCESS_TYPES: AccessType[] = ['ministry', 't3ch', 'tc', 'admin'];
+
 // TODO: Confirm on which access types can do what
 export const ROUTE_PERMISSIONS: Record<string, PermissionConfig> = {
   // Ownership routes
@@ -73,12 +76,12 @@ export const ROUTE_PERMISSIONS: Record<string, PermissionConfig> = {
   // Song routes
   'POST /songs/create': {
     requiresAuth: true,
-    allowedAccessTypes: ['admin', 'ministry'],
+    allowedAccessTypes: ALL_ACCESS_TYPES,
     description: 'Create new song',
   },
   'GET /songs/get': {
     requiresAuth: false,
-    allowedAccessTypes: ['admin', 'ministry'],
+    allowedAccessTypes: ALL_ACCESS_TYPES,
     description: 'View songs (admin view)',
   },
   'GET /songs/get-view': {
@@ -87,12 +90,12 @@ export const ROUTE_PERMISSIONS: Record<string, PermissionConfig> = {
   },
   'PUT /songs/update': {
     requiresAuth: true,
-    allowedAccessTypes: ['admin', 'ministry'],
+    allowedAccessTypes: ALL_ACCESS_TYPES,
     description: 'Update song',
   },
   'PUT /songs/delete': {
     requiresAuth: true,
-    allowedAccessTypes: ['admin', 'ministry'],
+    allowedAccessTypes: ALL_ACCESS_TYPES,
     description: 'Delete song',
   },
   'GET /songs/search': {
@@ -103,27 +106,27 @@ export const ROUTE_PERMISSIONS: Record<string, PermissionConfig> = {
   // Song Options routes
   'POST /song-options/create': {
     requiresAuth: true,
-    allowedAccessTypes: ['admin', 'ministry'],
+    allowedAccessTypes: ALL_ACCESS_TYPES,
     description: 'Create song option',
   },
   'GET /song-options/get': {
     requiresAuth: true,
-    allowedAccessTypes: ['admin', 'ministry'],
+    allowedAccessTypes: ALL_ACCESS_TYPES,
     description: 'Get specific song option',
   },
   'GET /song-options/list': {
     requiresAuth: true,
-    allowedAccessTypes: ['admin', 'ministry'],
+    allowedAccessTypes: ALL_ACCESS_TYPES,
     description: 'List all song options',
   },
   'PUT /song-options/update': {
     requiresAuth: true,
-    allowedAccessTypes: ['admin', 'ministry'],
+    allowedAccessTypes: ALL_ACCESS_TYPES,
     description: 'Update song option',
   },
   'PUT /song-options/delete': {
     requiresAuth: true,
-    allowedAccessTypes: ['admin', 'ministry'],
+    allowedAccessTypes: ALL_ACCESS_TYPES,
     description: 'Delete song option',
   },
 };
