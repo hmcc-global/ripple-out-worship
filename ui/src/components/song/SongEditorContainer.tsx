@@ -94,7 +94,6 @@ const SongEditorContainer: FC<SongEditorProps> = () => {
   const { register, handleSubmit, formState, reset, control, setValue, getValues } =
     useForm<SongEditorFields>();
   const { errors } = formState;
-
   useEffect(() => {
     if (song && Object.keys(song).length > 0) {
       setTempoList(song.tempo);
@@ -108,6 +107,7 @@ const SongEditorContainer: FC<SongEditorProps> = () => {
         title: song.title,
         year: song.year,
         code: song.code,
+        themes: song.themes,
         chordLyrics: song.chordLyrics,
         simplifiedChordLyrics: song.simplifiedChordLyrics,
         originalKey: song.originalKey,
@@ -115,68 +115,71 @@ const SongEditorContainer: FC<SongEditorProps> = () => {
     }
   }, [song, reset]);
 
-  const handleSaveSong: SubmitHandler<SongEditorFields> = async (data) => {
-    const songLetter = findFirstLetterLyrics(data.chordLyrics) || '';
-    const payload = await axios.get('/api/songs/search', {
-      params: {
-        code: songLetter,
-        sortBy: 'code',
-      },
-    });
-    const songs: SongSchema[] = payload.data.data;
-    const songIndex = songs.reverse()[0]?.code
-      ? parseInt(songs.reverse()[0].code.replace(songLetter, '')) + 1
-      : 1;
+  const handleSaveSong: SubmitHandler<SongEditorFields> = useCallback(
+    async (data) => {
+      const songLetter = findFirstLetterLyrics(data.chordLyrics) || '';
+      const payload = await axios.get('/api/songs/search', {
+        params: {
+          code: songLetter,
+          sortBy: 'code',
+        },
+      });
+      const songs: SongSchema[] = payload.data.data;
+      const songIndex = songs.reverse()[0]?.code
+        ? parseInt(songs.reverse()[0].code.replace(songLetter, '')) + 1
+        : 1;
 
-    try {
-      let payload;
-      if (action === 'edit') {
-        payload = await axios.put('/api/songs/update', {
-          id: songId,
-          artist: data.artist,
-          title: data.title,
-          themes: themeList,
-          tempo: tempoList,
-          year: data.year,
-          code: data.code,
-          timeSignature: timeSignatureList,
-          simplifiedChordLyrics: data.simplifiedChordLyrics,
-          originalKey: data.originalKey,
-          recommendedKeys: recommendedKeys,
-          chordLyrics: data.chordLyrics,
-        });
-      } else {
-        payload = await axios.post('/api/songs/create', {
-          artist: data.artist,
-          title: data.title,
-          themes: themeList,
-          tempo: tempoList,
-          year: data.year,
-          code: songLetter + songIndex,
-          timeSignature: timeSignatureList,
-          simplifiedChordLyrics: data.simplifiedChordLyrics,
-          originalKey: data.originalKey,
-          recommendedKeys: recommendedKeys,
-          chordLyrics: data.chordLyrics,
-        });
+      try {
+        let payload;
+        if (action === 'edit') {
+          payload = await axios.put('/api/songs/update', {
+            id: songId,
+            artist: data.artist,
+            title: data.title,
+            themes: themeList,
+            tempo: tempoList,
+            year: data.year,
+            code: data.code,
+            timeSignature: timeSignatureList,
+            simplifiedChordLyrics: data.simplifiedChordLyrics,
+            originalKey: data.originalKey,
+            recommendedKeys: recommendedKeys,
+            chordLyrics: data.chordLyrics,
+          });
+        } else {
+          payload = await axios.post('/api/songs/create', {
+            artist: data.artist,
+            title: data.title,
+            themes: themeList,
+            tempo: tempoList,
+            year: data.year,
+            code: songLetter + songIndex,
+            timeSignature: timeSignatureList,
+            simplifiedChordLyrics: data.simplifiedChordLyrics,
+            originalKey: data.originalKey,
+            recommendedKeys: recommendedKeys,
+            chordLyrics: data.chordLyrics,
+          });
+        }
+
+        if (payload.status === 200) {
+          setInvalidSong('');
+          setSuccessSnackbarOpen(true);
+          navigate(`/song/${songId}`);
+          return payload.data;
+        }
+
+        handleCloseSuccessSnackbar();
+        setInvalidSong('Error saving song!');
+        return;
+      } catch (error: any) {
+        setInvalidSong(error.response.data);
+        handleCloseSuccessSnackbar();
+        console.log(error);
       }
-
-      if (payload.status === 200) {
-        setInvalidSong('');
-        setSuccessSnackbarOpen(true);
-        navigate(`/song/${songId}`);
-        return payload.data;
-      }
-
-      handleCloseSuccessSnackbar();
-      setInvalidSong('Error saving song!');
-      return;
-    } catch (error: any) {
-      setInvalidSong(error.response.data);
-      handleCloseSuccessSnackbar();
-      console.log(error);
-    }
-  };
+    },
+    [action, navigate, recommendedKeys, songId, tempoList, themeList, timeSignatureList]
+  );
 
   const handleCloseSuccessSnackbar = () => {
     setSuccessSnackbarOpen(false);
@@ -215,68 +218,71 @@ const SongEditorContainer: FC<SongEditorProps> = () => {
   const SongActionButtons = ({ display }: { display: boolean }) => {
     return (
       <Box>
-        <Stack direction="row" display={display ? 'flex' : 'none'}>
-          {action === 'edit' && isDesktop ? (
-            <>
-              <Button
-                color="error"
-                variant="outlined"
-                startIcon={<DeleteIcon />}
-                onClick={() => setOpenDeleteDialog(true)}
-                sx={{
-                  textTransform: 'none',
-                  borderRadius: '100px',
-                  px: 3,
-                }}
-              >
-                Delete
-              </Button>
-              <Divider variant="fullWidth" orientation="vertical" flexItem sx={{ mx: 2 }} />
-            </>
+        <Stack direction="column" display={display ? 'flex' : 'none'}>
+          <Stack direction="row">
+            {action === 'edit' && isDesktop ? (
+              <>
+                <Button
+                  color="error"
+                  variant="outlined"
+                  startIcon={<DeleteIcon />}
+                  onClick={() => setOpenDeleteDialog(true)}
+                  sx={{
+                    textTransform: 'none',
+                    borderRadius: '100px',
+                    px: 3,
+                  }}
+                >
+                  Delete
+                </Button>
+                <Divider variant="fullWidth" orientation="vertical" flexItem sx={{ mx: 2 }} />
+              </>
+            ) : null}
+            <Button
+              type={'submit'}
+              color="secondary"
+              variant="contained"
+              sx={{
+                mr: 1,
+                textTransform: 'none',
+                borderRadius: '100px',
+                px: 3,
+              }}
+            >
+              Save
+            </Button>
+            <Button
+              color={'secondary'}
+              sx={{
+                textTransform: 'none',
+                borderRadius: '100px',
+                border: 1,
+                px: 2,
+              }}
+              onClick={() => navigate(action === 'edit' ? `/song/${songId}` : '/song')}
+            >
+              Cancel
+            </Button>
+          </Stack>
+          {action === 'edit' && !isDesktop ? (
+            <Button
+              color="error"
+              variant="outlined"
+              startIcon={<DeleteIcon />}
+              onClick={() => setOpenDeleteDialog(true)}
+              sx={{
+                textTransform: 'none',
+                borderRadius: '100px',
+                px: 3,
+                py: '6px',
+                width: '33%',
+                mt: 2,
+              }}
+            >
+              Delete
+            </Button>
           ) : null}
-          <Button
-            type={'submit'}
-            color="secondary"
-            variant="contained"
-            sx={{
-              mr: 1,
-              textTransform: 'none',
-              borderRadius: '100px',
-              px: 3,
-            }}
-          >
-            Save
-          </Button>
-          <Button
-            color={'secondary'}
-            sx={{
-              textTransform: 'none',
-              borderRadius: '100px',
-              border: 1,
-              px: 2,
-            }}
-            onClick={() => navigate(action === 'edit' ? `/song/${songId}` : '/song')}
-          >
-            Cancel
-          </Button>
         </Stack>
-        {action === 'edit' && !isDesktop ? (
-          <Button
-            color="error"
-            variant="outlined"
-            startIcon={<DeleteIcon />}
-            onClick={() => setOpenDeleteDialog(true)}
-            sx={{
-              textTransform: 'none',
-              borderRadius: '100px',
-              px: 3,
-              py: '6px',
-              mt: 2,
-            }}
-          >
-            Delete
-          </Button>
-        ) : null}
       </Box>
     );
   };
@@ -375,7 +381,7 @@ const SongEditorContainer: FC<SongEditorProps> = () => {
                         return currentThemes.length > 0 || 'At least one theme must be selected';
                       },
                     }}
-                    render={() => <input type="hidden" />}
+                    render={() => <TextField sx={{ display: 'none' }} />}
                   />
                   <FormControl fullWidth>
                     <Box>
@@ -582,7 +588,7 @@ const SongEditorContainer: FC<SongEditorProps> = () => {
                     justifyContent="space-between"
                   >
                     <HeaderWithIcon
-                      headerText={'Lyrics & Simplified Chords (Optional)'}
+                      headerText={'Lyrics & Simplified Chords'}
                       headerVariant={'h4'}
                       iconColor={'secondary.main'}
                       headerColor={'secondary.main'}

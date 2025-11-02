@@ -632,7 +632,9 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
       // Success - clear errors and redirect
       setInvalidSetlist('');
       setSuccessSnackbarOpen(true);
-      navigate('/setlist');
+      navigate(
+        isTablet || isDesktop ? `/setlist/${savedSetlistId}` : `/setlist/details/${savedSetlistId}`
+      );
     } catch (error: any) {
       console.error('Error saving setlist:', error);
       setInvalidSetlist(error.response?.data || 'Error saving setlist');
@@ -691,18 +693,19 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
   const handleToggleFilterDrawer = () => setIsFilterDrawerToggled(!isFilterDrawerToggled);
 
   return (
-        <form
-          onSubmit={handleSubmit(handleSaveSetlist)}
-        >
-    <MainContainer isMobileOrSmallTablet={isMobileOrSmallTablet} disableGutters>
-      <ContentWrapper>
-        {errorMessage && (
-          <Typography variant="body2" color="error" sx={{ mb: 2 }}>
-            {errorMessage}
-          </Typography>
-        )}
+    <form onSubmit={handleSubmit(handleSaveSetlist)}>
+      <MainContainer isMobileOrSmallTablet={isMobileOrSmallTablet} disableGutters>
+        <ContentWrapper>
+          {errorMessage && (
+            <Typography variant="body2" color="error" sx={{ mb: 2 }}>
+              {errorMessage}
+            </Typography>
+          )}
 
-        <SuccessSnackbar open={successSnackbarOpen} onClose={() => setSuccessSnackbarOpen(false)} />
+          <SuccessSnackbar
+            open={successSnackbarOpen}
+            onClose={() => setSuccessSnackbarOpen(false)}
+          />
 
           <PageHeader
             title={`${action === 'edit' ? 'Edit' : 'New'} Setlist`}
@@ -763,49 +766,48 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
             )}
           </SectionsContainer>
 
-        {/* Mobile Drawer for Song Search */}
-        {isMobileOrSmallTablet && (
-          <Drawer
-          anchor="bottom"
-          open={drawerOpen}
-          onClose={() => setDrawerOpen(false)}
-          PaperProps={{
-            sx: {
-              height: '100%',
-              bgcolor: '#171717',
-            },
-          }}
-          >
-            <DrawerContent>
-              <DrawerBody>
-                <SongSearchSection
-                  filterData={filterData}
-                  setFilterData={setFilterData}
-                  songResults={songResults}
-                  isMobileOrSmallTablet={isMobileOrSmallTablet}
-                  isTablet={isTablet}
-                  onAddSong={handleAddSong}
-                  addedSongIds={addedSongIds}
-                  isFilterDrawerToggled={isFilterDrawerToggled}
-                  showHeader={false}
-                  handleToggleFilterDrawer={handleToggleFilterDrawer}
-                />
-              </DrawerBody>
-              <StyledButton
-                color="secondary"
-                variant="contained"
-                onClick={() => setDrawerOpen(false)}
-              >
-                Done
-              </StyledButton>
-            </DrawerContent>
-          </Drawer>
-        )}
-      </ContentWrapper>
-      {isMobileOrSmallTablet && <MobileActionButtons onCancel={handleCancel} />}
-    </MainContainer>
+          {/* Mobile Drawer for Song Search */}
+          {isMobileOrSmallTablet && (
+            <Drawer
+              anchor="bottom"
+              open={drawerOpen}
+              onClose={() => setDrawerOpen(false)}
+              PaperProps={{
+                sx: {
+                  height: '100%',
+                  bgcolor: '#171717',
+                },
+              }}
+            >
+              <DrawerContent>
+                <DrawerBody>
+                  <SongSearchSection
+                    filterData={filterData}
+                    setFilterData={setFilterData}
+                    songResults={songResults}
+                    isMobileOrSmallTablet={isMobileOrSmallTablet}
+                    isTablet={isTablet}
+                    onAddSong={handleAddSong}
+                    addedSongIds={addedSongIds}
+                    isFilterDrawerToggled={isFilterDrawerToggled}
+                    showHeader={false}
+                    handleToggleFilterDrawer={handleToggleFilterDrawer}
+                  />
+                </DrawerBody>
+                <StyledButton
+                  color="secondary"
+                  variant="contained"
+                  onClick={() => setDrawerOpen(false)}
+                >
+                  Done
+                </StyledButton>
+              </DrawerContent>
+            </Drawer>
+          )}
+        </ContentWrapper>
+        {isMobileOrSmallTablet && <MobileActionButtons onCancel={handleCancel} />}
+      </MainContainer>
     </form>
-
   );
 };
 

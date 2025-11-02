@@ -69,9 +69,9 @@ declare module '@mui/material/styles' {
         root?: {
           color?: string;
           fontSize?: string;
-        };
-        '& .MuiTypography-root'?: {
-          color?: string;
+          '& .MuiTypography-root'?: {
+            color?: string;
+          };
         };
       };
     };
@@ -81,10 +81,12 @@ declare module '@mui/material/styles' {
           color?: string;
           fontSize?: string;
         };
-        '& .MuiDayCalendar-header .MuiTypography-root-MuiDayCalendar-weekDayLabel'?: {
-          color?: string;
-          fontSize?: string;
-          fontWeight?: number;
+        header: {
+          '& .MuiDayCalendar-weekDayLabel': {
+            color?: string;
+            fontSize?: string;
+            fontWeight?: number;
+          };
         };
       };
     };
@@ -409,9 +411,9 @@ const customTheme = createTheme({
         root: {
           color: '#FFF !important',
           fontSize: '1rem',
-        },
-        '& .MuiTypography-root': {
-          color: '#FFF !important',
+          '& .MuiTypography-root': {
+            color: '#FFF !important',
+          },
         },
       },
     },
@@ -421,10 +423,12 @@ const customTheme = createTheme({
           color: '#FFF !important',
           fontSize: '1rem',
         },
-        '& .MuiDayCalendar-header .MuiTypography-root-MuiDayCalendar-weekDayLabel': {
-          color: '#FFFFFF !important',
-          fontSize: '0.875rem',
-          fontWeight: 600,
+        header: {
+          '& .MuiDayCalendar-weekDayLabel': {
+            color: 'white',
+            fontSize: '0.875rem',
+            fontWeight: 600,
+          },
         },
       },
     },
@@ -438,7 +442,7 @@ const customTheme = createTheme({
     MuiMenu: {
       styleOverrides: {
         paper: {
-          backgroundColor: '#1D192B',
+          backgroundColor: PRIMARY_DARKER,
           color: PRIMARY_LIGHTER,
           boxShadow: '0 2px 6px 2px rgba(0, 0, 0, 0.15), 0 1px 2px 0 rgba(0, 0, 0, 0.30)',
           borderRadius: '8px',
@@ -568,7 +572,7 @@ const customTheme = createTheme({
           },
         },
         outlined: {
-          border: `1px solid ${WARNING_MAIN}`,
+          border: '1px solid #938F99',
           '&:hover': {
             borderColor: SECONDARY_MAIN,
           },

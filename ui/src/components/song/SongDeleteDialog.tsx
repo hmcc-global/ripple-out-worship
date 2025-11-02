@@ -38,7 +38,6 @@ const SongDeleteDialog = ({ open, onClose, songId }: Props) => {
       }
       confirmText="Confirm Delete Song"
       confirmColor="error"
-      cancelColor="error"
       showCloseIcon
     >
       <Stack spacing={2} alignItems="center" textAlign="center" paddingY={2}>

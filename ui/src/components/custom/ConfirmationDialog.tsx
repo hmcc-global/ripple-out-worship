@@ -18,8 +18,8 @@ interface ConfirmationDialogProps {
   children?: React.ReactNode;
   confirmText?: string;
   cancelText?: string;
-  cancelColor?: 'primary' | 'error' | 'warning' | 'success';
-  confirmColor?: 'primary' | 'error' | 'warning' | 'success';
+  cancelColor?: 'primary' | 'secondary' | 'error' | 'warning' | 'success';
+  confirmColor?: 'primary' | 'secondary' | 'error' | 'warning' | 'success';
   showCloseIcon?: boolean;
 }
 
@@ -32,7 +32,7 @@ const ConfirmationDialog = ({
   children,
   confirmText = 'Confirm',
   cancelText = 'Cancel',
-  cancelColor = 'primary',
+  cancelColor = 'secondary',
   confirmColor = 'primary',
   showCloseIcon = false,
 }: ConfirmationDialogProps) => (
