@@ -6,7 +6,7 @@ const setlistSchema = new Schema<SetlistSchema>(
     name: { type: String, required: true },
     date: { type: Date },
     createdBy: { type: Schema.Types.ObjectId, ref: 'Ownership' },
-    songs: [{ type: Object, ref: 'Song' }],
+    songs: [{ type: Types.ObjectId, ref: 'Song' }],
     lastUpdatedBy: { type: Schema.Types.ObjectId, ref: 'Ownership' },
     publicLink: { type: String, required: true, unique: true },
     groupIds: [{ type: Types.ObjectId, ref: 'Group' }],
