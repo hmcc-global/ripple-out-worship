@@ -226,7 +226,7 @@ const SetlistSongsTable: React.FC<SetlistSongsTableProps> = ({
                   <TableCell sx={tableCellStyles.key}>
                     <Box sx={keyBoxStyles}>
                       <Typography color="#EADDFF" fontSize="1rem" fontWeight={400}>
-                        {song.originalKey}
+                        {song.key || song.originalKey}
                       </Typography>
                     </Box>
                   </TableCell>
