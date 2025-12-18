@@ -48,10 +48,12 @@ const getSetlist: RequestHandler = async (req: Request, res: Response): Promise<
 
   if (Array.isArray(setlistId)) {
     try {
-      const data: SetlistDocument[] = await Setlist.find({
+      const data: SetlistDocument[] = (await Setlist.find({
         _id: { $in: setlistId },
         isDeleted: false,
-      }).exec();
+      })
+        .populate('songs')
+        .exec()) as SetlistDocument[];
 
       if (data && data.length > 0) {
         sendResponse(res, 200, data);
@@ -63,10 +65,12 @@ const getSetlist: RequestHandler = async (req: Request, res: Response): Promise<
     }
   } else if (setlistId) {
     try {
-      const data: SetlistDocument = await Setlist.findOne({
+      const data: SetlistDocument = (await Setlist.findOne({
         _id: setlistId,
         isDeleted: false,
-      }).exec();
+      })
+        .populate('songs')
+        .exec()) as SetlistDocument;
 
       if (data) {
         sendResponse(res, 200, data);
@@ -78,7 +82,9 @@ const getSetlist: RequestHandler = async (req: Request, res: Response): Promise<
     }
   } else {
     try {
-      const data: SetlistDocument[] = await Setlist.find({ isDeleted: false }).exec();
+      const data: SetlistDocument[] = (await Setlist.find({ isDeleted: false })
+        .populate('songs')
+        .exec()) as SetlistDocument[];
 
       if (data) {
         sendResponse(res, 200, data);
