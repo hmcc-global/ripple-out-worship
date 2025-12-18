@@ -632,9 +632,12 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
       // Success - clear errors and redirect
       setInvalidSetlist('');
       setSuccessSnackbarOpen(true);
-      navigate(
-        isTablet || isDesktop ? `/setlist/${savedSetlistId}` : `/setlist/details/${savedSetlistId}`
-      );
+      //TODO: Find a better way to redirect to list and refetch the newly created/updated setlist.
+      if (isTablet || isDesktop) {
+        window.location.href = `/setlist/${savedSetlistId}`;
+      } else {
+        window.location.href = `/setlist/details/${savedSetlistId}`;
+      }
     } catch (error: any) {
       console.error('Error saving setlist:', error);
       setInvalidSetlist(error.response?.data || 'Error saving setlist');
