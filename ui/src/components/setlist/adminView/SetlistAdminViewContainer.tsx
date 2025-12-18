@@ -120,7 +120,6 @@ const SetlistAdminViewContainer: FC = (): ReactElement | null => {
       setSnackbar({ open: true, message: 'No public link available' });
       return;
     }
-
     try {
       await navigator.clipboard.writeText(setlist.publicLink);
       setSnackbar({ open: true, message: 'Setlist Public Link copied to clipboard' });
@@ -135,8 +134,8 @@ const SetlistAdminViewContainer: FC = (): ReactElement | null => {
   }, [navigate, id]);
 
   const handlePublicViewClick = useCallback(() => {
-    navigate(`/setlist/view/${id}`);
-  }, [navigate, id]);
+    window.open(`/setlist/view/${id}`, '_blank');
+  }, [id]);
 
   const handleCloseSnackbar = useCallback((_: any, reason?: string) => {
     if (reason === 'clickaway') return;
