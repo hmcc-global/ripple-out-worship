@@ -454,9 +454,15 @@ const SetlistEditorContainer: FC<SetlistEditorProps> = () => {
 
   useEffect(() => {
     getSongResults();
-    getSetlist();
+  }, [getSongResults]);
+
+  useEffect(() => {
     getFolderOptions();
-  }, [getSetlist, getFolderOptions, getSongResults]);
+  }, [getFolderOptions]);
+
+  useEffect(() => {
+    getSetlist();
+  }, [getSetlist]);
 
   useEffect(() => {
     if (setlist && Object.keys(setlist).length > 0) {
