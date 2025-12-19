@@ -8,7 +8,7 @@ const setlistSchema = new Schema<SetlistSchema>(
     createdBy: { type: Schema.Types.ObjectId, ref: 'Ownership' },
     songs: [{ type: Types.ObjectId, ref: 'Song' }],
     lastUpdatedBy: { type: Schema.Types.ObjectId, ref: 'Ownership' },
-    publicLink: { type: String, required: false, unique: true, default: '' },
+    publicLink: { type: String, required: false, unique: true, sparse: true, default: null },
     groupIds: [{ type: Types.ObjectId, ref: 'Group' }],
     isDeleted: { type: Boolean, default: false },
   },
