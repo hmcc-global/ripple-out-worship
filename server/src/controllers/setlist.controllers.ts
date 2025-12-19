@@ -26,9 +26,9 @@ const createSetlist: RequestHandler = async (req: Request, res: Response): Promi
         const setlistUrl = toCreate.publicLink
           ? defaultUrl + toCreate.publicLink
           : defaultUrl + data._id;
-        await Setlist.findByIdAndUpdate(data._id, { publicLink: setlistUrl });
+        const updated = await Setlist.findByIdAndUpdate(data._id, { publicLink: setlistUrl });
 
-        sendResponse(res, 200, data);
+        sendResponse(res, 200, updated);
       } else {
         sendResponse(res, 404, 'Setlist not created');
       }
