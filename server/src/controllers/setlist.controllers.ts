@@ -1,7 +1,6 @@
 import { Request, RequestHandler, Response } from 'express';
 import { Setlist } from '../models/setlist.model';
 import { SetlistDocument } from '../types/setlist.types';
-import { nanoid } from 'nanoid';
 
 const sendResponse = (
   res: Response,
@@ -13,25 +12,23 @@ const sendResponse = (
 
 const createSetlist: RequestHandler = async (req: Request, res: Response): Promise<void> => {
   const { ...toCreate }: SetlistDocument = req.body;
-  const defaultUrl: string = req.protocol + '://' + req.get('host') + '/setlist/';
+
+  const defaultUrl: string =
+    (process.env.BASE_URL || req.protocol + '://' + req.get('host')) + '/setlist/view/';
 
   if (Object.keys(toCreate).length > 0) {
     try {
-      const urlSafeId = nanoid(10);
-
-      // this is to set the default url of the public link to setlist/:id,
-      // and to setlist/custom-name if the user define a custom link name
-      const setlistUrl = toCreate.publicLink
-        ? defaultUrl + toCreate.publicLink
-        : defaultUrl + urlSafeId;
-
-      const data: SetlistDocument = await Setlist.create({
-        ...toCreate,
-        publicLink: setlistUrl,
-      });
+      const data: SetlistDocument = await Setlist.create(toCreate);
 
       if (data) {
-        sendResponse(res, 200, data);
+        // this is to set the default url of the public link to setlist/:id,
+        // and to setlist/custom-name if the user define a custom link name
+        const setlistUrl = toCreate.publicLink
+          ? defaultUrl + toCreate.publicLink
+          : defaultUrl + data._id;
+        const updated = await Setlist.findByIdAndUpdate(data._id, { publicLink: setlistUrl });
+
+        sendResponse(res, 200, updated);
       } else {
         sendResponse(res, 404, 'Setlist not created');
       }
